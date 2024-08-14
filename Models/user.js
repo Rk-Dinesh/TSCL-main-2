@@ -16,5 +16,5 @@ const UserSchema = new Schema({
     created_by_user:String
 }, { timestamps: true });
 
-const UserModel = db.model('User', UserSchema);
+const UserModel = mongoose.model('User', UserSchema);
 module.exports = UserModel;

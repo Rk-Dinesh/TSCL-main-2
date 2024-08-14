@@ -12,5 +12,5 @@ const GrievanceEscalationSchema = new Schema({
     status: String,
 }, { timestamps: true });
 
-const GrievanceEscalationModel = db.model('GrievanceEscalation', GrievanceEscalationSchema);
+const GrievanceEscalationModel = mongoose.model('GrievanceEscalation', GrievanceEscalationSchema);
 module.exports = GrievanceEscalationModel;

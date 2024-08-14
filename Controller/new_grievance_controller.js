@@ -3,9 +3,9 @@ const IdcodeServices = require('../Service/idcode_Service');
 
 exports.createNewGrievance = async (req, res, next) => {
     try {
-        const { complaint_type_title, title, complaint_details, dept_name, zone_name, ward_name, street_name, public_user_id, public_user_name, grievance_mode, status, escalation_level } = req.body;
+        const { grievance_mode,complaint_type_title, dept_name, zone_name, ward_name, street_name,pincode,complaint,complaint_details, public_user_id, public_user_name,phone,assign_user,assign_username, status, escalation_level,statusflow} = req.body;
         const grievance_id = await IdcodeServices.generateCode("NewGrievance");
-        const newGrievance = await NewGrievanceService.createNewGrievance({ grievance_id, complaint_type_title, title, complaint_details, dept_name, zone_name, ward_name, street_name, public_user_id, public_user_name, grievance_mode, status, escalation_level });
+        const newGrievance = await NewGrievanceService.createNewGrievance({ grievance_id,grievance_mode, complaint_type_title, dept_name, zone_name, ward_name, street_name,pincode,complaint,complaint_details, public_user_id, public_user_name,phone,assign_user,assign_username, status, escalation_level,statusflow});
         
         res.status(200).json({
             status: true,

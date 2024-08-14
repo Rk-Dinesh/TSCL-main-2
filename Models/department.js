@@ -20,5 +20,5 @@ const DepartmentSchema = new Schema({
     }
 }, { timestamps: true });
 
-const DepartmentModel = db.model('Department', DepartmentSchema);
+const DepartmentModel = mongoose.model('Department', DepartmentSchema);
 module.exports = DepartmentModel;

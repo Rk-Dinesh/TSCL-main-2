@@ -18,6 +18,6 @@ const IdcodeSchema = new Schema({
     },
 });
 
-const IdcodeModel = db.model('idcodes',IdcodeSchema);
+const IdcodeModel = mongoose.model('idcodes',IdcodeSchema);
 
 module.exports = IdcodeModel;

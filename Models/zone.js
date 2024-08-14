@@ -17,5 +17,5 @@ const ZoneSchema = new Schema({
     }
 }, { timestamps: true });
 
-const ZoneModel = db.model('Zone', ZoneSchema);
+const ZoneModel = mongoose.model('Zone', ZoneSchema);
 module.exports = ZoneModel;

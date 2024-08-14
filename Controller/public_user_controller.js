@@ -4,9 +4,29 @@ const IdcodeServices = require('../Service/idcode_Service');
 exports.createPublicUser = async (req, res, next) => {
     try {
         const { public_user_name, phone, email, address, pincode, login_password, verification_status, user_status } = req.body;
+
+        const existingUser = await PublicUserService.findPublicUserByPhone(phone);
+        if (existingUser) {
+            return res.status(200).json({
+                status: true,
+                message: "User with this phone number already exists",
+                data: existingUser
+            });
+        }
         const public_user_id = await IdcodeServices.generateCode("PublicUser");
-        const publicUser = await PublicUserService.createPublicUser({ public_user_id, public_user_name, phone, email, address, pincode, login_password, verification_status, user_status });
-        
+        const publicUser = await PublicUserService.createPublicUser({
+            public_user_id,
+            public_user_name,
+            phone,
+            email,
+            address,
+            pincode,
+            login_password,
+            verification_status,
+            user_status
+        });
+
+        // Respond with success
         res.status(200).json({
             status: true,
             message: "Public user created successfully",
@@ -16,6 +36,7 @@ exports.createPublicUser = async (req, res, next) => {
         next(error);
     }
 };
+
 
 exports.getAllPublicUsers = async (req, res, next) => {
     try {

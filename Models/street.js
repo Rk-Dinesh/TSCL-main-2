@@ -29,5 +29,5 @@ const StreetSchema = new Schema({
     },
 }, { timestamps: true });
 
-const StreetModel = db.model('Street', StreetSchema);
+const StreetModel = mongoose.model('Street', StreetSchema);
 module.exports = StreetModel;

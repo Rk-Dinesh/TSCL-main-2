@@ -5,6 +5,11 @@ exports.createPublicUser = async (publicUserData) => {
     return await publicUser.save();
 };
 
+exports.findPublicUserByPhone = async (phone) => {
+    return await PublicUserModel.findOne({ phone });
+};
+
+
 exports.getAllPublicUsers = async () => {
     return await PublicUserModel.find();
 };

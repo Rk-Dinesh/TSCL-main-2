@@ -9,5 +9,5 @@ const RoleSchema = new Schema({
     created_by_user: String,
 }, { timestamps: true });
 
-const RoleModel = db.model('Role', RoleSchema);
+const RoleModel = mongoose.model('Role', RoleSchema);
 module.exports = RoleModel;

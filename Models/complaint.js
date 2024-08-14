@@ -50,5 +50,5 @@ const ComplaintSchema = new Schema({
     }
 }, { timestamps: true });
 
-const ComplaintModel = db.model('Complaint', ComplaintSchema);
+const ComplaintModel = mongoose.model('Complaint', ComplaintSchema);
 module.exports = ComplaintModel;

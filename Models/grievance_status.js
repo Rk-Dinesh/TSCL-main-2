@@ -7,5 +7,5 @@ const GrievanceStatusSchema = new Schema({
     created_by_user: String
 }, { timestamps: true });
 
-const GrievanceStatusModel = db.model('GrievanceStatus', GrievanceStatusSchema);
+const GrievanceStatusModel = mongoose.model('GrievanceStatus', GrievanceStatusSchema);
 module.exports = GrievanceStatusModel;

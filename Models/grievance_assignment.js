@@ -9,5 +9,5 @@ const GrievanceAssignmentSchema = new Schema({
     assigned_time: { type: Date, default: Date.now },
 }, { timestamps: true });
 
-const GrievanceAssignmentModel = db.model('GrievanceAssignment', GrievanceAssignmentSchema);
+const GrievanceAssignmentModel = mongoose.model('GrievanceAssignment', GrievanceAssignmentSchema);
 module.exports = GrievanceAssignmentModel;

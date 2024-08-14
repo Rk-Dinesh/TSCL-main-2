@@ -8,5 +8,5 @@ const GrievanceLogSchema = new Schema({
     created_by_user: String
 }, { timestamps: true });
 
-const GrievanceLogModel = db.model('GrievanceLog', GrievanceLogSchema);
+const GrievanceLogModel = mongoose.model('GrievanceLog', GrievanceLogSchema);
 module.exports = GrievanceLogModel;

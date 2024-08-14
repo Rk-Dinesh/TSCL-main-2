@@ -1,10 +1,22 @@
 const mongoose = require('mongoose');
 const mongoURI = "mongodb://localhost:27017/tscl";
-const connection = mongoose.createConnection(mongoURI);
-connection.on('open', () => {
-    console.log("MongoDB Connected");
-}).on('error', (error) => {
-    console.log("MongoDB Connection error:", error);
-});
+mongoose.connect(mongoURI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+  
+  const db = mongoose.connection;
+  
+  db.on('connected', () => {
+    console.log('MongoDB connected');
+  });
+  
+  db.on('error', (err) => {
+    console.error('MongoDB connection error:', err);
+  });
 
-module.exports = connection;
+  const gfs = new mongoose.mongo.GridFSBucket(db, {
+    bucketName: 'Attachments',
+  });
+
+  module.exports = { gfs};

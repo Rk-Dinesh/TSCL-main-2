@@ -18,5 +18,5 @@ const OrganizationSchema = new Schema({
     }
 }, { timestamps: true });
 
-const OrganizationModel = db.model('Organization',OrganizationSchema);
+const OrganizationModel = mongoose.model('Organization',OrganizationSchema);
 module.exports = OrganizationModel;

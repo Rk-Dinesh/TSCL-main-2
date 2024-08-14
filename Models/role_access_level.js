@@ -10,5 +10,5 @@ const RoleAccessLevelSchema = new Schema({
     created_by_user: String
 }, { timestamps: true });
 
-const RoleAccessLevelModel = db.model('RoleAccessLevel', RoleAccessLevelSchema);
+const RoleAccessLevelModel = mongoose.model('RoleAccessLevel', RoleAccessLevelSchema);
 module.exports = RoleAccessLevelModel;

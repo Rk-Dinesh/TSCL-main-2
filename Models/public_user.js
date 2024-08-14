@@ -14,5 +14,5 @@ const PublicUserSchema = new Schema({
     user_status: String,
 }, { timestamps: true });
 
-const PublicUserModel = db.model('PublicUser', PublicUserSchema);
+const PublicUserModel = mongoose.model('PublicUser', PublicUserSchema);
 module.exports = PublicUserModel;
