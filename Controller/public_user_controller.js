@@ -15,6 +15,15 @@ exports.createPublicUser = async (req, res, next) => {
             });
         }
 
+        const existingUser1 = await PublicUserService.findPublicUserByEmail(email);
+        if (existingUser1) {
+            return res.status(200).json({
+                status: true,
+                message: "User with this Email already exists",
+                data: existingUser1
+            });
+        }
+
         const publicUser = await PublicUserService.createPublicUser(
             public_user_name,
             phone,
@@ -49,7 +58,7 @@ exports.loginPublicUser = async (req, res, next) => {
       if (identifier.match(/^\d+$/)) { 
         user = await PublicUserModel.findOne({ phone: identifier });
       } else {
-        user = await PublicUserModel.findOne({ public_user_name: identifier });
+        user = await PublicUserModel.findOne({ email: identifier });
       }
   
       if (!user) {

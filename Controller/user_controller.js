@@ -1,21 +1,86 @@
+const UserModel = require('../Models/user');
 const UserService = require('../Service/user_service');
-const IdcodeServices = require('../Service/idcode_Service');
+const bcrypt = require('bcrypt');
+
 
 exports.createUser = async (req, res, next) => {
     try {
         const { user_name, dept_name, phone, email, address, pincode, login_password, status, role,  created_by_user } = req.body;
-        const user_id = await IdcodeServices.generateCode("User");
-        const user = await UserService.createUser({ user_id, user_name, dept_name, phone, email, address, pincode, login_password, status, role,  created_by_user });
-        
+
+        const existingUser = await UserService.findUserByPhone(phone);
+        if (existingUser) {
+            return res.status(200).json({
+                status: true,
+                message: "User with this phone number already exists",
+                data: existingUser
+            });
+        }
+
+        const existingUser1 = await UserService.findUserByEmail(email);
+        if (existingUser1) {
+            return res.status(200).json({
+                status: true,
+                message: "User with this Email already exists",
+                data: existingUser1
+            });
+        }
+
+        const adminUser = await UserService.createUser(
+            user_name,
+            dept_name,
+            phone,
+            email,
+            address,
+            pincode,
+            login_password,
+            status,
+            role,
+            created_by_user
+        );
+
         res.status(200).json({
             status: true,
-            message: "User created successfully",
-            data: user
+            message: "Admin created successfully",
+            data: adminUser
         });
     } catch (error) {
         next(error);
     }
 };
+
+exports.loginUser = async (req, res, next) => {
+    try {
+      const { identifier, login_password } = req.body;
+  
+      if (!identifier || !login_password) {
+        return res.status(400).json({ status: false, message: "Identifier (phone or username) and password are required" });
+      }
+  
+      let user;
+      if (identifier.match(/^\d+$/)) { 
+        user = await UserModel.findOne({ phone: identifier });
+      } else {
+        user = await UserModel.findOne({ email: identifier });
+      }
+  
+      if (!user) {
+        return res.status(401).json({ status: false, message: "Invalid identifier or password" });
+      }
+  
+      const isValidPassword = await bcrypt.compare(login_password, user.login_password);
+      if (!isValidPassword) {
+        return res.status(401).json({ status: false, message: "Invalid identifier or password" });
+      }
+  
+      res.status(200).json({
+        status: true,
+        message: "User logged in successfully",
+        data: user
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 
 exports.getAllUsers = async (req, res, next) => {
     try {

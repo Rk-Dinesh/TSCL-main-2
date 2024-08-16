@@ -35,6 +35,10 @@ exports.findPublicUserByPhone = async (phone) => {
     return await PublicUserModel.findOne({ phone });
 };
 
+exports.findPublicUserByEmail = async (email) => {
+    return await PublicUserModel.findOne({ email });
+};
+
 
 exports.getAllPublicUsers = async () => {
     return await PublicUserModel.find();
