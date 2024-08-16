@@ -21,6 +21,7 @@ const NewGrievanceSchema = new Schema({
   status: String,
   escalation_level: String,
   statusflow: String,
+  priority: String,
 }, { timestamps: true });
 
 const NewGrievanceModel = mongoose.model('NewGrievance', NewGrievanceSchema);
