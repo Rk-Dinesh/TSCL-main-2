@@ -1,5 +1,6 @@
 const PublicUserService = require('../Service/public_user_service');
-const IdcodeServices = require('../Service/idcode_Service');
+const bcrypt = require('bcrypt');
+const PublicUserModel = require('../Models/public_user');
 
 exports.createPublicUser = async (req, res, next) => {
     try {
@@ -13,9 +14,8 @@ exports.createPublicUser = async (req, res, next) => {
                 data: existingUser
             });
         }
-        const public_user_id = await IdcodeServices.generateCode("PublicUser");
-        const publicUser = await PublicUserService.createPublicUser({
-            public_user_id,
+
+        const publicUser = await PublicUserService.createPublicUser(
             public_user_name,
             phone,
             email,
@@ -24,9 +24,8 @@ exports.createPublicUser = async (req, res, next) => {
             login_password,
             verification_status,
             user_status
-        });
+        );
 
-        // Respond with success
         res.status(200).json({
             status: true,
             message: "Public user created successfully",
@@ -36,6 +35,41 @@ exports.createPublicUser = async (req, res, next) => {
         next(error);
     }
 };
+
+
+exports.loginPublicUser = async (req, res, next) => {
+    try {
+      const { identifier, login_password } = req.body;
+  
+      if (!identifier || !login_password) {
+        return res.status(400).json({ status: false, message: "Identifier (phone or username) and password are required" });
+      }
+  
+      let user;
+      if (identifier.match(/^\d+$/)) { 
+        user = await PublicUserModel.findOne({ phone: identifier });
+      } else {
+        user = await PublicUserModel.findOne({ public_user_name: identifier });
+      }
+  
+      if (!user) {
+        return res.status(401).json({ status: false, message: "Invalid identifier or password" });
+      }
+  
+      const isValidPassword = await bcrypt.compare(login_password, user.login_password);
+      if (!isValidPassword) {
+        return res.status(401).json({ status: false, message: "Invalid identifier or password" });
+      }
+  
+      res.status(200).json({
+        status: true,
+        message: "Public user logged in successfully",
+        data: user
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 
 
 exports.getAllPublicUsers = async (req, res, next) => {
