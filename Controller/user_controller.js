@@ -1,6 +1,7 @@
 const UserModel = require('../Models/user');
 const UserService = require('../Service/user_service');
 const bcrypt = require('bcrypt');
+const jwt = require("jsonwebtoken");
 
 
 exports.createUser = async (req, res, next) => {
@@ -77,6 +78,50 @@ exports.loginUser = async (req, res, next) => {
         message: "User logged in successfully",
         data: user
       });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  exports.loginUserweb = async (req, res, next) => {
+    try {
+      const { identifier, login_password } = req.body;
+  
+      if (!identifier || !login_password) {
+        return res
+          .status(400)
+          .json({
+            status: false,
+            message: "Identifier (phone or username) and password are required",
+          });
+      }
+  
+      let user;
+      if (identifier.match(/^\d+$/)) {
+        user = await UserModel.findOne({ phone: identifier });
+      } else {
+        user = await UserModel.findOne({ email: identifier });
+      }
+  
+      if (!user) {
+        return res
+          .status(401)
+          .json({ status: false, message: "Invalid identifier or password" });
+      }
+  
+      const isValidPassword = await bcrypt.compare(
+        login_password,
+        user.login_password
+      );
+      if (!isValidPassword) {
+        return res
+          .status(401)
+          .json({ status: false, message: "Invalid identifier or password" });
+      }
+
+      const token = jwt.sign({ email: user.email, role: user.role }, 'TSCL', { expiresIn: '1h' });
+  
+      return res.status(200).json({ token });
     } catch (error) {
       next(error);
     }

@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const IdcodeServices = require('./idcode_Service');
 
 
-exports.createPublicUser = async (public_user_name, phone, email, address, pincode, login_password, verification_status, user_status) => {
+exports.createPublicUser = async (public_user_name, phone, email, address, pincode, login_password, verification_status, user_status,role) => {
     try {
         
         var public_user_id = await IdcodeServices.generateCode("PublicUser");
@@ -20,7 +20,8 @@ exports.createPublicUser = async (public_user_name, phone, email, address, pinco
             pincode,
             login_password: hashedPassword,
             verification_status,
-            user_status
+            user_status,
+            role
         });
 
         return await publicUser.save();

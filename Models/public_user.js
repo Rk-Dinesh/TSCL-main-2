@@ -12,6 +12,7 @@ const PublicUserSchema = new Schema({
     login_password: String,
     verification_status: String,
     user_status: String,
+    role:String,
 }, { timestamps: true });
 
 const PublicUserModel = mongoose.model('PublicUser', PublicUserSchema);
