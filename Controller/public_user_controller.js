@@ -149,7 +149,7 @@ exports.loginPublicUserweb = async (req, res, next) => {
           .json({ status: false, message: "Invalid identifier or password" });
       }
 
-      const token = jwt.sign({ email: user.email, role: user.role }, 'TSCL', { expiresIn: '1h' });
+      const token = jwt.sign({ email: user.email, role: user.role }, process.env.SECRET_TOKEN, { expiresIn: '30s' });
   
       return res.status(200).json({ token });
     } catch (error) {

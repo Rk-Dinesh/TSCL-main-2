@@ -24,6 +24,7 @@ const roleAccessLevelRouter = require('./Router/role_access_level_router');
 const DepartmentRouter=require('./Router/department_routes')
 const OrganzationRouter=require('./Router/organization_routes');
 
+
 app.use(body_parser.json());
 app.use(cors());
 
@@ -52,4 +53,5 @@ app.get('/', (req, res) => {
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
+  
 });

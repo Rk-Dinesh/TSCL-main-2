@@ -1,5 +1,6 @@
+require('dotenv').config();
 const mongoose = require('mongoose');
-const mongoURI = "mongodb://localhost:27017/tscl";
+const mongoURI = process.env.MONGO_URI;
 mongoose.connect(mongoURI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
