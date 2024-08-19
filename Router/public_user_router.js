@@ -8,5 +8,5 @@ router.post('/login', publicUserController.loginPublicUser);
 router.post('/loginweb', publicUserController.loginPublicUserweb);
 router.get('/get',verifyToken, publicUserController.getAllPublicUsers);
 router.get('/getbyid',verifyToken, publicUserController.getPublicUserById);
-router.delete('/delete', publicUserController.deletePublicUserById);
+router.delete('/delete',verifyToken, publicUserController.deletePublicUserById);
 module.exports = router;

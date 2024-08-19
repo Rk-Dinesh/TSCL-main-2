@@ -23,6 +23,7 @@ const roleRouter = require('./Router/role_router');
 const roleAccessLevelRouter = require('./Router/role_access_level_router');
 const DepartmentRouter=require('./Router/department_routes')
 const OrganzationRouter=require('./Router/organization_routes');
+const ComplaintTypeRouter= require('./Router/complaint_type_router');
 
 
 app.use(body_parser.json());
@@ -46,6 +47,7 @@ app.use('/role', roleRouter);
 app.use('/role-access-level', roleAccessLevelRouter);
 app.use('/department',DepartmentRouter);
 app.use('/organization',OrganzationRouter);
+app.use('/complainttype',ComplaintTypeRouter)
 
 app.get('/', (req, res) => {
   res.send('Hello World!');

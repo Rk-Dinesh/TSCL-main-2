@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const zoneController = require('../Controller/zone_Controller');
+const verifyToken = require('../Authorization');
 
-router.post('/post', zoneController.createZone);
-router.get('/get', zoneController.getAllZones);
-router.get('/getbyid', zoneController.getZoneById);
-router.delete('/delete', zoneController.deleteZoneById);
+router.post('/post',verifyToken, zoneController.createZone);
+router.get('/get',verifyToken, zoneController.getAllZones);
+router.get('/getbyid',verifyToken, zoneController.getZoneById);
+router.delete('/delete',verifyToken, zoneController.deleteZoneById);
 module.exports = router;
