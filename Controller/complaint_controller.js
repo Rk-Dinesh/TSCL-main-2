@@ -3,9 +3,9 @@ const IdcodeServices = require('../Service/idcode_Service');
 
 exports.createComplaint = async (req, res, next) => {
     try {
-        const { complaint_type_title, dept, tat_type, tat_duration, priority, escalation_type,escalation_l1,role_l1, escalation_l2,role_l2, escalation_l3,role_l3, status, created_by_user } = req.body;
+        const { complaint_type_title, dept_name, tat_type, tat_duration, priority, escalation_type,escalation_l1,role_l1, escalation_l2,role_l2, escalation_l3,role_l3, status, created_by_user } = req.body;
         const complaint_id = await IdcodeServices.generateCode("Complaint");
-        const complaint = await ComplaintService.createComplaint({ complaint_id, complaint_type_title, dept, tat_type, tat_duration, priority, escalation_type,escalation_l1,role_l1, escalation_l2,role_l2, escalation_l3,role_l3, status, created_by_user});
+        const complaint = await ComplaintService.createComplaint({ complaint_id, complaint_type_title, dept_name, tat_type, tat_duration, priority, escalation_type,escalation_l1,role_l1, escalation_l2,role_l2, escalation_l3,role_l3, status, created_by_user});
         
         res.status(200).json({
             status: true,

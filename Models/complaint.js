@@ -9,7 +9,7 @@ const ComplaintSchema = new Schema({
     complaint_type_title: {
         type: String
     },
-    dept: {
+    dept_name: {
         type: String
     },
     tat_type: {
