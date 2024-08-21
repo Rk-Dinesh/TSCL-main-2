@@ -5,6 +5,7 @@ const verifyToken = require('../Authorization');
 
 router.post('/post',verifyToken, zoneController.createZone);
 router.get('/get',verifyToken, zoneController.getAllZones);
+router.get('/getgrievance',verifyToken, zoneController.getAllZonesGrivence);
 router.get('/getbyid',verifyToken, zoneController.getZoneById);
 router.delete('/delete',verifyToken, zoneController.deleteZoneById);
 module.exports = router;

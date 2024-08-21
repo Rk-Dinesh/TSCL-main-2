@@ -2,6 +2,8 @@ const PublicUserService = require("../Service/public_user_service");
 const bcrypt = require("bcrypt");
 const PublicUserModel = require("../Models/public_user");
 const jwt = require("jsonwebtoken");
+const encryptData = require("../encryptedData");
+
 
 exports.createPublicUser = async (req, res, next) => {
   try {
@@ -149,7 +151,7 @@ exports.loginPublicUserweb = async (req, res, next) => {
           .json({ status: false, message: "Invalid identifier or password" });
       }
 
-      const token = jwt.sign({ role: user.role,code:user.user_id }, process.env.SECRET_TOKEN, { expiresIn: '3h' });
+      const token = jwt.sign({ role: user.role,code:user.public_user_id }, process.env.SECRET_TOKEN, { expiresIn: '3h' });
   
       return res.status(200).json({ token });
     } catch (error) {
@@ -160,15 +162,17 @@ exports.loginPublicUserweb = async (req, res, next) => {
 exports.getAllPublicUsers = async (req, res, next) => {
   try {
     const publicUsers = await PublicUserService.getAllPublicUsers();
+    const encryptedData = encryptData(publicUsers)
     res.status(200).json({
       status: true,
       message: "Public users retrieved successfully",
-      data: publicUsers,
+      data: encryptedData,
     });
   } catch (error) {
     next(error);
   }
 };
+
 exports.getPublicUserById = async (req, res, next) => {
   try {
     const { public_user_id } = req.query;
@@ -189,6 +193,28 @@ exports.getPublicUserById = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.getPublicUserPhone = async (req, res, next) => {
+  try {
+    const { phone } = req.query;
+    const publicUser = await PublicUserService.findPublicUserByPhone(
+      phone
+    );
+    if (!publicUser) {
+      return res
+        .status(404)
+        .json({ status: false, message: "Phone not found" });
+    }
+    res.status(200).json({
+      status: true,
+      message: "Profile retrieved successfully",
+      data: publicUser,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.deletePublicUserById = async (req, res, next) => {
   try {
     const { public_user_id } = req.query;
@@ -206,3 +232,4 @@ exports.deletePublicUserById = async (req, res, next) => {
     next(error);
   }
 };
+
