@@ -1,5 +1,6 @@
 const WardService = require('../Service/ward_Service');
 const IdcodeServices = require('../Service/idcode_Service');
+const encryptData = require('../encryptedData');
 
 exports.createWard = async (req, res, next) => {
     try {
@@ -9,8 +10,7 @@ exports.createWard = async (req, res, next) => {
         
         res.status(200).json({
             status: true,
-            message: "Ward created successfully",
-            data: ward
+            message: "Ward created successfully"
         });
     } catch (error) {
         next(error);
@@ -20,10 +20,11 @@ exports.createWard = async (req, res, next) => {
 exports.getAllWards = async (req, res, next) => {
     try {
         const wards = await WardService.getAllWards();
+        const encryptedData = encryptData(wards)
         res.status(200).json({
             status: true,
             message: "Wards retrieved successfully",
-            data: wards
+            data: encryptedData
         });
     } catch (error) {
         next(error);
@@ -37,10 +38,11 @@ exports.getWardById = async (req, res, next) => {
         if (!ward) {
             return res.status(404).json({ status: false, message: "Ward not found" });
         }
+        const encryptedData = encryptData(ward)
         res.status(200).json({
             status: true,
             message: "Ward retrieved successfully",
-            data: ward
+            data: encryptedData
         });
     } catch (error) {
         next(error);

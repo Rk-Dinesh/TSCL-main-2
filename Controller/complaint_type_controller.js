@@ -1,3 +1,4 @@
+const encryptData = require('../encryptedData');
 const ComplaintTypeService = require('../Service/complaint_type_service');
 const IdcodeServices = require('../Service/idcode_Service');
 
@@ -9,8 +10,7 @@ exports.createComplaintType = async (req, res, next) => {
         
         res.status(200).json({
             status: true,
-            message: "ComplaintType created successfully",
-            data: complaint
+            message: "ComplaintType created successfully"
         });
     } catch (error) {
         next(error);
@@ -20,10 +20,11 @@ exports.createComplaintType = async (req, res, next) => {
 exports.getAllComplaintsType = async (req, res, next) => {
     try {
         const complaints = await ComplaintTypeService.getAllComplaintsType();
+        const encryptedData = encryptData(complaints)
         res.status(200).json({
             status: true,
             message: "ComplaintsType retrieved successfully",
-            data: complaints
+            data: encryptedData
         });
     } catch (error) {
         next(error);

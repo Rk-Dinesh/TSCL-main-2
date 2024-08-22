@@ -1,5 +1,6 @@
 const NewGrievanceService = require('../Service/new_grievance_service');
 const IdcodeServices = require('../Service/idcode_Service');
+const encryptData = require('../encryptedData');
 
 exports.createNewGrievance = async (req, res, next) => {
     try {
@@ -10,7 +11,7 @@ exports.createNewGrievance = async (req, res, next) => {
         res.status(200).json({
             status: true,
             message: "New grievance created successfully",
-            data: newGrievance
+            data: newGrievance.grievance_id
         });
     } catch (error) {
         next(error);
@@ -20,10 +21,11 @@ exports.createNewGrievance = async (req, res, next) => {
 exports.getAllNewGrievances = async (req, res, next) => {
     try {
         const newGrievances = await NewGrievanceService.getAllNewGrievances();
+        const encryptedData = encryptData(newGrievances)
         res.status(200).json({
             status: true,
             message: "New grievances retrieved successfully",
-            data: newGrievances
+            data: encryptedData
         });
     } catch (error) {
         next(error);
@@ -36,10 +38,11 @@ exports.getNewGrievanceById = async (req, res, next) => {
         if (!newGrievance) {
             return res.status(404).json({ status: false, message: "New grievance not found" });
         }
+        const encryptedData = encryptData(newGrievance)
         res.status(200).json({
             status: true,
             message: "New grievance retrieved successfully",
-            data: newGrievance
+            data: encryptedData
         });
     } catch (error) {
         next(error);
@@ -53,10 +56,11 @@ exports.getGrievanceByUserId = async (req, res, next) => {
         if (!newGrievance) {
             return res.status(404).json({ status: false, message: " grievance not found" });
         }
+        const encryptedData = encryptData(newGrievance)
         res.status(200).json({
             status: true,
             message: "New grievance retrieved successfully",
-            data: newGrievance
+            data: encryptedData
         });
     } catch (error) {
         next(error);

@@ -1,5 +1,6 @@
 const RoleService = require('../Service/role_service');
 const IdcodeServices = require('../Service/idcode_Service');
+const encryptData = require('../encryptedData');
 exports.createRole = async (req, res, next) => {
     try {
         const {role_name, status, created_by_user } = req.body;
@@ -8,8 +9,7 @@ exports.createRole = async (req, res, next) => {
 
         res.status(200).json({
             status: true,
-            message: "Role created successfully",
-            data: role
+            message: "Role created successfully"
         });
     } catch (error) {
         next(error);
@@ -19,10 +19,11 @@ exports.createRole = async (req, res, next) => {
 exports.getAllRoles = async (req, res, next) => {
     try {
         const roles = await RoleService.getAllRoles();
+        const encryptedData = encryptData(roles)
         res.status(200).json({
             status: true,
             message: "Roles retrieved successfully",
-            data: roles
+            data: encryptedData
         });
     } catch (error) {
         next(error);
@@ -35,10 +36,11 @@ exports.getRoleById = async (req, res, next) => {
         if (!role) {
             return res.status(404).json({ status: false, message: "Role not found" });
         }
+        const encryptedData = encryptData(role)
         res.status(200).json({
             status: true,
             message: "Role retrieved successfully",
-            data: role
+            data: encryptedData
         });
     } catch (error) {
         next(error);

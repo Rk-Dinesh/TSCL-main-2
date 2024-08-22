@@ -1,3 +1,4 @@
+const encryptData = require('../encryptedData');
 const ComplaintService = require('../Service/complaint_service');
 const IdcodeServices = require('../Service/idcode_Service');
 
@@ -9,8 +10,7 @@ exports.createComplaint = async (req, res, next) => {
         
         res.status(200).json({
             status: true,
-            message: "Complaint created successfully",
-            data: complaint
+            message: "Complaint created successfully"
         });
     } catch (error) {
         next(error);
@@ -20,10 +20,11 @@ exports.createComplaint = async (req, res, next) => {
 exports.getAllComplaints = async (req, res, next) => {
     try {
         const complaints = await ComplaintService.getAllComplaints();
+        const encryptedData = encryptData(complaints)
         res.status(200).json({
             status: true,
             message: "Complaints retrieved successfully",
-            data: complaints
+            data: encryptedData
         });
     } catch (error) {
         next(error);
@@ -36,10 +37,11 @@ exports.getComplaintById = async (req, res, next) => {
         if (!complaint) {
             return res.status(404).json({ status: false, message: "Complaint not found" });
         }
+        const encryptedData = encryptData(complaint)
         res.status(200).json({
             status: true,
             message: "Complaint retrieved successfully",
-            data: complaint
+            data: encryptedData
         });
     } catch (error) {
         next(error);

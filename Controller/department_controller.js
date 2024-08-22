@@ -1,3 +1,4 @@
+const encryptData = require('../encryptedData');
 const DepartmentService = require('../Service/department_service');
 const IdcodeServices = require('../Service/idcode_Service');
 
@@ -9,8 +10,7 @@ exports.createDepartment = async (req, res, next) => {
         
         res.status(200).json({
             status: true,
-            message: "Department created successfully",
-            data: department
+            message: "Department created successfully"
         });
     } catch (error) {
         next(error);
@@ -20,10 +20,11 @@ exports.createDepartment = async (req, res, next) => {
 exports.getAllDepartments = async (req, res, next) => {
     try {
         const departments = await DepartmentService.getAllDepartments();
+        const encryptedData = encryptData(departments)
         res.status(200).json({
             status: true,
             message: "Departments retrieved successfully",
-            data: departments
+            data: encryptedData
         });
     } catch (error) {
         next(error);
@@ -36,10 +37,11 @@ exports.getDepartmentById = async (req, res, next) => {
         if (!department) {
             return res.status(404).json({ status: false, message: "Department not found" });
         }
+        const encryptedData = encryptData(department)
         res.status(200).json({
             status: true,
             message: "Department retrieved successfully",
-            data: department
+            data: encryptedData
         });
     } catch (error) {
         next(error);

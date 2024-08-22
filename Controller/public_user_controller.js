@@ -33,8 +33,7 @@ exports.createPublicUser = async (req, res, next) => {
       return res.status(200).json({
         status: true,
         message:
-          "User with this phone number already exists, updated successfully",
-        data: existingUser,
+          "User with this phone number already exists, updated successfully"
       });
     }
 
@@ -43,7 +42,6 @@ exports.createPublicUser = async (req, res, next) => {
       return res.status(200).json({
         status: true,
         message: "User with this Email already exists",
-        data: existingUser1,
       });
     }
 
@@ -62,7 +60,7 @@ exports.createPublicUser = async (req, res, next) => {
     res.status(200).json({
       status: true,
       message: "Public user created successfully",
-      data: publicUser,
+     
     });
   } catch (error) {
     next(error);
@@ -184,10 +182,11 @@ exports.getPublicUserById = async (req, res, next) => {
         .status(404)
         .json({ status: false, message: "Public user not found" });
     }
+    const encryptedData = encryptData(publicUser)
     res.status(200).json({
       status: true,
       message: "Public user retrieved successfully",
-      data: publicUser,
+      data: encryptedData,
     });
   } catch (error) {
     next(error);
@@ -205,10 +204,11 @@ exports.getPublicUserPhone = async (req, res, next) => {
         .status(404)
         .json({ status: false, message: "Phone not found" });
     }
+    const encryptedData = encryptData(publicUser)
     res.status(200).json({
       status: true,
       message: "Profile retrieved successfully",
-      data: publicUser,
+      data: encryptedData,
     });
   } catch (error) {
     next(error);

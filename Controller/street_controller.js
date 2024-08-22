@@ -1,5 +1,6 @@
 const StreetService = require('../Service/street_Service');
 const IdcodeServices = require('../Service/idcode_Service');
+const encryptData = require('../encryptedData');
 
 exports.createStreet = async (req, res, next) => {
     try {
@@ -10,7 +11,7 @@ exports.createStreet = async (req, res, next) => {
         res.status(200).json({
             status: true,
             message: "Street created successfully",
-            data: street
+            
         });
     } catch (error) {
         next(error);
@@ -20,10 +21,11 @@ exports.createStreet = async (req, res, next) => {
 exports.getAllStreets = async (req, res, next) => {
     try {
         const streets = await StreetService.getAllStreets();
+        const encryptedData = encryptData(streets)
         res.status(200).json({
             status: true,
             message: "Streets retrieved successfully",
-            data: streets
+            data: encryptedData
         });
     } catch (error) {
         next(error);
@@ -37,10 +39,11 @@ exports.getStreetById = async (req, res, next) => {
         if (!street) {
             return res.status(404).json({ status: false, message: "Street not found" });
         }
+        const encryptedData = encryptData(street)
         res.status(200).json({
             status: true,
             message: "Street retrieved successfully",
-            data: street
+            data: encryptedData
         });
     } catch (error) {
         next(error);

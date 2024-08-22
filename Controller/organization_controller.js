@@ -1,5 +1,6 @@
 const OrganizationService = require('../Service/organization_service');
 const IdcodeServices = require('../Service/idcode_Service');
+const encryptData = require('../encryptedData');
 
 exports.createOrganization = async (req, res, next) => {
     try {
@@ -9,8 +10,7 @@ exports.createOrganization = async (req, res, next) => {
         
         res.status(200).json({
             status: true,
-            message: "Organization created successfully",
-            data: organization
+            message: "Organization created successfully"
         });
     } catch (error) {
         next(error);
@@ -20,10 +20,11 @@ exports.createOrganization = async (req, res, next) => {
 exports.getAllOrganizations = async (req, res, next) => {
     try {
         const organizations = await OrganizationService.getAllOrganizations();
+        const encryptedData = encryptData(organizations)
         res.status(200).json({
             status: true,
             message: "Organizations retrieved successfully",
-            data: organizations
+            data: encryptedData
         });
     } catch (error) {
         next(error);
@@ -36,10 +37,11 @@ exports.getOrganizationById = async (req, res, next) => {
         if (!organization) {
             return res.status(404).json({ status: false, message: "Organization not found" });
         }
+        const encryptedData = encryptData(organization)
         res.status(200).json({
             status: true,
             message: "Organization retrieved successfully",
-            data: organization
+            data: encryptedData
         });
     } catch (error) {
         next(error);

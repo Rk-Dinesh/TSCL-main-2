@@ -1,3 +1,4 @@
+const encryptData = require('../encryptedData');
 const UserModel = require('../Models/user');
 const UserService = require('../Service/user_service');
 const bcrypt = require('bcrypt');
@@ -12,8 +13,7 @@ exports.createUser = async (req, res, next) => {
         if (existingUser) {
             return res.status(200).json({
                 status: true,
-                message: "User with this phone number already exists",
-                data: existingUser
+                message: "User with this phone number already exists"
             });
         }
 
@@ -21,8 +21,7 @@ exports.createUser = async (req, res, next) => {
         if (existingUser1) {
             return res.status(200).json({
                 status: true,
-                message: "User with this Email already exists",
-                data: existingUser1
+                message: "User with this Email already exists"
             });
         }
 
@@ -41,8 +40,7 @@ exports.createUser = async (req, res, next) => {
 
         res.status(200).json({
             status: true,
-            message: "Admin created successfully",
-            data: adminUser
+            message: "Admin created successfully"
         });
     } catch (error) {
         next(error);
@@ -130,10 +128,11 @@ exports.loginUser = async (req, res, next) => {
 exports.getAllUsers = async (req, res, next) => {
     try {
         const users = await UserService.getAllUsers();
+        const encryptedData = encryptData(users)
         res.status(200).json({
             status: true,
             message: "Users retrieved successfully",
-            data: users
+            data: encryptedData
         });
     } catch (error) {
         next(error);
@@ -142,14 +141,15 @@ exports.getAllUsers = async (req, res, next) => {
 exports.getUserById = async (req, res, next) => {
     try {
         const { user_id } = req.query;
-        const zone = await UserService.getZoneById(user_id);
-        if (!zone) {
+        const users = await UserService.getZoneById(user_id);
+        if (!users) {
             return res.status(404).json({ status: false, message: "Zone not found" });
         }
+        const encryptedData = encryptData(users)
         res.status(200).json({
             status: true,
-            message: "Zone retrieved successfully",
-            data: zone
+            message: "Users retrieved successfully",
+            data: encryptedData
         });
     } catch (error) {
         next(error);
