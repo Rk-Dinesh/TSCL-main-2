@@ -67,6 +67,66 @@ exports.getGrievanceByUserId = async (req, res, next) => {
     }
 };
 
+exports.getGrievanceByAssign = async (req, res, next) => {
+    try {
+        const { assign_user } = req.query;
+        const newGrievance = await NewGrievanceService.getGrievanceByAssign(assign_user);
+        if (!newGrievance) {
+            return res.status(404).json({ status: false, message: " grievance not found" });
+        }
+        const encryptedData = encryptData(newGrievance)
+        res.status(200).json({
+            status: true,
+            message: "New grievance retrieved successfully",
+            data: encryptedData
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.updateStatus = async(req, res, next) => {
+    try {
+        const { grievance_id } = req.query;
+        const { status } = req.body;
+
+        const newGrievance = await NewGrievanceService.getNewGrievanceById(grievance_id);
+        if (!newGrievance) {
+            return res.status(404).json({ status: false, message: "Grievance not found" });
+        }
+
+        newGrievance.status = status;
+        newGrievance.statusflow = `${newGrievance.statusflow ? newGrievance.statusflow + '/' : ''}${status}`;
+
+        await newGrievance.save();
+
+        return res.status(200).json({ status: true, message: "Status and status flow updated successfully" });
+    } catch (error) {
+        next(error);
+    }
+}
+
+exports.updateAssign = async(req, res, next) => {
+    try {
+        const { grievance_id } = req.query;
+        const { assign_user,assign_username } = req.body;
+
+        const newGrievance = await NewGrievanceService.getNewGrievanceById(grievance_id);
+        if (!newGrievance) {
+            return res.status(404).json({ status: false, message: "Grievance not found" });
+        }
+
+        newGrievance.assign_user = assign_user;
+        newGrievance.assign_username = assign_username;
+
+        await newGrievance.save();
+
+        return res.status(200).json({ status: true, message: "Grievance Assigned successfully" });
+    } catch (error) {
+        next(error);
+    }
+}
+
 exports.deleteNewGrievanceById = async (req, res, next) => {
     try {
         const { grievance_id } = req.query;

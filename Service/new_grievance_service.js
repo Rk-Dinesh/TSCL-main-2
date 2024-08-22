@@ -16,6 +16,11 @@ exports.getGrievanceByUserId = async (public_user_id) => {
     return await NewGrievanceModel.find({ public_user_id });
 };
 
+exports.getGrievanceByAssign = async (assign_user) => {
+    return await NewGrievanceModel.find({ assign_user });
+};
+
+
 exports.deleteNewGrievanceById = async (grievance_id) => {
     return await NewGrievanceModel.findOneAndDelete({ grievance_id });
 };
