@@ -47,6 +47,26 @@ exports.getComplaintById = async (req, res, next) => {
         next(error);
     }
 };
+exports.updateComplaints = async (req, res, next) => {
+    try {
+      const { complaint_id } = req.query;
+      const { complaint_type_title,dept_name,tat_type,tat_duration,priority,escalation_type,escalation_l1,role_l1,escalation_l2,role_l2,escalation_l3,role_l3,status } = req.body;
+  
+    
+      const compliant = await ComplaintService.getComplaintById(complaint_id);
+      if (!compliant) {
+        return res.status(404).json({ status: false, message: "Compliant not found" });
+      }
+
+      const updatedCompliant = await ComplaintService.updateComplaintsById(complaint_id, {
+        complaint_type_title,dept_name,tat_type,tat_duration,priority,escalation_type,escalation_l1,role_l1,escalation_l2,role_l2,escalation_l3,role_l3,status
+      });
+  
+      return res.status(200).json({ status: true, message: "Compliant Updated successfully" });
+    } catch (error) {
+      next(error);
+    }
+  };
 exports.deleteComplaintById = async (req, res, next) => {
     try {
         const { complaint_id } = req.query;

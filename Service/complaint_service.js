@@ -11,6 +11,9 @@ exports.getAllComplaints = async () => {
 exports.getComplaintById = async (complaint_id) => {
     return await ComplaintModel.findOne({ complaint_id });
 };
+exports.updateComplaintsById = async (complaint_id, updateData) => {
+    return await ComplaintModel.updateOne({ complaint_id }, { $set: updateData });
+  };
 exports.deleteComplaintById = async (complaint_id) => {
     return await ComplaintModel.findOneAndDelete({ complaint_id });
 };

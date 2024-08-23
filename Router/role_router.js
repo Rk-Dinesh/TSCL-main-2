@@ -7,5 +7,5 @@ router.post('/post',verifyToken, roleController.createRole);
 router.get('/get',verifyToken, roleController.getAllRoles);
 router.get('/getbyid',verifyToken, roleController.getRoleById);
 router.delete('/delete',verifyToken, roleController.deleteRoleById);
-router.post('/update', roleController.updateRole);
+router.post('/update',verifyToken, roleController.updateRole);
 module.exports = router;
