@@ -141,9 +141,9 @@ exports.getAllUsers = async (req, res, next) => {
 exports.getUserById = async (req, res, next) => {
     try {
         const { user_id } = req.query;
-        const users = await UserService.getZoneById(user_id);
+        const users = await UserService.findUserById(user_id);
         if (!users) {
-            return res.status(404).json({ status: false, message: "Zone not found" });
+            return res.status(404).json({ status: false, message: "User not found" });
         }
         const encryptedData = encryptData(users)
         res.status(200).json({

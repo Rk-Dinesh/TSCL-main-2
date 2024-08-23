@@ -49,6 +49,24 @@ exports.getWardById = async (req, res, next) => {
     }
 };
 
+exports.getWardId = async (req, res, next) => {
+    try {
+        const {  ward_id } = req.query;
+        const ward = await WardService.getWardId( ward_id);
+        if (!ward) {
+            return res.status(404).json({ status: false, message: "Ward not found" });
+        }
+        const encryptedData = encryptData(ward)
+        res.status(200).json({
+            status: true,
+            message: "Ward retrieved successfully",
+            data: encryptedData
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 exports.updateWard = async (req, res, next) => {
     try {
       const { ward_id } = req.query;

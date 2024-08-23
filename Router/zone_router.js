@@ -8,5 +8,5 @@ router.get('/get',verifyToken, zoneController.getAllZones);
 router.get('/getgrievance',verifyToken, zoneController.getAllZonesGrivence);
 router.get('/getbyid',verifyToken, zoneController.getZoneById);
 router.delete('/delete',verifyToken, zoneController.deleteZoneById);
-router.post('/update', zoneController.updateZone);
+router.post('/update',verifyToken, zoneController.updateZone);
 module.exports = router;

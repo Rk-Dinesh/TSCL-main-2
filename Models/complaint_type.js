@@ -5,6 +5,7 @@ const { Schema } = mongoose;
 const ComplaintTypeSchema = new Schema({
     compliant_type_id: String,
     complaint_type: String,
+    status: String,
     created_by_user: String,
 }, { timestamps: true });
 

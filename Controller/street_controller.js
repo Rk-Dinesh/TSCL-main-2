@@ -49,6 +49,24 @@ exports.getStreetById = async (req, res, next) => {
         next(error);
     }
 };
+
+exports.getStreetId = async (req, res, next) => {
+    try {
+        const {  street_id } = req.query;
+        const street = await StreetService.getStreetId(street_id);
+        if (!street) {
+            return res.status(404).json({ status: false, message: "Street not found" });
+        }
+        const encryptedData = encryptData(street)
+        res.status(200).json({
+            status: true,
+            message: "Street retrieved successfully",
+            data: encryptedData
+        });
+    } catch (error) {
+        next(error);
+    }
+};
 exports.updateStreet = async (req, res, next) => {
     try {
       const { street_id } = req.query;

@@ -7,5 +7,5 @@ router.post('/post',verifyToken, organizationController.createOrganization);
 router.get('/get',verifyToken, organizationController.getAllOrganizations);
 router.get('/getbyid',verifyToken, organizationController.getOrganizationById);
 router.delete('/delete',verifyToken, organizationController.deleteOrganizationById);
-router.post('/update', organizationController.updateOrganization);
+router.post('/update',verifyToken, organizationController.updateOrganization);
 module.exports = router;
