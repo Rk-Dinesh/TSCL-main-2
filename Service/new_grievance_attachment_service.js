@@ -4,10 +4,7 @@ const mongoose = require("mongoose");
 const crypto = require("crypto");
 const NewGrievanceAttachmentModel = require('../Models/new_grievance_attachment');
 
-// exports.createNewGrievanceAttachment = async (newGrievanceAttachmentData) => {
-//     const newGrievanceAttachment = new NewGrievanceAttachmentModel(newGrievanceAttachmentData);
-//     return await newGrievanceAttachment.save();
-// };
+
 
 exports.attachment= async (file, grievance_id,created_by_user) => {
     try {

@@ -49,6 +49,14 @@ app.use('/department',DepartmentRouter);
 app.use('/organization',OrganzationRouter);
 app.use('/complainttype',ComplaintTypeRouter)
 
+app.use((err, req, res, next) => {
+  if (err.code === 'LIMIT_FILE_COUNT') {
+    res.status(400).json({ message: 'File count exceeds the limit of 5' });
+  } else {
+    next(err);
+  }
+});
+
 app.get('/', (req, res) => {
   res.send('Hello World!');
 });

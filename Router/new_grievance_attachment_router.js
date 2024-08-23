@@ -4,14 +4,15 @@ const multer = require("multer");
 const newGrievanceAttachmentController = require('../Controller/new_grievance_attachment_controller');
 
 const upload = multer({
-    dest: "attachments/",
-    limits: {
-      fileSize: 50 * 1024 * 1024,
-    },
-  });
+  dest: "attachments/",
+  limits: {
+    fileSize: 50 * 1024 * 1024,
+    files: 5, 
+  },
+});
 
-router.post('/post',upload.single("file"), newGrievanceAttachmentController.uploadFile);
-router.get('/get', newGrievanceAttachmentController.getAllNewGrievanceAttachments);
-router.get('/getbyid', newGrievanceAttachmentController.getNewGrievanceAttachmentById);
+
+router.post('/post', upload.array("files", 5), newGrievanceAttachmentController.uploadFiles);
+
 
 module.exports = router;

@@ -1,19 +1,10 @@
 const NewGrievanceAttachmentService = require('../Service/new_grievance_attachment_service');
+const crypto = require("crypto");
+const { gfs } = require('../Config/db');
+const fs = require("fs");
+const mongoose = require("mongoose");
+const NewGrievanceAttachmentModel = require('../Models/new_grievance_attachment');
 
-// exports.createNewGrievanceAttachment = async (req, res, next) => {
-//     try {
-//         const { grievance_id, attachment, created_by_user } = req.body;
-//         const newGrievanceAttachment = await NewGrievanceAttachmentService.createNewGrievanceAttachment({ grievance_id, attachment, created_by_user });
-        
-//         res.status(200).json({
-//             status: true,
-//             message: "New grievance attachment created successfully",
-//             data: newGrievanceAttachment
-//         });
-//     } catch (error) {
-//         next(error);
-//     }
-// };
 
 exports.uploadFile = async (req, res) => {
     try {
@@ -33,31 +24,46 @@ exports.uploadFile = async (req, res) => {
     }
   };
 
-exports.getAllNewGrievanceAttachments = async (req, res, next) => {
+  exports.uploadFiles = async (req, res) => {
     try {
-        const newGrievanceAttachments = await NewGrievanceAttachmentService.getAllNewGrievanceAttachments();
-        res.status(200).json({
-            status: true,
-            message: "New grievance attachments retrieved successfully",
-            data: newGrievanceAttachments
+      const files = req.files;
+      const grievance_id = req.body.grievance_id;
+      const created_by_user = req.body.created_by_user;
+  
+      if (files.length > 5) {
+        return res.status(400).json({ message: "File count exceeds the limit of 5" });
+      }
+  
+      const attachments = [];
+  
+      for (const file of files) {
+        const randomName = crypto.randomBytes(10).toString("hex");
+        const writeStream = gfs.openUploadStream(randomName, {
+          _id: new mongoose.Types.ObjectId(),
         });
-    } catch (error) {
-        next(error);
-    }
-};
-exports.getNewGrievanceAttachmentById = async (req, res, next) => {
-    try {
-        const { grievance_id } = req.query;
-        const newGrievanceAttachment = await NewGrievanceAttachmentService.getNewGrievanceAttachmentById(grievance_id);
-        if (!newGrievanceAttachment) {
-            return res.status(404).json({ status: false, message: "New grievance attachment not found" });
-        }
-        res.status(200).json({
-            status: true,
-            message: "New grievance attachment retrieved successfully",
-            data: newGrievanceAttachment
+  
+        fs.createReadStream(file.path).pipe(writeStream);
+  
+        const attachment = new NewGrievanceAttachmentModel({
+          grievance_id,
+          created_by_user,
+          attachment_id: writeStream.id,
+          attachment: randomName,
         });
+  
+        await attachment.save();
+        attachments.push(attachment);
+      }
+  
+      for (const file of files) {
+        fs.unlinkSync(file.path);
+      }
+  
+      res.status(200).json(attachments);
     } catch (error) {
-        next(error);
+      console.error(error);
+      res.status(500).json({ message: "Failed to upload files" });
     }
-};
+  };
+
+
