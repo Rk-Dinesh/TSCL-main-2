@@ -155,6 +155,89 @@ exports.getUserById = async (req, res, next) => {
         next(error);
     }
 };
+
+exports.forwardPassword = async(req, res, next) => {
+  try {
+      const { phone } = req.query;
+      const { login_password } = req.body;
+
+      const forgotPassword = await UserService.findUserByPhone(phone);
+      if (!forgotPassword) {
+          return res.status(404).json({ status: false, message: "User not found" });
+      }
+      const salt = await bcrypt.genSalt(10);
+
+      const hashedPassword = await bcrypt.hash(login_password, salt);
+
+      forgotPassword.login_password = hashedPassword;
+
+      await forgotPassword.save();
+
+      return res.status(200).json({ status: true, message: "User password changed to successfully" });
+  } catch (error) {
+      next(error);
+  }
+}
+
+exports.changePassword = async(req, res, next) => {
+  try {
+      const { phone } = req.query;
+      const { old_password, login_password } = req.body;
+
+      const changePassword = await UserService.findUserByPhone(phone);
+      if (!changePassword) {
+          return res.status(404).json({ status: false, message: "User not found" });
+      }
+       const oldPassword = changePassword.login_password;
+       const isValidPassword = await bcrypt.compare(
+        old_password,
+        oldPassword
+      );
+      if (!isValidPassword) {
+        return res
+          .status(401)
+          .json({ status: false, message: "Password mismatch" });
+      }
+      const salt = await bcrypt.genSalt(10);
+
+      const hashedPassword = await bcrypt.hash(login_password, salt);
+
+      changePassword.login_password = hashedPassword;
+
+      await changePassword.save();
+
+      return res.status(200).json({ status: true, message: "Password changed to successfully" });
+  } catch (error) {
+      next(error);
+  }
+}
+
+exports.updateUser = async (req, res, next) => {
+  try {
+    const { user_id } = req.query;
+    const { user_name,dept_name,address,pincode,status,role } = req.body;
+
+  
+    const user = await UserService.findUserById(user_id);
+    if (!user) {
+      return res.status(404).json({ status: false, message: "User not found" });
+    }
+
+    const updatedUser = await UserService.updateUserById(user_id, {
+      user_name,
+      dept_name,
+      address,
+      pincode,
+      status,
+      role
+    });
+
+    return res.status(200).json({ status: true, message: "User Updated successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.deleteUserById = async (req, res, next) => {
     try {
         const { user_id } = req.query;

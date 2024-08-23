@@ -47,6 +47,9 @@ exports.getAllPublicUsers = async () => {
 exports.getPublicUserById = async (public_user_id) => {
     return await PublicUserModel.findOne({ public_user_id });
 };
+exports.updatePublicUserById = async (public_user_id, updateData) => {
+    return await PublicUserModel.updateOne({ public_user_id }, { $set: updateData });
+  };
 exports.deletePublicUserById = async (public_user_id) => {
     return await PublicUserModel.findOneAndDelete({ public_user_id });
 };

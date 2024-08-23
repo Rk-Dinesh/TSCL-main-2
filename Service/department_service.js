@@ -11,6 +11,9 @@ exports.getAllDepartments = async () => {
 exports.getDepartmentById = async (dept_id) => {
     return await DepartmentModel.findOne({ dept_id });
 };
+exports.updateDepartmentById = async (dept_id, updateData) => {
+    return await DepartmentModel.updateOne({ dept_id }, { $set: updateData });
+  };
 exports.deleteDepartmentById = async (dept_id) => {
     return await DepartmentModel.findOneAndDelete({ dept_id });
 };

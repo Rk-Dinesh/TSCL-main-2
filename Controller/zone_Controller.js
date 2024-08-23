@@ -67,6 +67,28 @@ exports.getZoneById = async (req, res, next) => {
         next(error);
     }
 };
+exports.updateZone = async (req, res, next) => {
+    try {
+      const { zone_id } = req.query;
+      const { zone_name, status } = req.body;
+  
+    
+      const zone = await ZoneService.updateZoneById(zone_id);
+      if (!zone) {
+        return res.status(404).json({ status: false, message: "Zone not found" });
+      }
+  
+      const updateZone = await ZoneService.updateZoneById(zone_id, {
+        zone_name,
+        status
+      });
+  
+      return res.status(200).json({ status: true, message: "Zone Updated successfully" });
+    } catch (error) {
+      next(error);
+    }
+  };
+
 exports.deleteZoneById = async (req, res, next) => {
     try {
         const { zone_id } = req.query;

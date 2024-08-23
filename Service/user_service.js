@@ -37,10 +37,15 @@ exports.findUserByPhone = async (phone) => {
 exports.findUserByEmail = async (email) => {
     return await UserModel.findOne({ email });
 };
-
+exports.findUserById = async (user_id) => {
+    return await UserModel.findOne({ user_id });
+};
 exports.getAllUsers = async () => {
     return await UserModel.find();
 };
+exports.updateUserById = async (user_id, updateData) => {
+    return await UserModel.updateOne({ user_id }, { $set: updateData });
+  };
 exports.deleteUserById = async (user_id) => {
     return await UserModel.findOneAndDelete({ user_id });
 };

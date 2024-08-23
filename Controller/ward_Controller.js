@@ -48,6 +48,31 @@ exports.getWardById = async (req, res, next) => {
         next(error);
     }
 };
+
+exports.updateWard = async (req, res, next) => {
+    try {
+      const { ward_id } = req.query;
+      const { zone_id,zone_name,ward_name, status } = req.body;
+  
+    
+      const ward = await WardService.getWardId(ward_id);
+      if (!ward) {
+        return res.status(404).json({ status: false, message: "Ward not found" });
+      }
+  
+      const updatedWard = await WardService.updateWardById(ward_id, {
+        zone_id,
+        zone_name,
+        ward_name,
+        status,
+      });
+  
+      return res.status(200).json({ status: true, message: "Ward Updated successfully" });
+    } catch (error) {
+      next(error);
+    }
+  };
+
 exports.deleteWardById = async (req, res, next) => {
     try {
         const { ward_id } = req.query;

@@ -49,6 +49,32 @@ exports.getStreetById = async (req, res, next) => {
         next(error);
     }
 };
+exports.updateStreet = async (req, res, next) => {
+    try {
+      const { street_id } = req.query;
+      const { zone_id,zone_name,ward_id,ward_name,street_name, status } = req.body;
+  
+    
+      const street = await StreetService.getStreetId(street_id);
+      if (!street) {
+        return res.status(404).json({ status: false, message: "Street not found" });
+      }
+  
+      const updatedStreet = await StreetService.updateStreetById(street_id, {
+        zone_id,
+        zone_name,
+        ward_id,
+        ward_name,
+        street_name,
+        status
+      });
+  
+      return res.status(200).json({ status: true, message: "Street Updated successfully" });
+    } catch (error) {
+      next(error);
+    }
+  };
+
 exports.deleteStreetById = async (req, res, next) => {
     try {
         const { street_id } = req.query;

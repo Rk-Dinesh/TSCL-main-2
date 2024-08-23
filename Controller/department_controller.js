@@ -46,7 +46,32 @@ exports.getDepartmentById = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
-};exports.deleteDepartmentById = async (req, res, next) => {
+};
+
+exports.updateDepartment = async (req, res, next) => {
+    try {
+      const { dept_id } = req.query;
+      const { dept_name,org_name,status } = req.body;
+  
+    
+      const department = await DepartmentService.getDepartmentById(dept_id);
+      if (!department) {
+        return res.status(404).json({ status: false, message: "Department not found" });
+      }
+  
+      const updatedDepartment = await DepartmentService.updateDepartmentById(dept_id, {
+        dept_name,
+        org_name,
+        status,
+      });
+  
+      return res.status(200).json({ status: true, message: "Department Updated successfully" });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+exports.deleteDepartmentById = async (req, res, next) => {
     try {
         const { dept_id } = req.query;
         const result = await DepartmentService.deleteDepartmentById(dept_id);

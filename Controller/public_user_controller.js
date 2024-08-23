@@ -215,6 +215,83 @@ exports.getPublicUserPhone = async (req, res, next) => {
   }
 };
 
+exports.forwardPassword = async(req, res, next) => {
+  try {
+      const { phone } = req.query;
+      const { login_password } = req.body;
+
+      const forgotPassword = await PublicUserService.findPublicUserByPhone(phone);
+      if (!forgotPassword) {
+          return res.status(404).json({ status: false, message: "User not found" });
+      }
+      const salt = await bcrypt.genSalt(10);
+
+      const hashedPassword = await bcrypt.hash(login_password, salt);
+
+      forgotPassword.login_password = hashedPassword;
+
+      await forgotPassword.save();
+
+      return res.status(200).json({ status: true, message: "User password changed to successfully" });
+  } catch (error) {
+      next(error);
+  }
+}
+
+exports.changePassword = async(req, res, next) => {
+  try {
+      const { phone } = req.query;
+      const { old_password, login_password } = req.body;
+
+      const changePassword = await PublicUserService.findPublicUserByPhone(phone);
+      if (!changePassword) {
+          return res.status(404).json({ status: false, message: "User not found" });
+      }
+       const oldPassword = changePassword.login_password;
+       const isValidPassword = await bcrypt.compare(
+        old_password,
+        oldPassword
+      );
+      if (!isValidPassword) {
+        return res
+          .status(401)
+          .json({ status: false, message: "Password mismatch" });
+      }
+      const salt = await bcrypt.genSalt(10);
+
+      const hashedPassword = await bcrypt.hash(login_password, salt);
+
+      changePassword.login_password = hashedPassword;
+
+      await changePassword.save();
+
+      return res.status(200).json({ status: true, message: "Password changed to successfully" });
+  } catch (error) {
+      next(error);
+  }
+}
+
+exports.updatePublicUser = async (req, res, next) => {
+  try {
+    const { public_user_id } = req.query;
+    const { public_user_name,address,pincode,verification_status, user_status,role } = req.body;
+
+  
+    const publicuser = await PublicUserService.getPublicUserById(public_user_id);
+    if (!publicuser) {
+      return res.status(404).json({ status: false, message: "PublicUser not found" });
+    }
+
+    const updatedPublicUser = await PublicUserService.updatePublicUserById(public_user_id, {
+      public_user_name,address,pincode,verification_status, user_status,role
+    });
+
+    return res.status(200).json({ status: true, message: "PublicUser Updated successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.deletePublicUserById = async (req, res, next) => {
   try {
     const { public_user_id } = req.query;

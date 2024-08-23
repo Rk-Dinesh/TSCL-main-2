@@ -57,3 +57,32 @@ app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
   
 });
+
+
+exports.updateOrganization = async (req, res, next) => {
+  try {
+    const { org_id } = req.query;
+    const { org_name, status } = req.body;
+
+  
+    const organization = await OrganizationService.getOrganizationById(org_id);
+    if (!organization) {
+      return res.status(404).json({ status: false, message: "Organization not found" });
+    }
+
+    const updatedOrganization = await OrganizationService.updateOrganizationById(org_id, {
+      org_name,
+      status,
+    });
+
+    return res.status(200).json({ status: true, message: "Organization Updated successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.updateOrganizationById = async (org_id, updateData) => {
+  return await OrganizationModel.updateOne({ org_id }, { $set: updateData });
+};
+
+//router.post('/update', organizationController.updateOrganization);

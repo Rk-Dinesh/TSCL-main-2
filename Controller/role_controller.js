@@ -46,6 +46,27 @@ exports.getRoleById = async (req, res, next) => {
         next(error);
     }
 };
+exports.updateRole = async (req, res, next) => {
+    try {
+      const { role_id } = req.query;
+      const { role_name, status } = req.body;
+  
+    
+      const role = await RoleService.getRoleById(role_id);
+      if (!role) {
+        return res.status(404).json({ status: false, message: "Role not found" });
+      }
+  
+      const updatedRole = await RoleService.updateRoleById(role_id, {
+        role_name,
+        status,
+      });
+  
+      return res.status(200).json({ status: true, message: "Role Updated successfully" });
+    } catch (error) {
+      next(error);
+    }
+  };
 exports.deleteRoleById = async (req, res, next) => {
     try {
         const { role_id } = req.query;
