@@ -13,6 +13,8 @@ const upload = multer({
 
 
 router.post('/post', upload.array("files", 5), newGrievanceAttachmentController.uploadFiles);
-
+router.get('/getbyid',newGrievanceAttachmentController.getfileIdMul);
+router.get("/file/:filename", newGrievanceAttachmentController.getFile);
+router.get('/getattachments',newGrievanceAttachmentController.getAttachments);
 
 module.exports = router;
