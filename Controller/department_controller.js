@@ -30,6 +30,19 @@ exports.getAllDepartments = async (req, res, next) => {
         next(error);
     }
 };
+exports.getActiveDepartments = async (req, res, next) => {
+    try {
+        const departments = await DepartmentService.getActiveDepartments();
+        const encryptedData = encryptData(departments)
+        res.status(200).json({
+            status: true,
+            message: "Departments retrieved successfully",
+            data: encryptedData
+        });
+    } catch (error) {
+        next(error);
+    }
+};
 exports.getDepartmentById = async (req, res, next) => {
     try {
         const { dept_id } = req.query;

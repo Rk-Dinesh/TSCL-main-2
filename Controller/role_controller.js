@@ -29,6 +29,20 @@ exports.getAllRoles = async (req, res, next) => {
         next(error);
     }
 };
+
+exports.getActiveRoles = async (req, res, next) => {
+    try {
+        const roles = await RoleService.getActiveRoles();
+        const encryptedData = encryptData(roles)
+        res.status(200).json({
+            status: true,
+            message: "Roles retrieved successfully",
+            data: encryptedData
+        });
+    } catch (error) {
+        next(error);
+    }
+};
 exports.getRoleById = async (req, res, next) => {
     try {
         const { role_id } = req.query;

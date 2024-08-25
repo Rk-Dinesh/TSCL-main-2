@@ -30,6 +30,19 @@ exports.getAllComplaintsType = async (req, res, next) => {
         next(error);
     }
 };
+exports.getActiveComplaintsType = async (req, res, next) => {
+    try {
+        const complaints = await ComplaintTypeService.getActiveComplaintsType();
+        const encryptedData = encryptData(complaints)
+        res.status(200).json({
+            status: true,
+            message: "ComplaintsType retrieved successfully",
+            data: encryptedData
+        });
+    } catch (error) {
+        next(error);
+    }
+};
 
 exports.getComplaintsTypeById = async (req, res, next) => {
     try {

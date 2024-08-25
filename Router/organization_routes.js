@@ -5,6 +5,7 @@ const verifyToken = require('../Authorization');
 
 router.post('/post',verifyToken, organizationController.createOrganization);
 router.get('/get',verifyToken, organizationController.getAllOrganizations);
+router.get('/getactive',verifyToken, organizationController.getActiveOrganizations);
 router.get('/getbyid',verifyToken, organizationController.getOrganizationById);
 router.delete('/delete',verifyToken, organizationController.deleteOrganizationById);
 router.post('/update',verifyToken, organizationController.updateOrganization);

@@ -8,6 +8,9 @@ exports.createComplaintType = async (complaintData) => {
 exports.getAllComplaintsType = async () => {
     return await ComplaintTypeModel.find();
 };
+exports.getActiveComplaintsType = async () => {
+    return await ComplaintTypeModel.find({status:'active'});
+};
 exports.getComplaintsTypeById = async (compliant_type_id) => {
     return await ComplaintTypeModel.findOne({ compliant_type_id });
 };

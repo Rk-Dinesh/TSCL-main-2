@@ -31,6 +31,20 @@ exports.getAllWards = async (req, res, next) => {
     }
 };
 
+exports.getActiveWards = async (req, res, next) => {
+    try {
+        const wards = await WardService.getActiveWards();
+        const encryptedData = encryptData(wards)
+        res.status(200).json({
+            status: true,
+            message: "Wards retrieved successfully",
+            data: encryptedData
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 exports.getWardById = async (req, res, next) => {
     try {
         const { zone_id, ward_id } = req.query;

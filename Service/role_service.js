@@ -8,6 +8,9 @@ exports.createRole = async (roleData) => {
 exports.getAllRoles = async () => {
     return await RoleModel.find();
 };
+exports.getActiveRoles = async () => {
+    return await RoleModel.find({status:'active'});
+};
 exports.getRoleById = async (role_id) => {
     return await RoleModel.findOne({ role_id });
 };

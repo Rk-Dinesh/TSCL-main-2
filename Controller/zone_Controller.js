@@ -31,15 +31,10 @@ exports.getAllZones = async (req, res, next) => {
     }
 };
 
-exports.getAllZonesGrivence = async (req, res, next) => {
+exports.getActiveZones = async (req, res, next) => {
     try {
-        const zones = await ZoneService.getAllZones();
-        
-        const filteredZones = zones.map(zone => ({
-            _id: zone._id,
-            zone_name: zone.zone_name
-        }));
-        const encryptedData = encryptData(filteredZones)
+        const zones = await ZoneService.getActiveZones();
+        const encryptedData = encryptData(zones)
         res.status(200).json({
             status: true,
             message: "Zones retrieved successfully",
@@ -49,6 +44,8 @@ exports.getAllZonesGrivence = async (req, res, next) => {
         next(error);
     }
 };
+
+
 
 exports.getZoneById = async (req, res, next) => {
     try {

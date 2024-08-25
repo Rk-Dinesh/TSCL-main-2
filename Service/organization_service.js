@@ -8,6 +8,10 @@ exports.createOrganization = async (organizationData) => {
 exports.getAllOrganizations = async () => {
     return await OrganizationModel.find();
 };
+
+exports.getActiveOrganizations = async () => {
+    return await OrganizationModel.find({ status: 'active' });
+  };
 exports.getOrganizationById = async (org_id) => {
     return await OrganizationModel.findOne({ org_id });
 };

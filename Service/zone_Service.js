@@ -9,6 +9,10 @@ exports.getAllZones = async () => {
     return await ZoneModel.find();
 };
 
+exports.getActiveZones = async () => {
+    return await ZoneModel.find({status:'active'});
+};
+
 exports.getZoneById = async (zone_id) => {
     return await ZoneModel.findOne({ zone_id });
 };

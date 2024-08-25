@@ -32,6 +32,20 @@ exports.getAllStreets = async (req, res, next) => {
     }
 };
 
+exports.getActiveStreets = async (req, res, next) => {
+    try {
+        const streets = await StreetService.getActiveStreets();
+        const encryptedData = encryptData(streets)
+        res.status(200).json({
+            status: true,
+            message: "Streets retrieved successfully",
+            data: encryptedData
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 exports.getStreetById = async (req, res, next) => {
     try {
         const { ward_id, street_id } = req.query;

@@ -30,6 +30,21 @@ exports.getAllOrganizations = async (req, res, next) => {
         next(error);
     }
 };
+
+exports.getActiveOrganizations = async (req, res, next) => {
+    try {
+        const organizations = await OrganizationService.getActiveOrganizations();
+        const encryptedData = encryptData(organizations)
+        res.status(200).json({
+            status: true,
+            message: "Active Organizations retrieved successfully",
+            data: encryptedData
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 exports.getOrganizationById = async (req, res, next) => {
     try {
         const { org_id } = req.query;
