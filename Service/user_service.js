@@ -2,7 +2,7 @@ const UserModel = require('../Models/user');
 const IdcodeServices = require('./idcode_Service');
 const bcrypt = require('bcrypt');
 
-exports.createUser = async (user_name, dept_name, phone, email, address, pincode, login_password, status, role,  created_by_user) => {
+exports.createUser = async (user_name, dept_name, phone, email, address, pincode, login_password, status,role_id, role,  created_by_user) => {
     try {
         
         var user_id = await IdcodeServices.generateCode("User");
@@ -20,6 +20,7 @@ exports.createUser = async (user_name, dept_name, phone, email, address, pincode
             pincode,
             login_password:hashedPassword,
             status,
+            role_id,
             role,
             created_by_user
         });
@@ -48,5 +49,9 @@ exports.updateUserById = async (user_id, updateData) => {
   };
 exports.deleteUserById = async (user_id) => {
     return await UserModel.findOneAndDelete({ user_id });
+};
+
+exports.updateUserRoleNameByRoleId = async (role_id, updateData) => {
+    return await UserModel.updateMany({ role_id }, { $set: updateData });
 };
 

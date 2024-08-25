@@ -4,9 +4,10 @@ const roleAccessLevelController = require('../Controller/role_access_level_contr
 const verifyToken = require('../Authorization');
 
 router.post('/post',verifyToken, roleAccessLevelController.createRoleAccessLevel);
-router.post('/update', roleAccessLevelController.updateRoles);
-router.get('/get', roleAccessLevelController.getAllRoleAccessLevels);
-router.get('/getbyid', roleAccessLevelController.getRoleById);
-router.delete('/delete', roleAccessLevelController.deleteRoleById);
+router.post('/update',verifyToken, roleAccessLevelController.updateRoles);
+router.get('/get',verifyToken, roleAccessLevelController.getAllRoleAccessLevels);
+router.get('/getactive',verifyToken, roleAccessLevelController.getActiveRoleAccessLevels);
+router.get('/getbyid',verifyToken, roleAccessLevelController.getRoleById);
+router.delete('/delete',verifyToken, roleAccessLevelController.deleteRoleById);
 
 module.exports = router;

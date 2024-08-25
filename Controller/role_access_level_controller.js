@@ -2,10 +2,11 @@ const encryptData = require('../encryptedData');
 const RoleAccessLevelModel = require('../Models/role_access_level');
 const IdcodeServices = require('../Service/idcode_Service');
 const RoleAccessLevelService = require('../Service/role_access_level_service');
+const UserService = require('../Service/user_service');
 
 exports.createRoleAccessLevel = async (req, res, next) => {
     try {
-        const { role_name, accessLevels } = req.body;
+        const { role_name, accessLevels,status,created_by_user } = req.body;
         const role_id = await IdcodeServices.generateCode("RoleAccess");
 
         accessLevels.forEach((accessLevel) => {
@@ -17,7 +18,10 @@ exports.createRoleAccessLevel = async (req, res, next) => {
         const roleAccessLevel = new RoleAccessLevelModel({
             role_id,
             role_name,
-            accessLevels
+            accessLevels,
+            status,
+            created_by_user
+
         });
 
         const result = await roleAccessLevel.save();
@@ -33,7 +37,7 @@ exports.createRoleAccessLevel = async (req, res, next) => {
 exports.updateRoles = async (req, res, next) => {
     try {
       const { role_id } = req.query;
-      const { role_name, accessLevels } = req.body;
+      const { role_name, accessLevels,status } = req.body;
   
     
       const role = await RoleAccessLevelService.getRoleById(role_id);
@@ -44,7 +48,10 @@ exports.updateRoles = async (req, res, next) => {
       const UpdateRole = await RoleAccessLevelService.updateRoleAccessById(role, {
         role_name,
         accessLevels,
+        status
       });
+
+      await UserService.updateUserRoleNameByRoleId(role_id, { role: role_name });
   
       return res.status(200).json({ status: true, message: "role Updated successfully" });
     } catch (error) {
@@ -65,7 +72,19 @@ exports.getAllRoleAccessLevels = async (req, res, next) => {
         next(error);
     }
 };
-
+exports.getActiveRoleAccessLevels = async (req, res, next) => {
+    try {
+        const roleAccessLevels = await RoleAccessLevelService.getActiveRoleAccessLevels();
+        const encryptedData = encryptData(roleAccessLevels)
+        res.status(200).json({
+            status: true,
+            message: "Role access levels retrieved successfully",
+            data: encryptedData
+        });
+    } catch (error) {
+        next(error);
+    }
+};
 exports.getRoleById = async (req, res, next) => {
     try {
         const { role_id } = req.query;

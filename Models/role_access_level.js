@@ -10,7 +10,9 @@ const RoleAccessLevelSchema = new Schema({
         feature: String,
         permissions: [String]
       }
-    ]
+    ],
+    status: String,
+    created_by_user: String
 }, { timestamps: true });
 
 const RoleAccessLevelModel = mongoose.model('RoleAccessLevel', RoleAccessLevelSchema);

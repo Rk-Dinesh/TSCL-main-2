@@ -12,6 +12,7 @@ const UserSchema = new Schema({
     pincode: String,
     login_password: String,
     status: String,
+    role_id:String,
     role: String,
     created_by_user:String
 }, { timestamps: true });

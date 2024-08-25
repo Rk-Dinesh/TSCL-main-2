@@ -7,7 +7,7 @@ const jwt = require("jsonwebtoken");
 
 exports.createUser = async (req, res, next) => {
     try {
-        const { user_name, dept_name, phone, email, address, pincode, login_password, status, role,  created_by_user } = req.body;
+        const { user_name, dept_name, phone, email, address, pincode, login_password, status,role_id, role,  created_by_user } = req.body;
 
         const existingUser = await UserService.findUserByPhone(phone);
         if (existingUser) {
@@ -34,6 +34,7 @@ exports.createUser = async (req, res, next) => {
             pincode,
             login_password,
             status,
+            role_id,
             role,
             created_by_user
         );
@@ -117,7 +118,7 @@ exports.loginUser = async (req, res, next) => {
           .json({ status: false, message: "Invalid identifier or password" });
       }
 
-      const token = jwt.sign({ role: user.role,code:user.user_id }, process.env.SECRET_TOKEN, { expiresIn: '3h' });
+      const token = jwt.sign({ role_id:user.role_id,role: user.role,code:user.user_id }, process.env.SECRET_TOKEN, { expiresIn: '3h' });
   
       return res.status(200).json({ token });
     } catch (error) {
@@ -215,7 +216,7 @@ exports.changePassword = async(req, res, next) => {
 exports.updateUser = async (req, res, next) => {
   try {
     const { user_id } = req.query;
-    const { user_name,dept_name,address,pincode,status,role } = req.body;
+    const { user_name,dept_name,address,pincode,status,role_id,role } = req.body;
 
   
     const user = await UserService.findUserById(user_id);
@@ -229,6 +230,7 @@ exports.updateUser = async (req, res, next) => {
       address,
       pincode,
       status,
+      role_id,
       role
     });
 

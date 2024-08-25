@@ -18,6 +18,9 @@ exports.getRoleById = async (role_id) => {
 exports.getAllRoleAccessLevels = async () => {
   return await RoleAccessLevelModel.find();
 };
+exports.getActiveRoleAccessLevels = async () => {
+  return await RoleAccessLevelModel.find({status:'active'});
+};
 
 exports.deleteRoleById = async (role_id) => {
     return await RoleAccessLevelModel.findOneAndDelete({ role_id });
