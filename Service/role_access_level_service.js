@@ -1,10 +1,24 @@
-const RoleAccessLevelModel = require('../Models/role_access_level');
+const RoleAccessLevelModel = require("../Models/role_access_level");
 
-exports.createRoleAccessLevel = async (roleAccessLevelData) => {
-    const roleAccessLevel = new RoleAccessLevelModel(roleAccessLevelData);
-    return await roleAccessLevel.save();
+exports.updateRoleAccessById = async (role, updateData) => {
+    const { role_name, accessLevels } = updateData;
+    return await RoleAccessLevelModel.updateOne(
+      { _id: role._id },
+      { $set: {
+          role_name,
+          accessLevels
+      }}
+    );
+  };
+  
+exports.getRoleById = async (role_id) => {
+  return await RoleAccessLevelModel.findOne({ role_id });
 };
 
 exports.getAllRoleAccessLevels = async () => {
-    return await RoleAccessLevelModel.find();
+  return await RoleAccessLevelModel.find();
+};
+
+exports.deleteRoleById = async (role_id) => {
+    return await RoleAccessLevelModel.findOneAndDelete({ role_id });
 };

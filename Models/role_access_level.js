@@ -4,10 +4,13 @@ const { Schema } = mongoose;
 
 const RoleAccessLevelSchema = new Schema({
     role_id: String,
-    feature_access: String,
-    access_type: String,
-    status: String,
-    created_by_user: String
+    role_name: String,
+    accessLevels: [
+      {
+        feature: String,
+        permissions: [String]
+      }
+    ]
 }, { timestamps: true });
 
 const RoleAccessLevelModel = mongoose.model('RoleAccessLevel', RoleAccessLevelSchema);

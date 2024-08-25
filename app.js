@@ -24,6 +24,7 @@ const roleAccessLevelRouter = require('./Router/role_access_level_router');
 const DepartmentRouter=require('./Router/department_routes')
 const OrganzationRouter=require('./Router/organization_routes');
 const ComplaintTypeRouter= require('./Router/complaint_type_router');
+const StatusRouter= require('./Router/status_router');
 
 
 app.use(body_parser.json());
@@ -44,10 +45,11 @@ app.use('/grievance-worksheet', grievanceWorksheetRouter);
 app.use('/grievance-worksheet-attachment', grievanceWorksheetAttachmentRouter);
 app.use('/grievance-escalation', grievanceEscalationRouter);
 app.use('/role', roleRouter);
-app.use('/role-access-level', roleAccessLevelRouter);
+app.use('/roleaccess', roleAccessLevelRouter);
 app.use('/department',DepartmentRouter);
 app.use('/organization',OrganzationRouter);
-app.use('/complainttype',ComplaintTypeRouter)
+app.use('/complainttype',ComplaintTypeRouter);
+app.use('/status',StatusRouter);
 
 app.use((err, req, res, next) => {
   if (err.code === 'LIMIT_FILE_COUNT') {
