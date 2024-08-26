@@ -18,6 +18,7 @@ const NewGrievanceSchema = new Schema({
   phone:String,
   assign_user:String,
   assign_username:String,
+  assign_userphone:String,
   status: String,
   escalation_level: String,
   statusflow: String,

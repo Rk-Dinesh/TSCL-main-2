@@ -4,9 +4,9 @@ const encryptData = require('../encryptedData');
 
 exports.createNewGrievance = async (req, res, next) => {
     try {
-        const { grievance_mode,complaint_type_title, dept_name, zone_name, ward_name, street_name,pincode,complaint,complaint_details, public_user_id, public_user_name,phone,assign_user,assign_username, status, escalation_level,statusflow,priority} = req.body;
+        const { grievance_mode,complaint_type_title, dept_name, zone_name, ward_name, street_name,pincode,complaint,complaint_details, public_user_id, public_user_name,phone,assign_user,assign_username,assign_userphone, status, escalation_level,statusflow,priority} = req.body;
         const grievance_id = await IdcodeServices.generateCode("NewGrievance");
-        const newGrievance = await NewGrievanceService.createNewGrievance({ grievance_id,grievance_mode, complaint_type_title, dept_name, zone_name, ward_name, street_name,pincode,complaint,complaint_details, public_user_id, public_user_name,phone,assign_user,assign_username, status, escalation_level,statusflow,priority});
+        const newGrievance = await NewGrievanceService.createNewGrievance({ grievance_id,grievance_mode, complaint_type_title, dept_name, zone_name, ward_name, street_name,pincode,complaint,complaint_details, public_user_id, public_user_name,phone,assign_user,assign_username,assign_userphone, status, escalation_level,statusflow,priority});
         
         res.status(200).json({
             status: true,
@@ -67,6 +67,25 @@ exports.getGrievanceByUserId = async (req, res, next) => {
     }
 };
 
+
+exports.getGrievanceByDept = async (req, res, next) => {
+    try {
+        const { dept_name } = req.query;
+        const newGrievance = await NewGrievanceService.getGrievanceByDept(dept_name);
+        if (!newGrievance) {
+            return res.status(404).json({ status: false, message: " grievance not found" });
+        }
+        const encryptedData = encryptData(newGrievance)
+        res.status(200).json({
+            status: true,
+            message: "Dept grievance retrieved successfully",
+            data: encryptedData
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 exports.getGrievanceByAssign = async (req, res, next) => {
     try {
         const { assign_user } = req.query;
@@ -109,7 +128,7 @@ exports.updateStatus = async(req, res, next) => {
 exports.updateAssign = async(req, res, next) => {
     try {
         const { grievance_id } = req.query;
-        const { assign_user,assign_username } = req.body;
+        const { assign_user,assign_username,assign_userphone } = req.body;
 
         const newGrievance = await NewGrievanceService.getNewGrievanceById(grievance_id);
         if (!newGrievance) {
@@ -118,6 +137,7 @@ exports.updateAssign = async(req, res, next) => {
 
         newGrievance.assign_user = assign_user;
         newGrievance.assign_username = assign_username;
+        newGrievance.assign_userphone= assign_userphone;
 
         await newGrievance.save();
 

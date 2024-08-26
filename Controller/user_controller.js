@@ -118,7 +118,7 @@ exports.loginUser = async (req, res, next) => {
           .json({ status: false, message: "Invalid identifier or password" });
       }
 
-      const token = jwt.sign({ role_id:user.role_id,role: user.role,code:user.user_id }, process.env.SECRET_TOKEN, { expiresIn: '3h' });
+      const token = jwt.sign({ role_id:user.role_id,role: user.role,code:user.user_id,dept:user.dept_name }, process.env.SECRET_TOKEN, { expiresIn: '3h' });
   
       return res.status(200).json({ token });
     } catch (error) {
@@ -155,6 +155,24 @@ exports.getUserById = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
+};
+
+exports.getUserByDept = async (req, res, next) => {
+  try {
+      const { dept_name } = req.query;
+      const users = await UserService.findUserByDept(dept_name);
+      if (!users) {
+          return res.status(404).json({ status: false, message: "User not found" });
+      }
+      const encryptedData = encryptData(users)
+      res.status(200).json({
+          status: true,
+          message: "Users retrieved successfully",
+          data: encryptedData
+      });
+  } catch (error) {
+      next(error);
+  }
 };
 
 exports.forwardPassword = async(req, res, next) => {

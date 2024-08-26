@@ -41,6 +41,9 @@ exports.findUserByEmail = async (email) => {
 exports.findUserById = async (user_id) => {
     return await UserModel.findOne({ user_id });
 };
+exports.findUserByDept = async (dept_name) => {
+    return await UserModel.find({ dept_name });
+};
 exports.getAllUsers = async () => {
     return await UserModel.find();
 };

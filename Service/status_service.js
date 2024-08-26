@@ -9,6 +9,9 @@ exports.createstatus = async (statusData) => {
 exports.getAllstatus = async () => {
     return await StatusModel.find();
 };
+exports.getActivestatus = async () => {
+    return await StatusModel.find({status:'active'});
+};
 exports.getstatusById = async (status_id) => {
     return await StatusModel.findOne({ status_id });
 };
