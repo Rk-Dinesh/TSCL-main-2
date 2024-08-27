@@ -16,6 +16,14 @@ exports.getGrievanceByUserId = async (public_user_id) => {
     return await NewGrievanceModel.find({ public_user_id });
 };
 
+exports.getGrievanceBystatusClosed = async (public_user_id) => {
+    return await NewGrievanceModel.find({
+        public_user_id,
+        status: "closed"
+    });
+};
+
+
 exports.getGrievanceByDept = async (dept_name) => {
     return await NewGrievanceModel.find({ dept_name });
 };

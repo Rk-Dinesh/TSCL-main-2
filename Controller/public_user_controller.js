@@ -57,9 +57,12 @@ exports.createPublicUser = async (req, res, next) => {
       role
     );
 
+    const encryptedData =encryptData( publicUser.public_user_id);
+
     res.status(200).json({
       status: true,
       message: "Public user created successfully",
+      data:encryptedData
      
     });
   } catch (error) {

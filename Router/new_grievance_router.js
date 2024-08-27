@@ -7,6 +7,7 @@ router.post('/post',verifyToken, newGrievanceController.createNewGrievance);
 router.get('/get',verifyToken, newGrievanceController.getAllNewGrievances);
 router.get('/getbyid',verifyToken, newGrievanceController.getNewGrievanceById);
 router.get('/getbyuserid',verifyToken, newGrievanceController.getGrievanceByUserId);
+router.get('/getbyidstatus',verifyToken, newGrievanceController.getGrievanceByUstatusClosedID);
 router.get('/getbyassign',verifyToken, newGrievanceController.getGrievanceByAssign);
 router.get('/getbydept',verifyToken, newGrievanceController.getGrievanceByDept);
 router.post('/updatestatus', newGrievanceController.updateStatus);
