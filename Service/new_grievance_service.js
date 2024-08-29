@@ -36,3 +36,8 @@ exports.getGrievanceByAssign = async (assign_user) => {
 exports.deleteNewGrievanceById = async (grievance_id) => {
     return await NewGrievanceModel.findOneAndDelete({ grievance_id });
 };
+
+
+exports.filterGrievances = async (filter) => {
+    return await NewGrievanceModel.find(filter,'createdAt grievance_id status');
+  };

@@ -1,45 +1,87 @@
 const GrievanceWorksheetAttachmentService = require('../Service/grievance_worksheet_attachment_service');
 
-exports.createGrievanceWorksheetAttachment = async (req, res, next) => {
-    try {
-        const { grievance_id, worksheet_id, attachment_name, created_by_user } = req.body;
-        const grievanceWorksheetAttachment = await GrievanceWorksheetAttachmentService.createGrievanceWorksheetAttachment({ grievance_id, worksheet_id, attachment_name, created_by_user });
-        
-        res.status(200).json({
-            status: true,
-            message: "Grievance worksheet attachment created successfully",
-            data: grievanceWorksheetAttachment
-        });
-    } catch (error) {
-        next(error);
-    }
-};
+const crypto = require("crypto");
+const {  gfs1 } = require('../Config/db');
+const fs = require("fs");
+const mongoose = require("mongoose");
+const encryptData = require('../encryptedData');
+const GrievanceWorksheetAttachmentModel = require('../Models/grievance_worksheet_attachment');
 
-exports.getAllGrievanceWorksheetAttachments = async (req, res, next) => {
+
+  exports.uploadFiles = async (req, res) => {
     try {
-        const grievanceWorksheetAttachments = await GrievanceWorksheetAttachmentService.getAllGrievanceWorksheetAttachments();
-        res.status(200).json({
-            status: true,
-            message: "Grievance worksheet attachments retrieved successfully",
-            data: grievanceWorksheetAttachments
+      const files = req.files;
+      const grievance_id = req.body.grievance_id;
+      const created_by_user = req.body.created_by_user;
+  
+      if (files.length > 5) {
+        return res.status(400).json({ message: "File count exceeds the limit of 5" });
+      }
+  
+      const attachments = [];
+  
+      for (const file of files) {
+        const randomName = crypto.randomBytes(10).toString("hex");
+        const writeStream = gfs1.openUploadStream(randomName, {
+          _id: new mongoose.Types.ObjectId(),
         });
+  
+        fs.createReadStream(file.path).pipe(writeStream);
+  
+        const attachment = new GrievanceWorksheetAttachmentModel({
+          grievance_id,
+          created_by_user,
+          attachment_id: writeStream.id,
+          attachment: randomName,
+        });
+  
+        await attachment.save();
+        attachments.push(attachment);
+      }
+  
+      for (const file of files) {
+        fs.unlinkSync(file.path);
+      }
+  
+      res.status(200).json(attachments);
     } catch (error) {
-        next(error);
+      console.error(error);
+      res.status(500).json({ message: "Failed to upload files" });
     }
-};
-exports.getGrievanceWorksheetAttachmentById = async (req, res, next) => {
+  };
+
+  exports.getFile = async (req, res) => {
+    const { filename } = req.params;
+    const file = await GrievanceWorksheetAttachmentService.getFile(filename);
+  
+    if (!file) {
+      return res.status(404).send("File not found");
+    }
+  
+    res.set("Content-Type", file.contentType);
+    file.readStream.pipe(res);
+  };
+
+  exports.getAttachments = async (req, res, next) => {
     try {
         const { grievance_id } = req.query;
-        const grievanceWorksheetAttachment = await GrievanceWorksheetAttachmentService.getGrievanceWorksheetAttachmentById(grievance_id);
-        if (!grievanceWorksheetAttachment) {
-            return res.status(404).json({ status: false, message: "Grievance worksheet attachment not found" });
+        const grievance = await GrievanceWorksheetAttachmentService.getGrievanceWorksheetAttachmentAll(grievance_id);
+        if (!grievance) {
+            return res.status(404).json({ status: false, message: "grievance not found" });
         }
+        const encryptedData = encryptData(grievance)
         res.status(200).json({
             status: true,
-            message: "Grievance worksheet attachment retrieved successfully",
-            data: grievanceWorksheetAttachment
+            message: "grievance retrieved successfully",
+            data: encryptedData
         });
     } catch (error) {
         next(error);
     }
 };
+  
+  
+
+  
+
+

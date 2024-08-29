@@ -19,5 +19,9 @@ mongoose.connect(mongoURI, {
   const gfs = new mongoose.mongo.GridFSBucket(db, {
     bucketName: 'Attachments',
   });
+  const gfs1 = new mongoose.mongo.GridFSBucket(db, {
+    bucketName: 'Worksheet',
+  });
 
-  module.exports = { gfs};
+
+  module.exports = { gfs,gfs1};

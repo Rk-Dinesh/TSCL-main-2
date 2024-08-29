@@ -4,8 +4,11 @@ const { Schema } = mongoose;
 
 const GrievanceWorksheetAttachmentSchema = new Schema({
     grievance_id: String,
-    worksheet_id: String,
-    attachment_name: String,
+    attachment: String,
+    attachment_id:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'GridFSBucket',
+      },
     created_by_user: String
 }, { timestamps: true });
 

@@ -181,4 +181,28 @@ exports.deleteNewGrievanceById = async (req, res, next) => {
     }
 };
 
+exports.filterGrievances = async (req, res, next) => {
+    try {
+      const { zone_name, ward_name, street_name, dept_name, complaint } = req.query;
+      const filter = {};
+  
+      if (zone_name) filter.zone_name = zone_name;
+      if (ward_name) filter.ward_name = ward_name;
+      if (street_name) filter.street_name = street_name;
+      if (dept_name) filter.dept_name = dept_name;
+      if (complaint) filter.complaint = complaint;
+
+      filter.status = { $ne: 'closed' };
+  
+      const grievances = await NewGrievanceService.filterGrievances(filter);
+      res.status(200).json({
+        status: true,
+        message: "New grievance Filtered successfully",
+        data:grievances
+    });
+    } catch (error) {
+      next(error);
+    }
+  };
+
 

@@ -4,6 +4,6 @@ const grievanceWorksheetController = require('../Controller/grievance_worksheet_
 const verifyToken = require('../Authorization');
 
 router.post('/post',verifyToken, grievanceWorksheetController.createGrievanceWorksheet);
-router.get('/get', grievanceWorksheetController.getAllGrievanceWorksheets);
-router.get('/getbyid', grievanceWorksheetController.getGrievanceWorksheetById);
+router.get('/get',verifyToken, grievanceWorksheetController.getAllGrievanceWorksheets);
+router.get('/getbyid',verifyToken, grievanceWorksheetController.getGrievanceWorksheetById);
 module.exports = router;
