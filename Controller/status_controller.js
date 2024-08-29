@@ -4,9 +4,9 @@ const StatusService = require('../Service/status_service')
 
 exports.createstatus = async (req, res, next) => {
     try {
-        const { status_name,status, created_by_user} = req.body;   
+        const { status_name,status,color, created_by_user} = req.body;   
         const status_id = await IdcodeServices.generateCode("Status");
-        const newstatus = await StatusService.createstatus({ status_id, status_name,status, created_by_user});
+        const newstatus = await StatusService.createstatus({ status_id, status_name,status,color, created_by_user});
         
         res.status(200).json({
             status: true,
@@ -67,7 +67,7 @@ exports.getstatusById = async (req, res, next) => {
 exports.updatestatus = async (req, res, next) => {
     try {
       const { status_id } = req.query;
-      const { status_name,status } = req.body;  
+      const { status_name,status,color } = req.body;  
   
     
       const newstatus = await StatusService.getstatusById(status_id);
@@ -76,7 +76,7 @@ exports.updatestatus = async (req, res, next) => {
       }
 
       const updatedstatus = await StatusService.updatestatusById(status_id, {
-        status_name,status
+        status_name,status,color
       });
   
       return res.status(200).json({ status: true, message: "status Updated successfully" });
