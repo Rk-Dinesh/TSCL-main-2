@@ -1,3 +1,4 @@
+const encryptData = require('../encryptedData');
 const GrievanceLogService = require('../Service/grievance_log_service');
 
 exports.createGrievanceLog = async (req, res, next) => {
@@ -8,7 +9,7 @@ exports.createGrievanceLog = async (req, res, next) => {
         res.status(200).json({
             status: true,
             message: "Grievance log created successfully",
-            data: grievanceLog
+            
         });
     } catch (error) {
         next(error);
@@ -18,10 +19,11 @@ exports.createGrievanceLog = async (req, res, next) => {
 exports.getAllGrievanceLogs = async (req, res, next) => {
     try {
         const grievanceLogs = await GrievanceLogService.getAllGrievanceLogs();
+        const encryptedData = encryptData(grievanceLogs)
         res.status(200).json({
             status: true,
             message: "Grievance logs retrieved successfully",
-            data: grievanceLogs
+            data: encryptedData
         });
     } catch (error) {
         next(error);
@@ -34,10 +36,11 @@ exports.getGrievanceLogById = async (req, res, next) => {
         if (!grievanceLog) {
             return res.status(404).json({ status: false, message: "Grievance log not found" });
         }
+        const encryptedData = encryptData(grievanceLog)
         res.status(200).json({
             status: true,
-            message: "Grievance log retrieved successfully",
-            data: grievanceLog
+            message: "Grievance log by id retrieved successfully",
+            data: encryptedData
         });
     } catch (error) {
         next(error);

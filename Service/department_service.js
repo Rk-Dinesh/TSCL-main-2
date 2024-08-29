@@ -1,4 +1,5 @@
 const DepartmentModel = require('../Models/department');
+const IdcodeServices = require('./idcode_Service');
 
 exports.createDepartment = async (departmentData) => {
     const department = new DepartmentModel(departmentData);
@@ -20,4 +21,14 @@ exports.updateDepartmentById = async (dept_id, updateData) => {
 exports.deleteDepartmentById = async (dept_id) => {
     return await DepartmentModel.findOneAndDelete({ dept_id });
 };
+exports.bulkInsert =  async(csvs) => {
+    try {
+        for (let csv of csvs) {
+            csv.dept_id = await IdcodeServices.generateCode('Department');
+        }
+        return await DepartmentModel.insertMany(csvs);
+    } catch (error) {
+        throw error;
+    }
+}
 

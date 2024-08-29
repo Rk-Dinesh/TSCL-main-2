@@ -30,7 +30,7 @@ class IdcodeServices{
                 id = idcode+codes;
              }
              console.log(id);
-             this.updateCode(idname,codes)
+             await this.updateCode(idname,codes)
              return id;
         }catch(error){
             console.log(error);

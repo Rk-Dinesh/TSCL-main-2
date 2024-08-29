@@ -1,4 +1,5 @@
 const OrganizationModel = require('../Models/organization');
+const IdcodeServices = require('./idcode_Service');
 
 exports.createOrganization = async (organizationData) => {
     const organization = new OrganizationModel(organizationData);
@@ -23,3 +24,14 @@ exports.updateOrganizationById = async (org_id, updateData) => {
 exports.deleteOrganizationById = async (org_id) => {
     return await OrganizationModel.findOneAndDelete({ org_id });
 };
+
+exports.bulkInsert =  async(csvs) => {
+    try {
+        for (let csv of csvs) {
+            csv.org_id = await IdcodeServices.generateCode('Organization');
+        }
+        return await OrganizationModel.insertMany(csvs);
+    } catch (error) {
+        throw error;
+    }
+}
