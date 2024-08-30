@@ -195,10 +195,11 @@ exports.filterGrievances = async (req, res, next) => {
       filter.status = { $ne: 'closed' };
   
       const grievances = await NewGrievanceService.filterGrievances(filter);
+      const encryptedData = encryptData(grievances)
       res.status(200).json({
         status: true,
         message: "New grievance Filtered successfully",
-        data:grievances
+        data:encryptedData
     });
     } catch (error) {
       next(error);
