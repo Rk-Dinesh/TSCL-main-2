@@ -3,22 +3,7 @@ const Grievance = require('../Models/new_grievance');
 const Complaint =require('../Models/complaint');
 const GrievanceEscalation = require('../Models/grievance_escalation');
 
-exports.createGrievanceEscalation = async (req, res, next) => {
-    try {
-        const { grievance_id, escalation_details, escalation_level, escalation_department, escalation_to, escalated_user, status } = req.body;
-        const grievanceEscalation = await GrievanceEscalationService.createGrievanceEscalation({
-            grievance_id, escalation_details, escalation_level, escalation_department, escalation_to, escalated_user, status
-        });
 
-        res.status(200).json({
-            status: true,
-            message: "Grievance escalation created successfully",
-            data: grievanceEscalation
-        });
-    } catch (error) {
-        next(error);
-    }
-};
 exports.getAllGrievanceEscalations = async (req, res, next) => {
     try {
         const grievanceEscalations = await GrievanceEscalationService.getAllGrievanceEscalations();
@@ -75,6 +60,8 @@ const checkEscalation = async () => {
           escalationDateTime = new Date(grievance.createdAt.getTime() + escalationTime * 24 * 60 * 60 * 1000);
         } else if (escalationLevel === 'month') {
           escalationDateTime = new Date(grievance.createdAt.getTime() + escalationTime * 30 * 24 * 60 * 60 * 1000);
+        }else if (escalationLevel === 'minute') {
+            escalationDateTime = new Date(grievance.createdAt.getTime() + escalationTime * 60 * 1000);
         } else {
           console.log(`Invalid escalation level ${escalationLevel} for grievance ${grievance.grievance_id}`);
           continue;
@@ -121,7 +108,7 @@ const checkEscalation = async () => {
             escalation_details: `Escalation level 2 exceeded`,
             escalation_level: 'l2',
             escalation_department: complaint.dept_name,
-            escalation_to: complaint.escalation_l2,
+            escalation_to: complaint.complaint_type_title,
             escalated_user: grievance.assign_user,
             status: grievance.status,
           });
