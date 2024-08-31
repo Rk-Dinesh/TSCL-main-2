@@ -4,8 +4,8 @@ const grievanceEscalationController = require('../Controller/grievance_escalatio
 const verifyToken = require('../Authorization');
 
 
-router.get('/get', grievanceEscalationController.getAllGrievanceEscalations);
-router.get('/getbyid', grievanceEscalationController.getGrievanceEscalationById);
+router.get('/get',verifyToken, grievanceEscalationController.getAllGrievanceEscalations);
+router.get('/getbyid',verifyToken, grievanceEscalationController.getGrievanceEscalationById);
 router.get('/getbydeptrole',verifyToken, grievanceEscalationController.getGrievanceEscalationRoleDept);
 
 module.exports = router;

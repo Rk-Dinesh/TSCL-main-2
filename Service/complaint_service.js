@@ -1,4 +1,5 @@
 const ComplaintModel = require('../Models/complaint');
+const IdcodeServices = require('./idcode_Service');
 
 exports.createComplaint = async (complaintData) => {
     const complaint = new ComplaintModel(complaintData);

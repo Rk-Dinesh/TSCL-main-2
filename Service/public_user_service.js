@@ -61,7 +61,7 @@ exports.bulkInsert = async (csvs) => {
             const salt = await bcrypt.genSalt(10);
             csv.login_password = await bcrypt.hash(csv.login_password, salt);
         }
-        return await UserModel.insertMany(csvs);
+        return await PublicUserModel.insertMany(csvs);
     } catch (error) {
         throw error;
     }

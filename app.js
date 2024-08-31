@@ -30,7 +30,11 @@ const { checkEscalation } = require('./Controller/grievance_escalation_controlle
 
 
 // Schedule the cron job to run every 15 minutes
-cron.schedule('*/5 * * * * *', checkEscalation);
+// cron.schedule('*/5 * * * * *', checkEscalation);
+
+// Schedule to run once every day at midnight
+cron.schedule('0 0 * * *', checkEscalation);
+
 
 // Start the cron job
 checkEscalation();

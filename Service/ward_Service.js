@@ -1,4 +1,5 @@
 const WardModel = require('../Models/ward');
+const IdcodeServices = require('./idcode_Service');
 
 exports.createWard = async (wardData) => {
     const ward = new WardModel(wardData);
