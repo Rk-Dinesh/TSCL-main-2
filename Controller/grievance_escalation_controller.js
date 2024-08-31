@@ -2,13 +2,12 @@ const GrievanceEscalationService = require("../Service/grievance_escalation_serv
 const Grievance = require("../Models/new_grievance");
 const Complaint = require("../Models/complaint");
 const GrievanceEscalation = require("../Models/grievance_escalation");
-
-
+const encryptData = require("../encryptedData");
 
 exports.checkEscalation = async () => {
   // Get all grievances except status === 'closed'
   const grievances = await Grievance.find({ status: { $ne: "closed" } });
-  console.log(grievances);
+//  console.log(grievances);
   // Loop through each grievance
   for (const grievance of grievances) {
     // Get the complaint type and escalation details
@@ -36,7 +35,7 @@ exports.checkEscalation = async () => {
     ) {
       const level1 = complaint.escalation_l1;
       const escalationTime = parseInt(level1);
-      console.log("executed1");
+    //   console.log("executed1");
 
       let escalationDateTime;
       if (escalationLevel === "day") {
@@ -71,12 +70,15 @@ exports.checkEscalation = async () => {
           escalation_to: complaint.role_l1,
           escalated_user: grievance.assign_username,
           escalated_userid: grievance.assign_user,
+          escalated_due: escalationTime,
+          escalation_raisedby: grievance.public_user_name,
+          escalation_priority: complaint.priority,
           status: grievance.status,
         });
 
         // Save the escalation document
         await escalation.save();
-        console.log("escalted_l1");
+        // console.log("escalted_l1");
 
         // Update the grievance status
         await Grievance.updateOne(
@@ -92,10 +94,10 @@ exports.checkEscalation = async () => {
     ) {
       const level1 = complaint.escalation_l1;
       const level2 = complaint.escalation_l2;
-      console.log("add", level1 + level2);
-      console.log("add", parseInt(level1) + parseInt(level2));
+    //   console.log("add", level1 + level2);
+    //   console.log("add", parseInt(level1) + parseInt(level2));
       const escalationTime = parseInt(level1) + parseInt(level2);
-      console.log("executed2");
+    //   console.log("executed2");
 
       let escalationDateTime;
       if (escalationLevel === "day") {
@@ -130,10 +132,13 @@ exports.checkEscalation = async () => {
             escalation_to: complaint.role_l2,
             escalated_user: grievance.assign_username,
             escalated_userid: grievance.assign_user,
+            escalated_due: escalationTime,
+            escalation_raisedby: grievance.public_user_name,
+            escalation_priority: complaint.priority,
             status: grievance.status,
           }
         );
-        console.log("escalted_l2");
+        // console.log("escalted_l2");
         // Update the grievance status
         await Grievance.updateOne(
           { grievance_id: grievance.grievance_id },
@@ -150,14 +155,14 @@ exports.checkEscalation = async () => {
       const level2 = complaint.escalation_l2;
       const level3 = complaint.escalation_l3;
 
-      console.log("add", level1 + level2 + level3);
-      console.log(
-        "add",
-        parseInt(level1) + parseInt(level2) + parseInt(level3)
-      );
+    //   console.log("add", level1 + level2 + level3);
+    //   console.log(
+    //     "add",
+    //     parseInt(level1) + parseInt(level2) + parseInt(level3)
+    //   );
       const escalationTime =
         parseInt(level1) + parseInt(level2) + parseInt(level3);
-      console.log("executed3");
+    //   console.log("executed3");
       let escalationDateTime;
       if (escalationLevel === "day") {
         escalationDateTime = new Date(
@@ -190,11 +195,14 @@ exports.checkEscalation = async () => {
             escalation_to: complaint.role_l3,
             escalated_user: grievance.assign_username,
             escalated_userid: grievance.assign_user,
+            escalated_due: escalationTime,
+            escalation_raisedby: grievance.public_user_name,
+            escalation_priority: complaint.priority,
             status: grievance.status,
           }
         );
 
-        console.log("escalted_l3");
+        // console.log("escalted_l3");
 
         // Update the grievance status
         await Grievance.updateOne(
@@ -207,54 +215,60 @@ exports.checkEscalation = async () => {
 };
 
 exports.getAllGrievanceEscalations = async (req, res, next) => {
-    try {
-      const grievanceEscalations =
-        await GrievanceEscalationService.getAllGrievanceEscalations();
-      res.status(200).json({
-        status: true,
-        message: "Grievance escalations retrieved successfully",
-        data: grievanceEscalations,
-      });
-    } catch (error) {
-      next(error);
+  try {
+    const grievanceEscalations =
+      await GrievanceEscalationService.getAllGrievanceEscalations();
+      const encryptedData = encryptData(grievanceEscalations)
+    res.status(200).json({
+      status: true,
+      message: "Grievance escalations retrieved successfully",
+      data: encryptedData,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+exports.getGrievanceEscalationById = async (req, res, next) => {
+  try {
+    const { grievance_id } = req.query;
+    const grievanceEscalation =
+      await GrievanceEscalationService.getGrievanceEscalationById(grievance_id);
+    if (!grievanceEscalation) {
+      return res
+        .status(404)
+        .json({ status: false, message: "Grievance escalation not found" });
     }
-  };
-  exports.getGrievanceEscalationById = async (req, res, next) => {
-    try {
-      const { grievance_id } = req.query;
-      const grievanceEscalation =
-        await GrievanceEscalationService.getGrievanceEscalationById(grievance_id);
-      if (!grievanceEscalation) {
-        return res
-          .status(404)
-          .json({ status: false, message: "Grievance escalation not found" });
-      }
-      res.status(200).json({
-        status: true,
-        message: "Grievance escalation retrieved successfully",
-        data: grievanceEscalation,
-      });
-    } catch (error) {
-      next(error);
-    }
-  };
+    const encryptedData = encryptData(grievanceEscalation)
+    res.status(200).json({
+      status: true,
+      message: "Grievance escalation retrieved successfully",
+      data: encryptedData,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
-
-  exports.getGrievanceEscalationRoleDept = async (req, res, next) => {
-    try {
-      const { escalation_department, escalation_to } = req.query;
-      const grievanceEscalation = await GrievanceEscalationService.getGrievanceEscalationByDepartmentAndTo(escalation_department, escalation_to);
-      if (!grievanceEscalation) {
-        return res
-          .status(404)
-          .json({ status: false, message: "Grievance escalation not found" });
-      }
-      res.status(200).json({
-        status: true,
-        message: "Grievance escalation on role and dept  retrieved successfully",
-        data: grievanceEscalation,
-      });
-    } catch (error) {
-      next(error);
+exports.getGrievanceEscalationRoleDept = async (req, res, next) => {
+  try {
+    const { escalation_department, escalation_to } = req.query;
+    const grievanceEscalation =
+      await GrievanceEscalationService.getGrievanceEscalationByDepartmentAndTo(
+        escalation_department,
+        escalation_to
+      );
+    if (!grievanceEscalation) {
+      return res
+        .status(404)
+        .json({ status: false, message: "Grievance escalation not found" });
     }
-  };
+    const encryptedData = encryptData(grievanceEscalation)
+    res.status(200).json({
+      status: true,
+      message: "Grievance escalation on role and dept  retrieved successfully",
+      data: encryptedData,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

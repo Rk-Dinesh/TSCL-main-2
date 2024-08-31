@@ -11,6 +11,9 @@ const GrievanceEscalationSchema = new Schema({
     escalation_complaint: String,
     escalated_user: String,
     escalated_userid: String,
+    escalated_due: String,
+    escalation_raisedby:String,
+    escalation_priority:String,
     status: String,
 }, { timestamps: true });
 
