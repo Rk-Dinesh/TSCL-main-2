@@ -8,3 +8,9 @@ exports.getGrievanceEscalationById = async (grievance_id) => {
     return await GrievanceEscalationModel.findOne({ grievance_id });
 };
 
+exports.getGrievanceEscalationByDepartmentAndTo = async (escalation_department, escalation_to) => {
+    return await GrievanceEscalationModel.find({ escalation_department, escalation_to });
+  };
+
+
+

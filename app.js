@@ -4,6 +4,7 @@ const port = 4000;
 const body_parser = require('body-parser');
 const path = require('path');
 const cors = require('cors');
+const cron = require('node-cron')
 
 const zoneRouter = require('./Router/zone_router');
 const wardRouter = require('./Router/ward_router');
@@ -25,6 +26,14 @@ const DepartmentRouter=require('./Router/department_routes')
 const OrganzationRouter=require('./Router/organization_routes');
 const ComplaintTypeRouter= require('./Router/complaint_type_router');
 const StatusRouter= require('./Router/status_router');
+const { checkEscalation } = require('./Controller/grievance_escalation_controller');
+
+
+// Schedule the cron job to run every 15 minutes
+cron.schedule('*/5 * * * * *', checkEscalation);
+
+// Start the cron job
+checkEscalation();
 
 
 app.use(body_parser.json());

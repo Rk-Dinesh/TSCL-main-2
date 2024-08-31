@@ -4,7 +4,7 @@ const userController = require('../Controller/user_controller');
 const verifyToken = require('../Authorization');
 
 router.post('/post',verifyToken, userController.createUser);
-router.post('/userforgotpassword',verifyToken,userController.forwardPassword);
+router.post('/userforgotpassword',userController.forwardPassword);
 router.post('/userchangepassword',verifyToken,userController.changePassword);
 router.post('/login', userController.loginUser);
 router.post('/loginweb', userController.loginUserweb);
