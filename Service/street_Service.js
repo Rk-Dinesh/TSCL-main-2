@@ -28,3 +28,14 @@ exports.updateStreetById = async (street_id, updateData) => {
 exports.deleteStreetById = async (street_id) => {
     return await StreetModel.findOneAndDelete({ street_id });
 };
+
+exports.bulkInsert =  async(csvs) => {
+    try {
+        for (let csv of csvs) {
+            csv.street_id = await IdcodeServices.generateCode('Street');
+        }
+        return await StreetModel.insertMany(csvs);
+    } catch (error) {
+        throw error;
+    }
+}

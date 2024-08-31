@@ -20,3 +20,14 @@ exports.updateComplaintsById = async (complaint_id, updateData) => {
 exports.deleteComplaintById = async (complaint_id) => {
     return await ComplaintModel.findOneAndDelete({ complaint_id });
 };
+
+exports.bulkInsert =  async(csvs) => {
+    try {
+        for (let csv of csvs) {
+            csv.complaint_id = await IdcodeServices.generateCode('Complaint');
+        }
+        return await ComplaintModel.insertMany(csvs);
+    } catch (error) {
+        throw error;
+    }
+}

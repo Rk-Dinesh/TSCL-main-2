@@ -35,3 +35,4 @@ exports.bulkInsert =  async(csvs) => {
         throw error;
     }
 }
+

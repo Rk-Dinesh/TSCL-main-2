@@ -27,3 +27,14 @@ exports.updateWardById = async (ward_id, updateData) => {
 exports.deleteWardById = async (ward_id) => {
     return await WardModel.findOneAndDelete({ ward_id });
 };
+
+exports.bulkInsert =  async(csvs) => {
+    try {
+        for (let csv of csvs) {
+            csv.ward_id = await IdcodeServices.generateCode('Ward');
+        }
+        return await WardModel.insertMany(csvs);
+    } catch (error) {
+        throw error;
+    }
+}

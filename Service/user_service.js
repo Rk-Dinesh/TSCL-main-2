@@ -57,4 +57,15 @@ exports.deleteUserById = async (user_id) => {
 exports.updateUserRoleNameByRoleId = async (role_id, updateData) => {
     return await UserModel.updateMany({ role_id }, { $set: updateData });
 };
-
+exports.bulkInsert = async (csvs) => {
+    try {
+        for (let csv of csvs) {
+            csv.user_id = await IdcodeServices.generateCode('User');
+            const salt = await bcrypt.genSalt(10);
+            csv.login_password = await bcrypt.hash(csv.login_password, salt);
+        }
+        return await UserModel.insertMany(csvs);
+    } catch (error) {
+        throw error;
+    }
+}

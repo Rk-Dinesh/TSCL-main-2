@@ -1,6 +1,9 @@
 const WardService = require('../Service/ward_Service');
 const IdcodeServices = require('../Service/idcode_Service');
 const encryptData = require('../encryptedData');
+const csvParser = require('csv-parser');
+const fs = require('fs');
+const path = require('path');
 
 exports.createWard = async (req, res, next) => {
     try {
@@ -120,3 +123,33 @@ exports.deleteWardById = async (req, res, next) => {
         next(error);
     }
 };
+
+exports.uploadCSV = async (req, res, next) => {
+    try {
+     
+      if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+      }
+  
+      const csvs = [];
+      const filePath = path.join(__dirname, '../excel', req.file.filename);
+      fs.createReadStream(filePath)
+        .pipe(csvParser())
+        .on('data', (row) => {
+          csvs.push(row);
+        })
+        .on('end', async () => {
+          try {
+            const result = await WardService.bulkInsert(csvs);
+            res.status(200).json(result);
+          } catch (error) {
+            next(error);
+          } finally {
+            // Remove the file after processing
+            fs.unlinkSync(filePath);
+          }
+        });
+    } catch (error) {
+      next(error);
+    }
+  };

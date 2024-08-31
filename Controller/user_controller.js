@@ -3,6 +3,9 @@ const UserModel = require('../Models/user');
 const UserService = require('../Service/user_service');
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
+const csvParser = require('csv-parser');
+const fs = require('fs');
+const path = require('path');
 
 
 exports.createUser = async (req, res, next) => {
@@ -272,4 +275,33 @@ exports.deleteUserById = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
+};
+exports.uploadCSV = async (req, res, next) => {
+  try {
+   
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    const csvs = [];
+    const filePath = path.join(__dirname, '../excel', req.file.filename);
+    fs.createReadStream(filePath)
+      .pipe(csvParser())
+      .on('data', (row) => {
+        csvs.push(row);
+      })
+      .on('end', async () => {
+        try {
+          const result = await UserService.bulkInsert(csvs);
+          res.status(200).json(result);
+        } catch (error) {
+          next(error);
+        } finally {
+          // Remove the file after processing
+          fs.unlinkSync(filePath);
+        }
+      });
+  } catch (error) {
+    next(error);
+  }
 };

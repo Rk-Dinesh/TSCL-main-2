@@ -54,5 +54,16 @@ exports.deletePublicUserById = async (public_user_id) => {
     return await PublicUserModel.findOneAndDelete({ public_user_id });
 };
 
-
+exports.bulkInsert = async (csvs) => {
+    try {
+        for (let csv of csvs) {
+            csv.public_user_id = await IdcodeServices.generateCode('PublicUser');
+            const salt = await bcrypt.genSalt(10);
+            csv.login_password = await bcrypt.hash(csv.login_password, salt);
+        }
+        return await UserModel.insertMany(csvs);
+    } catch (error) {
+        throw error;
+    }
+}
 

@@ -21,4 +21,5 @@ router.get('/getbyid',verifyToken, organizationController.getOrganizationById);
 router.delete('/delete',verifyToken, organizationController.deleteOrganizationById);
 router.post('/update',verifyToken, organizationController.updateOrganization);
 router.post('/uploadcsv', upload.single('file'), organizationController.uploadCSV);
+
 module.exports = router;
