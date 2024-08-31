@@ -102,3 +102,32 @@ exports.deleteZoneById = async (req, res, next) => {
     }
 };
 
+exports.uploadCSV = async (req, res, next) => {
+    try {
+     
+      if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+      }
+  
+      const csvs = [];
+      const filePath = path.join(__dirname, '../excel', req.file.filename);
+      fs.createReadStream(filePath)
+        .pipe(csvParser())
+        .on('data', (row) => {
+          csvs.push(row);
+        })
+        .on('end', async () => {
+          try {
+            const result = await ZoneService.bulkInsert(csvs);
+            res.status(200).json(result);
+          } catch (error) {
+            next(error);
+          } finally {
+            // Remove the file after processing
+            fs.unlinkSync(filePath);
+          }
+        });
+    } catch (error) {
+      next(error);
+    }
+  };

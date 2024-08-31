@@ -24,3 +24,14 @@ exports.updateZoneById = async (zone_id, updateData) => {
 exports.deleteZoneById = async (zone_id) => {
     return await ZoneModel.findOneAndDelete({ zone_id });
 };
+
+exports.bulkInsert =  async(csvs) => {
+    try {
+        for (let csv of csvs) {
+            csv.zone_id = await IdcodeServices.generateCode('Zone');
+        }
+        return await ZoneModel.insertMany(csvs);
+    } catch (error) {
+        throw error;
+    }
+}
