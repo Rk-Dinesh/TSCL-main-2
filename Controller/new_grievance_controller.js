@@ -192,7 +192,8 @@ exports.filterGrievances = async (req, res, next) => {
       if (dept_name) filter.dept_name = dept_name;
       if (complaint) filter.complaint = complaint;
 
-      filter.status = { $ne: 'closed' };
+      filter.status = { $nin: ['closed', 'Closed','CLOSE', 'CLOSED'] };
+    
   
       const grievances = await NewGrievanceService.filterGrievances(filter);
       const encryptedData = encryptData(grievances)

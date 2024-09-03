@@ -121,7 +121,7 @@ exports.loginUser = async (req, res, next) => {
           .json({ status: false, message: "Invalid identifier or password" });
       }
 
-      const token = jwt.sign({ role_id:user.role_id,role: user.role,code:user.user_id,dept:user.dept_name }, process.env.SECRET_TOKEN, { expiresIn: '3h' });
+      const token = jwt.sign({ role_id:user.role_id,role: user.role,code:user.user_id,dept:user.dept_name,name:user.user_name }, process.env.SECRET_TOKEN, { expiresIn: '3h' });
   
       return res.status(200).json({ token });
     } catch (error) {
