@@ -26,6 +26,8 @@ const DepartmentRouter=require('./Router/department_routes')
 const OrganzationRouter=require('./Router/organization_routes');
 const ComplaintTypeRouter= require('./Router/complaint_type_router');
 const StatusRouter= require('./Router/status_router');
+const DesignationRouter= require('./Router/designation_router');
+const EmployeeRouter= require('./Router/employe_router');
 const { checkEscalation } = require('./Controller/grievance_escalation_controller');
 
 
@@ -63,6 +65,8 @@ app.use('/department',DepartmentRouter);
 app.use('/organization',OrganzationRouter);
 app.use('/complainttype',ComplaintTypeRouter);
 app.use('/status',StatusRouter);
+app.use('/designation',DesignationRouter);
+app.use('/employee',EmployeeRouter);
 
 app.use((err, req, res, next) => {
   if (err.code === 'LIMIT_FILE_COUNT') {
