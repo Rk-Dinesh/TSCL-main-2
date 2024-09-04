@@ -17,7 +17,9 @@ const upload = multer({ storage: storage });
 
 router.post('/post',verifyToken, EmployeeController.createUser);
 router.get('/get',verifyToken, EmployeeController.getAllUsers);
+router.get('/getactive',verifyToken, EmployeeController.getActiveUsers);
 router.get('/getbyid',verifyToken, EmployeeController.getUserById);
+router.get('/getbyname',verifyToken, EmployeeController.getUserByName);
 router.get('/getbydept',verifyToken, EmployeeController.getUserByDept);
 router.delete('/delete',verifyToken, EmployeeController.deleteUserById);
 router.post('/update',verifyToken, EmployeeController.updateUser);

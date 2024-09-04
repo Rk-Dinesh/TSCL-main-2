@@ -14,7 +14,8 @@ const EmployeeSchema = new Schema({
     designation_id:String,
     designation: String,
     status: String,
-    created_by_user:String
+    created_by_user:String,
+    
 }, { timestamps: true });
 
 const EmployeeModel = mongoose.model('Employee', EmployeeSchema);

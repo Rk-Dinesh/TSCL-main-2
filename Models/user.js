@@ -14,7 +14,9 @@ const UserSchema = new Schema({
     status: String,
     role_id:String,
     role: String,
-    created_by_user:String
+    created_by_user:String,
+    zone_name:String,
+    ward_name:[String]
 }, { timestamps: true });
 
 const UserModel = mongoose.model('User', UserSchema);

@@ -1,13 +1,82 @@
 const NewGrievanceService = require('../Service/new_grievance_service');
 const IdcodeServices = require('../Service/idcode_Service');
 const encryptData = require('../encryptedData');
+const UserModel = require('../Models/user');
+const GrievanceLogModel = require('../Models/grievance_log');
+
+// exports.createNewGrievance = async (req, res, next) => {
+//     try {
+//         const { grievance_mode,complaint_type_title, dept_name, zone_name, ward_name, street_name,pincode,complaint,complaint_details, public_user_id, public_user_name,phone,assign_user,assign_username,assign_userphone, status, escalation_level,statusflow,priority} = req.body;
+//         const grievance_id = await IdcodeServices.generateCode("NewGrievance");
+//         const newGrievance = await NewGrievanceService.createNewGrievance({ grievance_id,grievance_mode, complaint_type_title, dept_name, zone_name, ward_name, street_name,pincode,complaint,complaint_details, public_user_id, public_user_name,phone,assign_user,assign_username,assign_userphone, status, escalation_level,statusflow,priority});
+        
+//         res.status(200).json({
+//             status: true,
+//             message: "New grievance created successfully",
+//             data: newGrievance.grievance_id
+//         });
+//     } catch (error) {
+//         next(error);
+//     }
+// };
 
 exports.createNewGrievance = async (req, res, next) => {
     try {
-        const { grievance_mode,complaint_type_title, dept_name, zone_name, ward_name, street_name,pincode,complaint,complaint_details, public_user_id, public_user_name,phone,assign_user,assign_username,assign_userphone, status, escalation_level,statusflow,priority} = req.body;
+        const { grievance_mode, complaint_type_title, dept_name, zone_name, ward_name, street_name, pincode, complaint, complaint_details, public_user_id, public_user_name, phone, status, escalation_level, statusflow, priority } = req.body;
         const grievance_id = await IdcodeServices.generateCode("NewGrievance");
-        const newGrievance = await NewGrievanceService.createNewGrievance({ grievance_id,grievance_mode, complaint_type_title, dept_name, zone_name, ward_name, street_name,pincode,complaint,complaint_details, public_user_id, public_user_name,phone,assign_user,assign_username,assign_userphone, status, escalation_level,statusflow,priority});
-        
+
+        const user = await UserModel.findOne({ dept_name, ward_name: { $in: [ward_name] } });
+        if (user) {
+          
+            var newGrievance = await NewGrievanceService.createNewGrievance({
+                grievance_id,
+                grievance_mode,
+                complaint_type_title,
+                dept_name,
+                zone_name,
+                ward_name,
+                street_name,
+                pincode,
+                complaint,
+                complaint_details,
+                public_user_id,
+                public_user_name,
+                phone,
+                assign_user: user.user_id,
+                assign_username: user.user_name,
+                assign_userphone: user.phone,
+                status,
+                escalation_level,
+                statusflow,
+                priority
+            });
+            const newLog = await GrievanceLogModel.create({
+                grievance_id,
+                log_details:`Work assigned automatically to ${user.user_name}`,
+                created_by_user: public_user_name
+            });
+        } else {
+            var newGrievance = await NewGrievanceService.createNewGrievance({
+                grievance_id,
+                grievance_mode,
+                complaint_type_title,
+                dept_name,
+                zone_name,
+                ward_name,
+                street_name,
+                pincode,
+                complaint,
+                complaint_details,
+                public_user_id,
+                public_user_name,
+                phone,
+                status,
+                escalation_level,
+                statusflow,
+                priority
+            });
+        }
+
         res.status(200).json({
             status: true,
             message: "New grievance created successfully",

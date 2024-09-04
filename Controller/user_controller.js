@@ -10,7 +10,7 @@ const path = require('path');
 
 exports.createUser = async (req, res, next) => {
     try {
-        const { user_name, dept_name, phone, email, address, pincode, login_password, status,role_id, role,  created_by_user } = req.body;
+        const { user_name, dept_name, phone, email, address, pincode, login_password, status,role_id, role,  created_by_user,zone_name,ward_name } = req.body;
 
         const existingUser = await UserService.findUserByPhone(phone);
         if (existingUser) {
@@ -39,7 +39,9 @@ exports.createUser = async (req, res, next) => {
             status,
             role_id,
             role,
-            created_by_user
+            created_by_user,
+            zone_name,
+            ward_name
         );
 
         res.status(200).json({
@@ -237,7 +239,7 @@ exports.changePassword = async(req, res, next) => {
 exports.updateUser = async (req, res, next) => {
   try {
     const { user_id } = req.query;
-    const { user_name,dept_name,address,pincode,status,role_id,role } = req.body;
+    const { user_name,dept_name,address,pincode,status,role_id,role ,zone_name,ward_name } = req.body;
 
   
     const user = await UserService.findUserById(user_id);
@@ -252,7 +254,9 @@ exports.updateUser = async (req, res, next) => {
       pincode,
       status,
       role_id,
-      role
+      role,
+      zone_name,
+      ward_name
     });
 
     return res.status(200).json({ status: true, message: "User Updated successfully" });

@@ -18,7 +18,8 @@ exports.createUser = async (emp_name, dept_name, phone, email,dob, address, pinc
             designation_id,
             designation,
             status,
-            created_by_user
+            created_by_user,
+            
         });
 
         return await employee.save();
@@ -37,6 +38,14 @@ exports.findUserByEmail = async (email) => {
 
 exports.findUserById = async (emp_id) => {
     return await EmployeeModel.findOne({ emp_id });
+};
+
+exports.findUserByActive = async () => {
+    return await EmployeeModel.find({ status:"active" });
+};
+
+exports.findUserName = async (emp_name) => {
+    return await EmployeeModel.findOne({ emp_name });
 };
 exports.findUserByDept = async (dept_name) => {
     return await EmployeeModel.find({ dept_name });

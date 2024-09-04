@@ -73,6 +73,38 @@ exports.getAllUsers = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.getActiveUsers = async (req, res, next) => {
+    try {
+        const users = await EmployeeService.findUserByActive();
+        const encryptedData = encryptData(users)
+        res.status(200).json({
+            status: true,
+            message: "Employee retrieved successfully",
+            data: encryptedData
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.getUserByName = async (req, res, next) => {
+    try {
+      const { emp_name } = req.query;
+      const users = await EmployeeService.findUserName(emp_name);
+      if (!users) {
+        return res.status(404).json({ status: false, message: "Employee not found" });
+      }
+      const encryptedData = encryptData(users);
+      res.status(200).json({
+        status: true,
+        message: "Employee retrieved successfully",
+        data: encryptedData,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
 exports.getUserById = async (req, res, next) => {
   try {
     const { emp_id } = req.query;
