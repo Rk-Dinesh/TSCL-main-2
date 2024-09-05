@@ -212,6 +212,28 @@ exports.updateStatus = async(req, res, next) => {
     }
 }
 
+exports.updateTransfer = async(req, res, next) => {
+    try {
+        const { grievance_id } = req.query;
+        const { dept_name,complaint } = req.body;
+
+        const newGrievance = await NewGrievanceService.getNewGrievanceById(grievance_id);
+        if (!newGrievance) {
+            return res.status(404).json({ status: false, message: "Grievance not found" });
+        }
+
+        newGrievance.dept_name = dept_name;
+        newGrievance.complaint = complaint;
+        
+
+        await newGrievance.save();
+
+        return res.status(200).json({ status: true, message: "Transfered successfully" });
+    } catch (error) {
+        next(error);
+    }
+}
+
 exports.updateAssign = async(req, res, next) => {
     try {
         const { grievance_id } = req.query;

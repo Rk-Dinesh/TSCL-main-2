@@ -12,6 +12,7 @@ router.get('/getbyassign',verifyToken, newGrievanceController.getGrievanceByAssi
 router.get('/getbydept',verifyToken, newGrievanceController.getGrievanceByDept);
 router.post('/updatestatus', newGrievanceController.updateStatus);
 router.post('/updateassign',verifyToken, newGrievanceController.updateAssign);
+router.post('/tickettransfer',verifyToken, newGrievanceController.updateTransfer);
 router.delete('/delete',verifyToken, newGrievanceController.deleteNewGrievanceById);
 router.get('/filter',verifyToken, newGrievanceController.filterGrievances);
 module.exports = router;
