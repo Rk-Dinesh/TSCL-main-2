@@ -80,6 +80,11 @@ app.get('/', (req, res) => {
   res.send('Hello World!');
 });
 
+app.post('/manual-escalation-check', (req, res) => {
+  checkEscalation();
+  return res.status(200).json({ message: "Manual escalation check triggered successfully!"});
+});
+
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
   

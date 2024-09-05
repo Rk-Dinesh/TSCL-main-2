@@ -5,9 +5,10 @@ const GrievanceEscalation = require("../Models/grievance_escalation");
 const encryptData = require("../encryptedData");
 
 exports.checkEscalation = async () => {
-  // Get all grievances except status === 'closed'
-  const grievances = await Grievance.find({ status: { $ne: "closed" } });
-//  console.log(grievances);
+  
+  const grievances = await Grievance.find({ status: {  $nin: ['closed', 'Closed','CLOSE', 'CLOSED'] } });
+  // console.log(grievances);
+  
   // Loop through each grievance
   for (const grievance of grievances) {
     // Get the complaint type and escalation details
