@@ -3,6 +3,7 @@ const IdcodeServices = require('../Service/idcode_Service');
 const encryptData = require('../encryptedData');
 const UserModel = require('../Models/user');
 const GrievanceLogModel = require('../Models/grievance_log');
+const NewGrievanceModel = require('../Models/new_grievance');
 
 // exports.createNewGrievance = async (req, res, next) => {
 //     try {
@@ -299,3 +300,275 @@ exports.filterGrievances = async (req, res, next) => {
   };
 
 
+// List wards with grievance count in descending order
+exports.wardGrievanceCounts = async (req, res, next) => {
+    try {
+        //console.log('Executing aggregation pipeline...');
+        const wardGrievanceCounts = await NewGrievanceModel.aggregate([
+          {
+            $group: {
+              _id: "$ward_name",
+              count: { $sum: 1 }
+            }
+          },
+          {
+            $sort: { count: -1 }
+          }
+        ]);
+    
+        // console.log('Aggregation pipeline executed successfully');
+        // console.log('Ward grievance counts:', wardGrievanceCounts);
+    
+        res.json(wardGrievanceCounts);
+      } catch (error) {
+        console.error('Error getting ward grievance counts:', error);
+        res.status(500).json({ message: 'Error retrieving ward grievance counts' });
+      }
+  };
+  
+
+// Get the most frequent complainants user by ward with name and count
+exports.frequentComplainantsByuserinward = async (req, res, next) => {
+    try {
+        //console.log('Executing aggregation pipeline...');
+        const frequentComplainantsByWard = await NewGrievanceModel.aggregate([
+          {
+            $group: {
+              _id: { ward_name: "$ward_name", public_user_name: "$public_user_name" },
+              count: { $sum: 1 }
+            }
+          },
+          {
+            $sort: { count: -1 }
+          },
+          {
+            $group: {
+              _id: "$_id.ward_name",
+              frequentComplainants: { $push: { name: "$_id.public_user_name", count: "$count" } }
+            }
+          }
+        ]);
+    
+        // console.log('Aggregation pipeline executed successfully');
+        // console.log('Frequent complainants by ward:', frequentComplainantsByWard);
+    
+        res.json(frequentComplainantsByWard);
+      } catch (error) {
+        // console.error('Error getting frequent complainants by ward:', error);
+        res.status(500).json({ message: 'Error retrieving frequent complainants by ward' });
+      }
+  };
+  
+exports.frequentComplainantsByWardAll = async (req, res, next) => {
+    try {
+      //console.log('Executing aggregation pipeline...');
+      const frequentComplainantsByWard = await NewGrievanceModel.aggregate([
+        {
+          $group: {
+            _id: { ward_name: "$ward_name", complaint: "$complaint" },
+            count: { $sum: 1 }
+          }
+        },
+        {
+          $sort: { count: -1 }
+        },
+        {
+          $group: {
+            _id: "$_id.ward_name",
+            frequentComplaints: { $push: { complaint: "$_id.complaint", count: "$count" } }
+          }
+        }
+      ]);
+  
+    //   console.log('Aggregation pipeline executed successfully');
+    //   console.log('Frequent complaints by ward:', frequentComplainantsByWard);
+  
+      res.json(frequentComplainantsByWard);
+    } catch (error) {
+    //   console.error('Error getting frequent complaints by ward:', error);
+      res.status(500).json({ message: 'Error retrieving frequent complaints by ward' });
+    }
+  }; 
+
+
+exports.frequentComplainantsByWard = async (req, res, next) => {
+    try {
+      //console.log('Executing aggregation pipeline...');
+      const frequentComplainantsByWard = await NewGrievanceModel.aggregate([
+        {
+          $group: {
+            _id: { ward_name: "$ward_name", complaint: "$complaint" },
+            count: { $sum: 1 }
+          }
+        },
+        {
+          $sort: { count: -1 }
+        },
+        {
+          $group: {
+            _id: "$_id.ward_name",
+            maxComplaint: { $first: { complaint: "$_id.complaint", count: "$count" } }
+          }
+        }
+      ]);
+  
+    //   console.log('Aggregation pipeline executed successfully');
+    //   console.log('Max complaint by ward:', frequentComplainantsByWard);
+  
+      res.json(frequentComplainantsByWard);
+    } catch (error) {
+    //   console.error('Error getting max complaint by ward:', error);
+      res.status(500).json({ message: 'Error retrieving max complaint by ward' });
+    }
+  };
+
+// Get the top grievances contributed by public name with count
+exports.topGrievancesByPublicName = async (req, res, next) => {
+    try {
+        //console.log('Executing aggregation pipeline...');
+        const topGrievancesByPublicName = await NewGrievanceModel.aggregate([
+          {
+            $group: {
+              _id: "$public_user_name",
+              count: { $sum: 1 }
+            }
+          },
+          {
+            $sort: { count: -1 }
+          },
+          {
+            $limit: 10 // Adjust this limit as needed
+          }
+        ]);
+    
+        // console.log('Aggregation pipeline executed successfully');
+        // console.log('Top grievances by public name:', topGrievancesByPublicName);
+    
+        res.json(topGrievancesByPublicName);
+      } catch (error) {
+        // console.error('Error getting top grievances by public name:', error);
+        res.status(500).json({ message: 'Error retrieving top grievances by public name' });
+      }
+  };
+
+  exports.getGrievanceCounts = async (req, res, next) => {
+    try {
+     // console.log('Executing aggregation pipeline...');
+  
+      const counts = await NewGrievanceModel.aggregate([
+        {
+          $facet: {
+            totalGrievances: [{ $count: "total" }],
+            resolvedGrievances: [
+              { $match: { status: { $in: ["closed", "Closed", "CLOSED", "CLOSE"] } } },
+              { $count: "resolved" }
+            ],
+            pendingGrievances: [
+              { $match: { status: { $not: { $in: ["closed", "Closed", "CLOSED", "CLOSE"] } } } },
+              { $count: "pending" }
+            ],
+            escalatedGrievances: [
+              { $match: { escalation_level: { $exists: true } } },
+              { $count: "escalated" }
+            ],
+            highPriorityGrievances: [
+              { $match: { priority: "High" } },
+              { $count: "highPriority" }
+            ]
+          }
+        }
+      ]);
+  
+    //   console.log('Aggregation pipeline executed successfully');
+    //   console.log('Grievance counts:', counts);
+  
+      res.json(counts[0]);
+    } catch (error) {
+    //   console.error('Error getting grievance counts:', error);
+      res.status(500).json({ message: 'Error retrieving grievance counts' });
+    }
+  };
+
+  exports.PriorityCounts = async (req, res, next) => {
+    try {
+      const priorityCounts = await NewGrievanceModel.aggregate([
+        {
+          $group: {
+            _id: "$priority",
+            count: { $sum: 1 }
+          }
+        }
+      ]);
+  
+      const priorityArray = priorityCounts.map((priorityCount) => {
+        return {
+          priority: priorityCount._id,
+          count: priorityCount.count
+        };
+      });
+  
+      res.json(priorityArray);
+  
+    } catch (error) {
+      
+      res.status(500).json({ message: "Error fetching priority counts" });
+    }
+  };
+
+  exports.TopGrievancesByLocation = async (req, res, next) => {
+    try {
+      const topGrievancesByLocation = await NewGrievanceModel.aggregate([
+        {
+          $group: {
+            _id: "$zone_name",
+            count: { $sum: 1 }
+          }
+        },
+        {
+          $sort: { count: -1 }
+        }
+      ]);
+  
+      const locationCounts = topGrievancesByLocation.map((locationCount) => {
+        return {
+          zone: locationCount._id,
+          count: locationCount.count
+        };
+      });
+  
+      res.json(locationCounts);
+  
+    } catch (error) {
+    //   console.error("Error fetching top grievances by location:", error);
+      res.status(500).json({ message: "Error fetching top grievances by location" });
+    }
+  };
+
+  exports.TopGrievancescomplaint = async (req, res, next) => {
+    try {
+      const topGrievancesByComplaint = await NewGrievanceModel.aggregate([
+        {
+          $group: {
+            _id: "$complaint",
+            count: { $sum: 1 }
+          }
+        },
+        {
+          $sort: { count: -1 }
+        }
+      ]);
+  
+      const complaintCounts = topGrievancesByComplaint.map((complaintCount) => {
+        return {
+          complaint: complaintCount._id,
+          count: complaintCount.count
+        };
+      });
+  
+      res.json(complaintCounts);
+  
+    } catch (error) {
+      // console.error("Error fetching top grievances by complaint:", error);
+      res.status(500).json({ message: "Error fetching top grievances by complaint" });
+    }
+  };

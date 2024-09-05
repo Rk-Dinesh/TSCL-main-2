@@ -15,4 +15,14 @@ router.post('/updateassign',verifyToken, newGrievanceController.updateAssign);
 router.post('/tickettransfer',verifyToken, newGrievanceController.updateTransfer);
 router.delete('/delete',verifyToken, newGrievanceController.deleteNewGrievanceById);
 router.get('/filter',verifyToken, newGrievanceController.filterGrievances);
+
+router.get('/ward-grievance-counts', newGrievanceController.wardGrievanceCounts);
+router.get('/frequent-complainants-by-wardall', newGrievanceController.frequentComplainantsByWardAll);
+router.get('/frequent-complainants-by-ward', newGrievanceController.frequentComplainantsByWard);
+router.get('/top-grievances-by-public-name', newGrievanceController.topGrievancesByPublicName);
+router.get('/grievancecounts', newGrievanceController.getGrievanceCounts);
+router.get('/prioritycounts', newGrievanceController.PriorityCounts);
+router.get('/locationZone', newGrievanceController.TopGrievancesByLocation);
+router.get('/complaintcount', newGrievanceController.TopGrievancescomplaint);
+
 module.exports = router;
