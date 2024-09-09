@@ -40,13 +40,7 @@ exports.createPublicUser = async (req, res, next) => {
       });
     }
 
-    const existingUser1 = await PublicUserService.findPublicUserByEmail(email);
-    if (existingUser1) {
-      return res.status(200).json({
-        status: true,
-        message: "User with this Email already exists",
-      });
-    }
+    
 
     const publicUser = await PublicUserService.createPublicUser(
       public_user_name,

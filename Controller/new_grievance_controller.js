@@ -257,6 +257,67 @@ exports.updateAssign = async(req, res, next) => {
     }
 }
 
+exports.UpdateManyAssign = async (req, res, next) => {
+  try {
+    const { grievanceIds, assignUserDetails } = req.body;
+
+    if (!grievanceIds || !Array.isArray(grievanceIds) || !assignUserDetails) {
+      return res.status(400).json({ error: 'Invalid request' });
+    }
+
+    const updates = grievanceIds.map((grievanceId) => {
+      return {
+        updateOne: {
+          filter: { grievance_id: grievanceId },
+          update: {
+            $set: {
+              assign_user: assignUserDetails.assign_user,
+              assign_username: assignUserDetails.assign_username,
+              assign_userphone: assignUserDetails.assign_userphone,
+            },
+          },
+        },
+      };
+    });
+
+    await NewGrievanceModel.bulkWrite(updates);
+
+    res.json({ message: 'Grievances updated successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+exports.UpdateManyTransfer = async (req, res, next) => {
+  try {
+    const { grievanceIds, transferDetails } = req.body;
+
+    if (!grievanceIds || !Array.isArray(grievanceIds) || !transferDetails) {
+      return res.status(400).json({ error: 'Invalid request' });
+    }
+
+    const updates = grievanceIds.map((grievanceId) => {
+      return {
+        updateOne: {
+          filter: { grievance_id: grievanceId },
+          update: {
+            $set: {
+              dept_name: transferDetails.dept_name,
+              complaint: transferDetails.complaint,
+            },
+          },
+        },
+      };
+    });
+
+    await NewGrievanceModel.bulkWrite(updates);
+
+    res.json({ message: 'Grievances Transfer successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
 exports.deleteNewGrievanceById = async (req, res, next) => {
     try {
         const { grievance_id } = req.query;

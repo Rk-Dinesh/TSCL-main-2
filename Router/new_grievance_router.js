@@ -14,6 +14,8 @@ router.post('/updatestatus', newGrievanceController.updateStatus);
 router.post('/updateassign',verifyToken, newGrievanceController.updateAssign);
 router.post('/tickettransfer',verifyToken, newGrievanceController.updateTransfer);
 router.delete('/delete',verifyToken, newGrievanceController.deleteNewGrievanceById);
+router.post('/updatemanyassign', newGrievanceController.UpdateManyAssign);
+router.post('/updatemanytransfer', newGrievanceController.UpdateManyTransfer);
 router.get('/filter',verifyToken, newGrievanceController.filterGrievances);
 
 router.get('/ward-grievance-counts', newGrievanceController.wardGrievanceCounts);
@@ -26,3 +28,6 @@ router.get('/locationZone', newGrievanceController.TopGrievancesByLocation);
 router.get('/complaintcount', newGrievanceController.TopGrievancescomplaint);
 
 module.exports = router;
+
+
+
