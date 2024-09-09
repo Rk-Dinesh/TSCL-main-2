@@ -26,6 +26,11 @@ router.get('/grievancecounts', newGrievanceController.getGrievanceCounts);
 router.get('/prioritycounts', newGrievanceController.PriorityCounts);
 router.get('/locationZone', newGrievanceController.TopGrievancesByLocation);
 router.get('/complaintcount', newGrievanceController.TopGrievancescomplaint);
+router.get('/engineerload', newGrievanceController.EngineerWorkload);
+router.get('/averageresolution', newGrievanceController.AverageResolutionTimeByEngineerByDepartment);
+router.get('/beforeescalation', newGrievanceController.PercentageOfGrievancesResolvedWithinSpecifiedPeriodByDepartmentAndComplaintType);
+router.get('/afterescalation', newGrievanceController.PercentageOfGrievancesEscalatedToHigherAuthorities);
+router.get('/compartiveanalysis', newGrievanceController.ComparativeAnalysis);
 
 module.exports = router;
 
