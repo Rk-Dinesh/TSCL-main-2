@@ -670,7 +670,7 @@ exports.topGrievancesByPublicName = async (req, res, next) => {
       const averageResolutionTimeByEngineerByDepartment = await NewGrievanceModel.aggregate([
         {
           $match: {
-            status: "closed" 
+            status:  { $in: ["closed", "Closed", "CLOSED", "CLOSE"] } 
           }
         },
         {
@@ -828,13 +828,21 @@ exports.topGrievancesByPublicName = async (req, res, next) => {
     try {
       const currentMonth = new Date().getMonth();
       const currentYear = new Date().getFullYear();
-      const previousMonth = currentMonth === 0 ? 11 : currentMonth - 1;
-      const previousYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+      let previousMonth = currentMonth - 1;
+      let previousYear = currentYear;
+  
+      if (currentMonth === 0) {
+        previousMonth = 11;
+        previousYear = currentYear - 1;
+      }
+  
+      const lastDayOfMonth = (year, month) => new Date(year, month + 1, 0, 23, 59, 59, 999);
   
       const currentMonthStart = new Date(currentYear, currentMonth, 1);
-      const currentMonthEnd = new Date(currentYear, currentMonth + 1, 0);
+      const currentMonthEnd = new Date(lastDayOfMonth(currentYear, currentMonth)+ 999);
       const previousMonthStart = new Date(previousYear, previousMonth, 1);
-      const previousMonthEnd = new Date(previousYear, previousMonth + 1, 0);
+      const previousMonthEnd = new Date(lastDayOfMonth(previousYear, previousMonth)+ 999);
+      
   
       const currentMonthGrievances = await NewGrievanceModel.countDocuments({
         createdAt: { $gte: currentMonthStart, $lte: currentMonthEnd }
@@ -845,12 +853,12 @@ exports.topGrievancesByPublicName = async (req, res, next) => {
       });
   
       const currentMonthResolvedGrievances = await NewGrievanceModel.countDocuments({
-        status: 'closed',
+        status: { $in: ["closed", "Closed", "CLOSED", "CLOSE"] },
         updatedAt: { $gte: currentMonthStart, $lte: currentMonthEnd }
       });
   
       const previousMonthResolvedGrievances = await NewGrievanceModel.countDocuments({
-        status: 'closed',
+        status: { $in: ["closed", "Closed", "CLOSED", "CLOSE"] },
         updatedAt: { $gte: previousMonthStart, $lte: previousMonthEnd }
       });
   
