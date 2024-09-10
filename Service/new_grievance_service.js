@@ -13,8 +13,11 @@ exports.getNewGrievanceById = async (grievance_id) => {
 };
 
 exports.getGrievanceByUserId = async (public_user_id) => {
-    return await NewGrievanceModel.find({ public_user_id });
-};
+    return await NewGrievanceModel.find({
+      public_user_id,
+      status: { $nin: ['closed', 'Closed', 'CLOSE', 'CLOSED'] }
+    });
+  };
 
 exports.getGrievanceBystatusClosed = async (public_user_id) => {
     return await NewGrievanceModel.find({
