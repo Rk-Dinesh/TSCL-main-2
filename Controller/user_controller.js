@@ -239,7 +239,7 @@ exports.changePassword = async(req, res, next) => {
 exports.updateUser = async (req, res, next) => {
   try {
     const { user_id } = req.query;
-    const { user_name,dept_name,address,pincode,status,role_id,role ,zone_name,ward_name } = req.body;
+    const { user_name,dept_name,address,login_password,pincode,status,role_id,role ,zone_name,ward_name } = req.body;
 
   
     const user = await UserService.findUserById(user_id);
@@ -247,10 +247,15 @@ exports.updateUser = async (req, res, next) => {
       return res.status(404).json({ status: false, message: "User not found" });
     }
 
+    const salt = await bcrypt.genSalt(10);
+
+      const hashedPassword = await bcrypt.hash(login_password, salt);
+
     const updatedUser = await UserService.updateUserById(user_id, {
       user_name,
       dept_name,
       address,
+      login_password:hashedPassword,
       pincode,
       status,
       role_id,

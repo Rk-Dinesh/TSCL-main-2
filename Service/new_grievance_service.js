@@ -42,5 +42,5 @@ exports.deleteNewGrievanceById = async (grievance_id) => {
 
 
 exports.filterGrievances = async (filter) => {
-    return await NewGrievanceModel.find(filter,'createdAt grievance_id status');
+    return await NewGrievanceModel.find(filter,'createdAt grievance_id status complaint_details complaint dept_name');
   };  
