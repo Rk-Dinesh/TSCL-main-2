@@ -18,6 +18,7 @@ router.post('/post',verifyToken, complaintController.createComplaint);
 router.get('/get',verifyToken, complaintController.getAllComplaints);
 router.get('/getactive',verifyToken, complaintController.getActiveComplaints);
 router.get('/getactiveguest', complaintController.getActiveComplaintsGuest);
+router.get('/getdept',verifyToken, complaintController.getComplaintByDept);
 router.get('/getbyid',verifyToken,complaintController.getComplaintById)
 router.delete('/delete',verifyToken,complaintController.deleteComplaintById)
 router.post('/update',verifyToken, complaintController.updateComplaints);

@@ -12,6 +12,9 @@ exports.getAllComplaints = async () => {
 exports.getActiveComplaints = async () => {
     return await ComplaintModel.find({status:'active'});
 };
+exports.getActiveComplaintsByDept = async (dept_name) => {
+    return await ComplaintModel.find({status:'active',dept_name});
+};
 exports.getComplaintById = async (complaint_id) => {
     return await ComplaintModel.findOne({ complaint_id });
 };

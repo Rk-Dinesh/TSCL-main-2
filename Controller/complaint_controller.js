@@ -60,6 +60,24 @@ exports.getActiveComplaintsGuest = async (req, res, next) => {
       next(error);
   }
 };
+
+exports.getComplaintByDept = async (req, res, next) => {
+  try {
+      const { dept_name } = req.query;
+      const complaint = await ComplaintService.getActiveComplaintsByDept(dept_name);
+      if (!complaint) {
+          return res.status(404).json({ status: false, message: "Complaint not found" });
+      }
+      const encryptedData = encryptData(complaint)
+      res.status(200).json({
+          status: true,
+          message: "Complaint retrieved successfully",
+          data: encryptedData
+      });
+  } catch (error) {
+      next(error);
+  }
+};
 exports.getComplaintById = async (req, res, next) => {
     try {
         const { complaint_id } = req.query;
