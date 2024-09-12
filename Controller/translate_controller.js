@@ -1,11 +1,11 @@
 const {Translate} = require('@google-cloud/translate').v2;
 
-//const CREDENTIALS =require('../utils/tscl-434007-dac924e90848.json')
+const CREDENTIALS =require('../utils/tscl-434007-dac924e90848.json')
 
-// const translate = new Translate({
-//     credentials: CREDENTIALS,
-//     projectId: CREDENTIALS.project_id
-// });
+const translate = new Translate({
+    credentials: CREDENTIALS,
+    projectId: CREDENTIALS.project_id
+});
 
 const translateText = async (text, targetLanguage) => {
     try {
