@@ -5,6 +5,7 @@ const UserModel = require('../Models/user');
 const GrievanceLogModel = require('../Models/grievance_log');
 const NewGrievanceModel = require('../Models/new_grievance');
 const ComplaintModel = require('../Models/complaint');
+const GrievanceEscalationModel = require('../Models/grievance_escalation');
 
 // exports.createNewGrievance = async (req, res, next) => {
 //     try {
@@ -207,6 +208,12 @@ exports.updateStatus = async(req, res, next) => {
         newGrievance.statusflow = `${newGrievance.statusflow ? newGrievance.statusflow + '/' : ''}${status}`;
 
         await newGrievance.save();
+
+        const escalation = await GrievanceEscalationModel.findOne({ grievance_id });
+        if (escalation) {
+            escalation.status = status;
+            await escalation.save();
+        }
 
         return res.status(200).json({ status: true, message: "Status and status flow updated successfully" });
     } catch (error) {

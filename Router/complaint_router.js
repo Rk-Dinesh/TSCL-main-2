@@ -17,7 +17,7 @@ const upload = multer({ storage: storage });
 router.post('/post',verifyToken, complaintController.createComplaint);
 router.get('/get',verifyToken, complaintController.getAllComplaints);
 router.get('/getactive',verifyToken, complaintController.getActiveComplaints);
-router.get('/getactive', complaintController.getActiveComplaintsGuest);
+router.get('/getactiveguest', complaintController.getActiveComplaintsGuest);
 router.get('/getbyid',verifyToken,complaintController.getComplaintById)
 router.delete('/delete',verifyToken,complaintController.deleteComplaintById)
 router.post('/update',verifyToken, complaintController.updateComplaints);
