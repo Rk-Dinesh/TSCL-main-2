@@ -543,6 +543,10 @@ exports.topGrievancesByPublicName = async (req, res, next) => {
             highPriorityGrievances: [
               { $match: { priority: "High" } },
               { $count: "highPriority" }
+            ],
+            reopendGrievances: [
+              { $match: { status: "re-opened" } },
+              { $count: "reopen" }
             ]
           }
         }
