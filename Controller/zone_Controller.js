@@ -48,6 +48,21 @@ exports.getActiveZones = async (req, res, next) => {
     }
 };
 
+exports.getActiveZonesGuest = async (req, res, next) => {
+  try {
+      const zones = await ZoneService.getActiveZones();
+      const encryptedData = encryptData(zones)
+      res.status(200).json({
+          status: true,
+          message: "Zones retrieved successfully",
+          data: encryptedData
+      });
+  } catch (error) {
+      next(error);
+  }
+};
+
+
 
 
 exports.getZoneById = async (req, res, next) => {

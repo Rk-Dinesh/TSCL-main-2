@@ -14,6 +14,10 @@ exports.getActiveStreets = async () => {
     return await StreetModel.find({status:'active'});
 };
 
+exports.getActive = async (ward_name) => {
+    return await StreetModel.find({status:'active',ward_name});
+};
+
 exports.getStreetById = async (ward_id, street_id) => {
     return await StreetModel.findOne({ ward_id, street_id });
 };

@@ -17,6 +17,8 @@ const upload = multer({ storage: storage });
 router.post('/post',verifyToken, wardController.createWard);
 router.get('/get',verifyToken, wardController.getAllWards);
 router.get('/getactive',verifyToken, wardController.getActiveWards);
+router.get('/getzone',verifyToken, wardController.getWardByZoneName);
+router.get('/getzoneGuest', wardController.getWardByZoneNameGuest);
 router.get('/getbyid/:zone_id/:ward_id',verifyToken, wardController.getWardById);
 router.get('/getbyid',verifyToken, wardController.getWardId);
 router.delete('/delete',verifyToken, wardController.deleteWardById);

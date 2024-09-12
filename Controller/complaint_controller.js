@@ -46,6 +46,20 @@ exports.getActiveComplaints = async (req, res, next) => {
         next(error);
     }
 };
+
+exports.getActiveComplaintsGuest = async (req, res, next) => {
+  try {
+      const complaints = await ComplaintService.getActiveComplaints();
+      const encryptedData = encryptData(complaints)
+      res.status(200).json({
+          status: true,
+          message: "Complaints retrieved successfully",
+          data: encryptedData
+      });
+  } catch (error) {
+      next(error);
+  }
+};
 exports.getComplaintById = async (req, res, next) => {
     try {
         const { complaint_id } = req.query;

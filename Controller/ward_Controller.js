@@ -48,6 +48,42 @@ exports.getActiveWards = async (req, res, next) => {
     }
 };
 
+exports.getWardByZoneName = async (req, res, next) => {
+    try {
+        const {  zone_name } = req.query;
+        const ward = await WardService.getActiveWardsGuest( zone_name);
+        if (!ward) {
+            return res.status(404).json({ status: false, message: "Ward not found" });
+        }
+        const encryptedData = encryptData(ward)
+        res.status(200).json({
+            status: true,
+            message: "Ward retrieved successfully",
+            data: encryptedData
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.getWardByZoneNameGuest = async (req, res, next) => {
+    try {
+        const {  zone_name } = req.query;
+        const ward = await WardService.getActiveWardsGuest( zone_name);
+        if (!ward) {
+            return res.status(404).json({ status: false, message: "Ward not found" });
+        }
+        const encryptedData = encryptData(ward)
+        res.status(200).json({
+            status: true,
+            message: "Ward retrieved successfully",
+            data: encryptedData
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 exports.getWardById = async (req, res, next) => {
     try {
         const { zone_id, ward_id } = req.query;

@@ -17,6 +17,8 @@ const upload = multer({ storage: storage });
 router.post('/post',verifyToken, streetController.createStreet);
 router.get('/get',verifyToken, streetController.getAllStreets);
 router.get('/getactive',verifyToken, streetController.getActiveStreets);
+router.get('/getward',verifyToken, streetController.getWardByWardName);
+router.get('/getwardguest', streetController.getWardByWardNameGuest);
 router.get('/getbyid/:ward_id/:street_id',verifyToken, streetController.getStreetById);
 router.get('/getbyid',verifyToken, streetController.getStreetId);
 router.delete('/delete',verifyToken, streetController.deleteStreetById);

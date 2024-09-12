@@ -6,6 +6,7 @@ const verifyToken = require('../Authorization');
 router.post('/post',verifyToken, complaintTypeController.createComplaintType);
 router.get('/get',verifyToken, complaintTypeController.getAllComplaintsType);
 router.get('/getactive',verifyToken, complaintTypeController.getActiveComplaintsType);
+router.get('/getactiveguest', complaintTypeController.getActiveComplaintsTypeGuest);
 router.get('/getbyid',verifyToken, complaintTypeController.getComplaintsTypeById);
 router.delete('/delete',verifyToken, complaintTypeController.deleteComplaintsTypeById);
 router.post('/update',verifyToken, complaintTypeController.updateComplaintsType);

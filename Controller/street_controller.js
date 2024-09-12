@@ -49,6 +49,42 @@ exports.getActiveStreets = async (req, res, next) => {
     }
 };
 
+exports.getWardByWardName = async (req, res, next) => {
+    try {
+        const {  ward_name } = req.query;
+        const street = await StreetService.getActive(ward_name);
+        if (!street) {
+            return res.status(404).json({ status: false, message: "Street not found" });
+        }
+        const encryptedData = encryptData(street)
+        res.status(200).json({
+            status: true,
+            message: "Street retrieved successfully",
+            data: encryptedData
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.getWardByWardNameGuest = async (req, res, next) => {
+    try {
+        const {  ward_name } = req.query;
+        const street = await StreetService.getActive(ward_name);
+        if (!street) {
+            return res.status(404).json({ status: false, message: "Street not found" });
+        }
+        const encryptedData = encryptData(street)
+        res.status(200).json({
+            status: true,
+            message: "Street retrieved successfully",
+            data: encryptedData
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 exports.getStreetById = async (req, res, next) => {
     try {
         const { ward_id, street_id } = req.query;

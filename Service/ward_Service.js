@@ -14,6 +14,10 @@ exports.getActiveWards = async () => {
     return await WardModel.find({status:'active'});
 };
 
+exports.getActiveWardsGuest = async (zone_name) => {
+    return await WardModel.find({ status: 'active', zone_name });
+};
+
 exports.getWardById = async (zone_id, ward_id) => {
     return await WardModel.findOne({ zone_id, ward_id });
 };
