@@ -466,7 +466,7 @@ exports.frequentComplainantsByWard = async (req, res, next) => {
       const frequentComplainantsByWard = await NewGrievanceModel.aggregate([
         {
           $group: {
-            _id: { ward_name: "$ward_name", complaint: "$complaint" },
+            _id: { dept_name:"$dept_name",ward_name: "$ward_name", complaint: "$complaint" },
             count: { $sum: 1 }
           }
         },
@@ -476,7 +476,7 @@ exports.frequentComplainantsByWard = async (req, res, next) => {
         {
           $group: {
             _id: "$_id.ward_name",
-            maxComplaint: { $first: { complaint: "$_id.complaint", count: "$count" } }
+            maxComplaint: { $first: { dept_name:"$_id.dept_name",complaint: "$_id.complaint", count: "$count" } }
           }
         }
       ]);
@@ -654,7 +654,12 @@ exports.topGrievancesByPublicName = async (req, res, next) => {
             _id: {
               $ifNull: ["$assign_username", "Yet to be assigned"]
             },
-            count: { $sum: 1 }
+            count: { $sum: 1 },
+            closedCount: {
+              $sum: {
+                $cond: { if: { $eq: ["$status", "closed"] }, then: 1, else: 0 }
+              }
+            }
           }
         },
         {
@@ -665,7 +670,8 @@ exports.topGrievancesByPublicName = async (req, res, next) => {
       const engineerCounts = engineerWorkload.map((engineerCount) => {
         return {
           engineer: engineerCount._id,
-          count: engineerCount.count
+          count: engineerCount.count,
+          closedCount: engineerCount.closedCount
         };
       });
   
