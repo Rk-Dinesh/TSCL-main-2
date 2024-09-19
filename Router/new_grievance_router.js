@@ -4,7 +4,6 @@ const newGrievanceController = require('../Controller/new_grievance_controller')
 const verifyToken = require('../Authorization');
 
 router.post('/post',verifyToken, newGrievanceController.createNewGrievance);
-router.get('/get',verifyToken, newGrievanceController.getAllNewGrievances);
 router.get('/getbyid',verifyToken, newGrievanceController.getNewGrievanceById);
 router.get('/getbyuserid',verifyToken, newGrievanceController.getGrievanceByUserId);
 router.get('/getbyidstatus',verifyToken, newGrievanceController.getGrievanceByUstatusClosedID);
@@ -31,6 +30,15 @@ router.get('/averageresolution', newGrievanceController.AverageResolutionTimeByE
 router.get('/beforeescalation', newGrievanceController.PercentageOfGrievancesResolvedWithinSpecifiedPeriodByDepartmentAndComplaintType);
 router.get('/afterescalation', newGrievanceController.PercentageOfGrievancesEscalatedToHigherAuthorities);
 router.get('/compartiveanalysis', newGrievanceController.ComparativeAnalysis);
+
+router.get('/get',verifyToken, newGrievanceController.getAllNewGrievances);
+router.get('/bynotclosed',verifyToken, newGrievanceController.getGrievanceBynotClosed);
+router.get('/byclosed',verifyToken, newGrievanceController.getGrievanceByClosed);
+router.get('/byhigh',verifyToken, newGrievanceController.getGrievanceBySeverityHigh);
+router.get('/bymedium',verifyToken, newGrievanceController.getGrievanceBySeverityMedium);
+router.get('/bylow',verifyToken, newGrievanceController.getGrievanceBySeverityLow);
+router.get('/byreopen',verifyToken, newGrievanceController.getGrievanceByReopen);
+
 
 module.exports = router;
 

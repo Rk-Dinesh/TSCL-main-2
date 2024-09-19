@@ -44,3 +44,40 @@ exports.deleteNewGrievanceById = async (grievance_id) => {
 exports.filterGrievances = async (filter) => {
     return await NewGrievanceModel.find(filter,'createdAt grievance_id status complaint_details complaint dept_name');
   };  
+
+
+  exports.getGrievanceBynotClosed = async () => {
+    return await NewGrievanceModel.find({
+      status: { $nin: ['closed', 'Closed', 'CLOSE', 'CLOSED'] }
+    });
+  };
+
+  exports.getGrievanceByClosed = async () => {
+    return await NewGrievanceModel.find({
+      status: { $in: ['closed', 'Closed', 'CLOSE', 'CLOSED'] }
+    });
+  };
+
+  exports.getGrievanceBySeverityHigh = async () => {
+    return await NewGrievanceModel.find({
+      priority:'High'
+    });
+  };
+
+  exports.getGrievanceBySeverityLow = async () => {
+    return await NewGrievanceModel.find({
+      priority:'Low'
+    });
+  };
+
+  exports.getGrievanceBySeverityMedium = async () => {
+    return await NewGrievanceModel.find({
+      priority:'Medium'
+    });
+  };
+
+  exports.getGrievanceByReopen = async () => {
+    return await NewGrievanceModel.find({
+      status:'Re-opened'
+    });
+  };

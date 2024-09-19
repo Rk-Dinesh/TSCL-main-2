@@ -734,6 +734,7 @@ exports.topGrievancesByPublicName = async (req, res, next) => {
     try {
       let totalGrievancesReceived = 0;
       let totalGrievancesResolvedWithinPeriod = 0;
+      let totalGrievanceResolved = 0;
   
       const grievances = await NewGrievanceModel.find();
   
@@ -779,25 +780,37 @@ exports.topGrievancesByPublicName = async (req, res, next) => {
             status: "closed",
             updatedAt: { $gte: new Date(Date.now() - periodInDays * 24 * 60 * 60 * 1000) }
           });
+
+          const grievancesResolved = await NewGrievanceModel.countDocuments({
+            dept_name: department,
+            complaint: complaintType,
+            status: "closed",
+           
+          });
   
           totalGrievancesReceived += grievancesReceived;
           totalGrievancesResolvedWithinPeriod += grievancesResolvedWithinPeriod;
+          totalGrievanceResolved += grievancesResolved;
   
           // console.log({
           //   department,
           //   complaintType,
           //   grievancesReceived,
-          //   grievancesResolvedWithinPeriod
+          //   grievancesResolvedWithinPeriod,
+          //   grievancesResolved
           // });
         }
       }
   
       const totalPercentageResolved = (totalGrievancesResolvedWithinPeriod / totalGrievancesReceived) * 100;
+      const generalPercentage = (totalGrievanceResolved/ totalGrievancesReceived) * 100;
   
       res.json({
         totalPercentageResolved: totalPercentageResolved.toFixed(2),
         totalGrievancesReceived: totalGrievancesReceived,
-        totalGrievancesResolvedWithinPeriod: totalGrievancesResolvedWithinPeriod
+        totalGrievancesResolvedWithinPeriod: totalGrievancesResolvedWithinPeriod,
+        generalPercentage: generalPercentage.toFixed(2),
+        generalResolved: totalGrievanceResolved
       });
   
     } catch (error) {
@@ -912,3 +925,90 @@ exports.topGrievancesByPublicName = async (req, res, next) => {
       res.status(500).json({ message: "Error fetching comparative analysis data" });
     }
   };
+
+
+  exports.getGrievanceBynotClosed = async (req, res, next) => {
+    try {
+        const newGrievances = await NewGrievanceService.getGrievanceBynotClosed();
+        const encryptedData = encryptData(newGrievances)
+        res.status(200).json({
+            status: true,
+            message: "New grievances Not closed retrieved successfully",
+            data: encryptedData
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.getGrievanceByClosed = async (req, res, next) => {
+  try {
+      const newGrievances = await NewGrievanceService.getGrievanceByClosed();
+      const encryptedData = encryptData(newGrievances)
+      res.status(200).json({
+          status: true,
+          message: "New grievances Closed retrieved successfully",
+          data: encryptedData
+      });
+  } catch (error) {
+      next(error);
+  }
+};
+
+exports.getGrievanceBySeverityHigh = async (req, res, next) => {
+  try {
+      const newGrievances = await NewGrievanceService.getGrievanceBySeverityHigh();
+      const encryptedData = encryptData(newGrievances)
+      res.status(200).json({
+          status: true,
+          message: "New grievances High retrieved successfully",
+          data: encryptedData
+      });
+  } catch (error) {
+      next(error);
+  }
+};
+
+exports.getGrievanceBySeverityMedium = async (req, res, next) => {
+  try {
+      const newGrievances = await NewGrievanceService.getGrievanceBySeverityMedium();
+      const encryptedData = encryptData(newGrievances)
+      res.status(200).json({
+          status: true,
+          message: "New grievances Medium retrieved successfully",
+          data: encryptedData
+      });
+  } catch (error) {
+      next(error);
+  }
+};
+
+exports.getGrievanceBySeverityLow = async (req, res, next) => {
+  try {
+      const newGrievances = await NewGrievanceService.getGrievanceBySeverityLow();
+      const encryptedData = encryptData(newGrievances)
+      res.status(200).json({
+          status: true,
+          message: "New grievances Low retrieved successfully",
+          data: encryptedData
+      });
+  } catch (error) {
+      next(error);
+  }
+};
+
+exports.getGrievanceByReopen = async (req, res, next) => {
+  try {
+      const newGrievances = await NewGrievanceService.getGrievanceByReopen();
+      const encryptedData = encryptData(newGrievances)
+      res.status(200).json({
+          status: true,
+          message: "New grievances Reopen retrieved successfully",
+          data: encryptedData
+      });
+  } catch (error) {
+      next(error);
+  }
+};
+
+
