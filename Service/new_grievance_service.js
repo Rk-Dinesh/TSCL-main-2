@@ -31,8 +31,36 @@ exports.getGrievanceByDept = async (dept_name) => {
     return await NewGrievanceModel.find({ dept_name });
 };
 
+exports.getGrievanceByDeptnotClosed = async (dept_name) => {
+  return await NewGrievanceModel.find({ 
+    dept_name,
+    status: { $nin: ['closed', 'Closed', 'CLOSE', 'CLOSED'] }
+  });
+};
+
+exports.getGrievanceByDeptClosed = async (dept_name) => {
+  return await NewGrievanceModel.find({ 
+    dept_name,
+    status: { $in: ['closed', 'Closed', 'CLOSE', 'CLOSED'] }
+  });
+};
+
 exports.getGrievanceByAssign = async (assign_user) => {
     return await NewGrievanceModel.find({ assign_user });
+};
+
+exports.getGrievanceByAssignnotClosed = async (assign_user) => {
+  return await NewGrievanceModel.find({ 
+    assign_user,
+    status: { $nin: ['closed', 'Closed', 'CLOSE', 'CLOSED'] }
+  });
+};
+
+exports.getGrievanceByAssignClosed = async (assign_user) => {
+  return await NewGrievanceModel.find({ 
+    assign_user ,
+    status: { $in: ['closed', 'Closed', 'CLOSE', 'CLOSED'] }
+  });
 };
 
 

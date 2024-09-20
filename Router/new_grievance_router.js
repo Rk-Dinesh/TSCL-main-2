@@ -39,6 +39,14 @@ router.get('/bymedium',verifyToken, newGrievanceController.getGrievanceBySeverit
 router.get('/bylow',verifyToken, newGrievanceController.getGrievanceBySeverityLow);
 router.get('/byreopen',verifyToken, newGrievanceController.getGrievanceByReopen);
 
+router.get('/getbydeptnotclosed',verifyToken, newGrievanceController.getGrievanceByDeptnotClosed);
+router.get('/getbydeptclosed',verifyToken, newGrievanceController.getGrievanceByDeptClosed);
+
+router.get('/getbyassignnotclosed',verifyToken, newGrievanceController.getGrievanceByAssignnotClosed);
+router.get('/getbyassignclosed',verifyToken, newGrievanceController.getGrievanceByAssignClosed);
+
+
+
 
 module.exports = router;
 

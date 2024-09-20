@@ -176,6 +176,42 @@ exports.getGrievanceByDept = async (req, res, next) => {
     }
 };
 
+exports.getGrievanceByDeptnotClosed = async (req, res, next) => {
+  try {
+      const { dept_name } = req.query;
+      const newGrievance = await NewGrievanceService.getGrievanceByDeptnotClosed(dept_name);
+      if (!newGrievance) {
+          return res.status(404).json({ status: false, message: " grievance not found" });
+      }
+      const encryptedData = encryptData(newGrievance)
+      res.status(200).json({
+          status: true,
+          message: "Dept grievance notclosed retrieved successfully",
+          data: encryptedData
+      });
+  } catch (error) {
+      next(error);
+  }
+};
+
+exports.getGrievanceByDeptClosed = async (req, res, next) => {
+  try {
+      const { dept_name } = req.query;
+      const newGrievance = await NewGrievanceService.getGrievanceByDeptClosed(dept_name);
+      if (!newGrievance) {
+          return res.status(404).json({ status: false, message: " grievance not found" });
+      }
+      const encryptedData = encryptData(newGrievance)
+      res.status(200).json({
+          status: true,
+          message: "Dept grievance closed retrieved successfully",
+          data: encryptedData
+      });
+  } catch (error) {
+      next(error);
+  }
+};
+
 exports.getGrievanceByAssign = async (req, res, next) => {
     try {
         const { assign_user } = req.query;
@@ -192,6 +228,42 @@ exports.getGrievanceByAssign = async (req, res, next) => {
     } catch (error) {
         next(error);
     }
+};
+
+exports.getGrievanceByAssignnotClosed = async (req, res, next) => {
+  try {
+      const { assign_user } = req.query;
+      const newGrievance = await NewGrievanceService.getGrievanceByAssignnotClosed(assign_user);
+      if (!newGrievance) {
+          return res.status(404).json({ status: false, message: " grievance not found" });
+      }
+      const encryptedData = encryptData(newGrievance)
+      res.status(200).json({
+          status: true,
+          message: "New grievance not closed  retrieved successfully",
+          data: encryptedData
+      });
+  } catch (error) {
+      next(error);
+  }
+};
+
+exports.getGrievanceByAssignClosed = async (req, res, next) => {
+  try {
+      const { assign_user } = req.query;
+      const newGrievance = await NewGrievanceService.getGrievanceByAssignClosed(assign_user);
+      if (!newGrievance) {
+          return res.status(404).json({ status: false, message: " grievance not found" });
+      }
+      const encryptedData = encryptData(newGrievance)
+      res.status(200).json({
+          status: true,
+          message: "New grievance closed retrieved successfully",
+          data: encryptedData
+      });
+  } catch (error) {
+      next(error);
+  }
 };
 
 exports.updateStatus = async(req, res, next) => {
