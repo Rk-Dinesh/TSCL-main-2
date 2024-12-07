@@ -25,7 +25,7 @@ const GrievanceEscalationModel = require('../Models/grievance_escalation');
 
 exports.createNewGrievance = async (req, res, next) => {
     try {
-        const { grievance_mode, complaint_type_title, dept_name, zone_name, ward_name, street_name, pincode, complaint, complaint_details, public_user_id, public_user_name, phone, status, escalation_level, statusflow, priority } = req.body;
+        const { grievance_mode, complaint_type_title, dept_name, zone_name, ward_name, street_name, pincode,complaintaddress, complaint, complaint_details, public_user_id, public_user_name, phone, status, escalation_level, statusflow, priority } = req.body;
         const grievance_id = await IdcodeServices.generateCode("NewGrievance");
 
         const user = await UserModel.findOne({ dept_name, ward_name: { $in: [ward_name] } });
@@ -40,6 +40,7 @@ exports.createNewGrievance = async (req, res, next) => {
                 ward_name,
                 street_name,
                 pincode,
+                complaintaddress,
                 complaint,
                 complaint_details,
                 public_user_id,
@@ -68,6 +69,7 @@ exports.createNewGrievance = async (req, res, next) => {
                 ward_name,
                 street_name,
                 pincode,
+                complaintaddress,
                 complaint,
                 complaint_details,
                 public_user_id,

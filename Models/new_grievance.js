@@ -11,6 +11,7 @@ const NewGrievanceSchema = new Schema({
   ward_name: String,
   street_name: String,
   pincode: String,
+  complaintaddress:String,
   complaint: String,
   complaint_details: String,
   public_user_id: String,

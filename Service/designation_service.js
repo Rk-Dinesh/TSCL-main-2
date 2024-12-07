@@ -1,4 +1,5 @@
 const DesignationModel = require("../Models/designation");
+const IdcodeServices = require("./idcode_Service");
 
 exports.createDesignation = async (complaintData) => {
     const designation = new DesignationModel(complaintData);
@@ -22,3 +23,14 @@ exports.updateDesignationById = async (desgination_id, updateData) => {
 exports.deleteDesignationById = async (desgination_id) => {
     return await DesignationModel.findOneAndDelete({ desgination_id });
 };
+
+exports.bulkInsert =  async(csvs) => {
+    try {
+        for (let csv of csvs) {
+            csv.desgination_id = await IdcodeServices.generateCode("Designation");
+        }
+        return await DesignationModel.insertMany(csvs);
+    } catch (error) {
+        throw error;
+    }
+}

@@ -3,6 +3,7 @@ const EmployeeService = require("../Service/employee_service");
 const csvParser = require("csv-parser");
 const fs = require("fs");
 const path = require("path");
+const IdcodeServices = require("../Service/idcode_Service");
 
 exports.createUser = async (req, res, next) => {
   try {
@@ -36,8 +37,9 @@ exports.createUser = async (req, res, next) => {
         message: "Employee with this Email already exists",
       });
     }
-
+    const emp_id = await IdcodeServices.generateCode("Employee");
     const Employee = await EmployeeService.createUser(
+      emp_id,
         emp_name,
         dept_name,
         phone,
