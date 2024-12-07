@@ -29,6 +29,7 @@ const StatusRouter= require('./Router/status_router');
 const DesignationRouter= require('./Router/designation_router');
 const EmployeeRouter= require('./Router/employe_router');
 const translateRouter = require('./Router/translate_router');
+const templateRouter = require('./Router/template_router');
 const { checkEscalation } = require('./Controller/grievance_escalation_controller');
 
 
@@ -69,6 +70,7 @@ app.use('/status',StatusRouter);
 app.use('/designation',DesignationRouter);
 app.use('/employee',EmployeeRouter);
 app.use('/translate', translateRouter);
+app.use('template',templateRouter)
 
 app.use((err, req, res, next) => {
   if (err.code === 'LIMIT_FILE_COUNT') {
