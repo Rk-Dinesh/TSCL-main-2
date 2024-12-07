@@ -86,3 +86,23 @@ exports.deleteTemplateById = async (req, res, next) => {
         next(error);
     }
 };
+
+exports.getTemplateByDeptAndComplaint = async (req, res, next) => {
+    try {
+        const { dept_name, complaint_type } = req.query;
+        const template = await TemplateService.getTemplateByDeptAndComplaint(dept_name, complaint_type);
+        
+        if (!template) {
+            return res.status(404).json({ status: false, message: "Template not found" });
+        }
+        
+        const encryptedData = encryptData(template);
+        res.status(200).json({
+            status: true,
+            message: "Template retrieved successfully",
+            data: encryptedData
+        });
+    } catch (error) {
+        next(error);
+    }
+};

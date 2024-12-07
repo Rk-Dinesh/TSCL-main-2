@@ -20,3 +20,7 @@ exports.updateTemplateById = async (temp_id, updateData) => {
 exports.deleteTemplateById = async (temp_id) => {
     return await TemplateModel.findOneAndDelete({ temp_id });
 };
+
+exports.getTemplateByDeptAndComplaint = async (dept_name, complaint_type) => {
+    return await TemplateModel.find({ dept_name, complaint_type });
+};
