@@ -4,9 +4,9 @@ const IdcodeServices = require('../Service/idcode_Service');
 
 exports.createTemplate = async (req, res, next) => {
     try {
-        const { dept,complaint_type, temp_title,desc} = req.body;
+        const { dept_name,complaint_type, temp_title,desc,created_by_user} = req.body;
         const temp_id = await IdcodeServices.generateCode("Template");
-        const template = await TemplateService.createTemplate({ temp_id, dept,complaint_type, temp_title,desc});
+        const template = await TemplateService.createTemplate({ temp_id, dept_name,complaint_type, temp_title,desc,created_by_user});
         
         res.status(200).json({
             status: true,
@@ -52,7 +52,7 @@ exports.getTemplateById = async (req, res, next) => {
 exports.updateTemplate = async (req, res, next) => {
     try {
       const { temp_id } = req.query;
-      const { dept,complaint_type,temp_title,desc } = req.body;
+      const { dept_name,complaint_type,temp_title,desc } = req.body;
   
     
       const template = await TemplateService.getTemplateById(temp_id);
@@ -61,7 +61,7 @@ exports.updateTemplate = async (req, res, next) => {
       }
 
       const updatedTemplate = await TemplateService.updateTemplateById(temp_id, {
-        dept,complaint_type,temp_title,desc
+        dept_name,complaint_type,temp_title,desc
       });
   
       return res.status(200).json({ status: true, message: "template Updated successfully" });

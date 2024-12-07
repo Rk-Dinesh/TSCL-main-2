@@ -70,7 +70,7 @@ app.use('/status',StatusRouter);
 app.use('/designation',DesignationRouter);
 app.use('/employee',EmployeeRouter);
 app.use('/translate', translateRouter);
-app.use('template',templateRouter)
+app.use('/template',templateRouter)
 
 app.use((err, req, res, next) => {
   if (err.code === 'LIMIT_FILE_COUNT') {
