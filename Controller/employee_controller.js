@@ -39,7 +39,6 @@ exports.createUser = async (req, res, next) => {
     }
     const emp_id = await IdcodeServices.generateCode("Employee");
     const Employee = await EmployeeService.createUser(
-      emp_id,
         emp_name,
         dept_name,
         phone,
@@ -146,7 +145,7 @@ exports.getUserByDept = async (req, res, next) => {
 exports.updateUser = async (req, res, next) => {
   try {
     const { emp_id } = req.query;
-    const { emp_name, dept_name, address, pincode,dob,designation, status, } =
+    const { emp_name, dept_name, address, pincode,dob,designation,designation_id, status, } =
       req.body;
 
     const user = await EmployeeService.findUserById(emp_id);
@@ -155,7 +154,7 @@ exports.updateUser = async (req, res, next) => {
     }
 
     const updatedUser = await EmployeeService.updateUserById(emp_id, {
-        emp_name, dept_name, address, pincode,dob,designation, status
+        emp_name, dept_name, address, pincode,dob,designation,designation_id, status
     });
 
     return res
