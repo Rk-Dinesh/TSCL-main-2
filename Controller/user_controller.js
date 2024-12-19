@@ -10,7 +10,7 @@ const path = require('path');
 
 exports.createUser = async (req, res, next) => {
     try {
-        const { user_name, dept_name, phone, email, address, pincode, login_password, status,role_id, role,  created_by_user,zone_name,ward_name } = req.body;
+        const { user_name, dept_name, phone, email, address, pincode,  status,role_id, role,  created_by_user,zone_name,ward_name } = req.body;
 
         const existingUser = await UserService.findUserByPhone(phone);
         if (existingUser) {
@@ -27,7 +27,7 @@ exports.createUser = async (req, res, next) => {
                 message: "User with this Email already exists"
             });
         }
-
+        const login_password='Admin@mscl'
         const adminUser = await UserService.createUser(
             user_name,
             dept_name,
@@ -35,7 +35,7 @@ exports.createUser = async (req, res, next) => {
             email,
             address,
             pincode,
-            login_password,
+            login_password ,
             status,
             role_id,
             role,
