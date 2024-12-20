@@ -13,6 +13,8 @@ const PublicUserSchema = new Schema({
     verification_status: String,
     user_status: String,
     role:String,
+    lat:String,
+    lon:String,
 }, { timestamps: true });
 
 const PublicUserModel = mongoose.model('PublicUser', PublicUserSchema);

@@ -14,6 +14,7 @@ const UserSchema = new Schema({
     status: String,
     role_id:String,
     role: String,
+    designation:String,
     created_by_user:String,
     zone_name:String,
     ward_name:[String]

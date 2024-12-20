@@ -24,5 +24,6 @@ router.post('/forgotpassword',publicUserController.forwardPassword);
 router.post('/changePassword',verifyToken,publicUserController.changePassword);
 router.delete('/delete',verifyToken, publicUserController.deletePublicUserById);
 router.post('/update',verifyToken, publicUserController.updatePublicUser);
+router.post('/updatelonlat',verifyToken, publicUserController.updatePublicUserlon);
 router.post('/uploadcsv', upload.single('file'), publicUserController.uploadCSV);
 module.exports = router;

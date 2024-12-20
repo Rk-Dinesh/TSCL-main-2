@@ -10,7 +10,7 @@ const path = require('path');
 
 exports.createUser = async (req, res, next) => {
     try {
-        const { user_name, dept_name, phone, email, address, pincode,  status,role_id, role,  created_by_user,zone_name,ward_name } = req.body;
+        const { user_name, dept_name, phone, email, address, pincode,  status,role_id, role,designation,  created_by_user,zone_name,ward_name } = req.body;
 
         const existingUser = await UserService.findUserByPhone(phone);
         if (existingUser) {
@@ -39,6 +39,7 @@ exports.createUser = async (req, res, next) => {
             status,
             role_id,
             role,
+            designation,
             created_by_user,
             zone_name,
             ward_name
@@ -123,7 +124,7 @@ exports.loginUser = async (req, res, next) => {
           .json({ status: false, message: "Invalid identifier or password" });
       }
 
-      const token = jwt.sign({ role_id:user.role_id,role: user.role,code:user.user_id,dept:user.dept_name,name:user.user_name }, process.env.SECRET_TOKEN, { expiresIn: '3h' });
+      const token = jwt.sign({ role_id:user.role_id,role: user.role,designation:user.designation,code:user.user_id,dept:user.dept_name,name:user.user_name }, process.env.SECRET_TOKEN, { expiresIn: '3h' });
   
       return res.status(200).json({ token });
     } catch (error) {

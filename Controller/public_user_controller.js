@@ -19,7 +19,9 @@ exports.createPublicUser = async (req, res, next) => {
       login_password,
       verification_status,
       user_status,
-      role
+      role,
+      lat,
+      lon
     } = req.body;
 
     const existingUser = await PublicUserService.findPublicUserByPhone(phone);
@@ -36,7 +38,7 @@ exports.createPublicUser = async (req, res, next) => {
       return res.status(200).json({
         status: true,
         message:
-          "User with this phone number already exists, updated successfully"
+          "User with this phone number already exists"
       });
     }
 
@@ -51,7 +53,9 @@ exports.createPublicUser = async (req, res, next) => {
       login_password,
       verification_status,
       user_status,
-      role
+      role,
+      lat,
+      lon
     );
 
     const encryptedData =encryptData( publicUser.public_user_id);
@@ -291,6 +295,28 @@ exports.updatePublicUser = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.updatePublicUserlon = async (req, res, next) => {
+  try {
+    const { public_user_id } = req.query;
+    const { address,lon,lat } = req.body;
+
+  
+    const publicuser = await PublicUserService.getPublicUserById(public_user_id);
+    if (!publicuser) {
+      return res.status(404).json({ status: false, message: "PublicUser not found" });
+    }
+
+    const updatedPublicUser = await PublicUserService.updatePublicUserById(public_user_id, {
+      public_user_name,address,pincode,verification_status, user_status,role
+    });
+
+    return res.status(200).json({ status: true, message: "PublicUser Updated successfully" });
+  } catch (error) {
+    next(error);
+  }
+};
+
 
 exports.deletePublicUserById = async (req, res, next) => {
   try {
