@@ -308,7 +308,7 @@ exports.updatePublicUserlon = async (req, res, next) => {
     }
 
     const updatedPublicUser = await PublicUserService.updatePublicUserById(public_user_id, {
-      public_user_name,address,pincode,verification_status, user_status,role
+      address,lon,lat
     });
 
     return res.status(200).json({ status: true, message: "PublicUser Updated successfully" });
