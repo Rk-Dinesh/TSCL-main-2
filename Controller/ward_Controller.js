@@ -223,8 +223,6 @@ exports.uploadCSV = async (req, res, next) => {
                     for (let csv of csvs) {
                         const zone = await ZoneModel.findOne({
                             zone_id: csv.zone_id,
-                            status: 'active',
-                            created_by_user: createdByUser ,
                         });
 
                         if (!zone) {
