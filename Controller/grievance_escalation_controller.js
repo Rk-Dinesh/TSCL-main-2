@@ -29,12 +29,13 @@ exports.checkEscalation = async () => {
 
     // Check if escalation_l1 is done
     if (
-      complaint.escalation_l1 &&
+      complaint.tat_duration &&
       grievance.escalation_level !== "escalated_l1" &&
       grievance.escalation_level !== "escalated_l2" &&
-      grievance.escalation_level !== "escalated_l3"
+      grievance.escalation_level !== "escalated_l3" &&
+      grievance.escalation_level !== "escalated_l4"
     ) {
-      const level1 = complaint.escalation_l1;
+      const level1 = complaint.tat_duration;
       const escalationTime = parseInt(level1);
     //   console.log("executed1");
 
@@ -64,7 +65,7 @@ exports.checkEscalation = async () => {
         // Create a new escalation document
         const escalation = new GrievanceEscalation({
           grievance_id: grievance.grievance_id,
-          escalation_details: `Escalation level 1 exceeded`,
+          escalation_details: ` Level 1 exceeded`,
           escalation_level: "escalated_l1",
           escalation_department: complaint.dept_name,
           escalation_complaint: complaint.complaint_type_title,
@@ -90,11 +91,11 @@ exports.checkEscalation = async () => {
     }
     // Check if escalation_l2 is done
     else if (
-      complaint.escalation_l2 &&
+      complaint.escalation_l1 &&
       grievance.escalation_level === "escalated_l1"
     ) {
-      const level1 = complaint.escalation_l1;
-      const level2 = complaint.escalation_l2;
+      const level1 = complaint.tat_duration;
+      const level2 = complaint.escalation_l1;
     //   console.log("add", level1 + level2);
     //   console.log("add", parseInt(level1) + parseInt(level2));
       const escalationTime = parseInt(level1) + parseInt(level2);
@@ -126,7 +127,7 @@ exports.checkEscalation = async () => {
         await GrievanceEscalation.updateOne(
           { grievance_id: grievance.grievance_id },
           {
-            escalation_details: `Escalation level 2 exceeded`,
+            escalation_details: ` Level 2 exceeded`,
             escalation_level: "escalated_l2",
             escalation_department: complaint.dept_name,
             escalation_complaint: complaint.complaint_type_title,
@@ -149,12 +150,12 @@ exports.checkEscalation = async () => {
     }
     // Check if escalation_l3 is done
     else if (
-      complaint.escalation_l3 &&
+      complaint.escalation_l2 &&
       grievance.escalation_level === "escalated_l2"
     ) {
-      const level1 = complaint.escalation_l1;
-      const level2 = complaint.escalation_l2;
-      const level3 = complaint.escalation_l3;
+      const level1 = complaint.tat_duration;
+      const level2 = complaint.escalation_l1;
+      const level3 = complaint.escalation_l2;
 
     //   console.log("add", level1 + level2 + level3);
     //   console.log(
@@ -189,7 +190,7 @@ exports.checkEscalation = async () => {
         await GrievanceEscalation.updateOne(
           { grievance_id: grievance.grievance_id },
           {
-            escalation_details: `Escalation level 3 exceeded`,
+            escalation_details: ` Level 3 exceeded`,
             escalation_level: "escalated_l3",
             escalation_department: complaint.dept_name,
             escalation_complaint: complaint.complaint_type_title,
@@ -209,6 +210,71 @@ exports.checkEscalation = async () => {
         await Grievance.updateOne(
           { grievance_id: grievance.grievance_id },
           { escalation_level: "escalated_l3" }
+        );
+      }
+    }
+    else if (
+      complaint.escalation_l3 &&
+      grievance.escalation_level === "escalated_l3"
+    ) {
+      const level1 = complaint.tat_duration;
+      const level2 = complaint.escalation_l1;
+      const level3 = complaint.escalation_l2;
+      const level4 = complaint.escalation_l3;
+
+    //   console.log("add", level1 + level2 + level3);
+    //   console.log(
+    //     "add",
+    //     parseInt(level1) + parseInt(level2) + parseInt(level3)
+    //   );
+      const escalationTime =
+        parseInt(level1) + parseInt(level2) + parseInt(level3) + parseInt(level4) ;
+    //   console.log("executed3");
+      let escalationDateTime;
+      if (escalationLevel === "day") {
+        escalationDateTime = new Date(
+          grievance.updatedAt.getTime() + escalationTime * 24 * 60 * 60 * 1000
+        );
+      } else if (escalationLevel === "month") {
+        escalationDateTime = new Date(
+          grievance.updatedAt.getTime() +
+            escalationTime * 30 * 24 * 60 * 60 * 1000
+        );
+      } else if (escalationLevel === "minute") {
+        escalationDateTime = new Date(
+          grievance.createdAt.getTime() + escalationTime * 60 * 1000
+        );
+      } else {
+        console.log(
+          `Invalid escalation level ${escalationLevel} for grievance ${grievance.grievance_id}`
+        );
+        break;
+      }
+
+      if (new Date() > escalationDateTime) {
+        await GrievanceEscalation.updateOne(
+          { grievance_id: grievance.grievance_id },
+          {
+            escalation_details: ` Level 4 exceeded`,
+            escalation_level: "escalated_l4",
+            escalation_department: complaint.dept_name,
+            escalation_complaint: complaint.complaint_type_title,
+            escalation_to: complaint.role_l3,
+            escalated_user: grievance.assign_username,
+            escalated_userid: grievance.assign_user,
+            escalated_due: escalationTime,
+            escalation_raisedby: grievance.public_user_name,
+            escalation_priority: complaint.priority,
+            status: grievance.status,
+          }
+        );
+
+        // console.log("escalted_l3");
+
+        // Update the grievance status
+        await Grievance.updateOne(
+          { grievance_id: grievance.grievance_id },
+          { escalation_level: "escalated_l4" }
         );
       }
     }
