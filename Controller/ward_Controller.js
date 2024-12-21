@@ -4,6 +4,8 @@ const encryptData = require('../encryptedData');
 const csvParser = require('csv-parser');
 const fs = require('fs');
 const path = require('path');
+const ZoneModel = require('../Models/zone');
+const WardModel = require('../Models/ward');
 
 exports.createWard = async (req, res, next) => {
     try {
@@ -160,32 +162,96 @@ exports.deleteWardById = async (req, res, next) => {
     }
 };
 
+exports.uploadCSVa = async (req, res, next) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ error: 'No file uploaded' });
+        }
+
+        const createdByUser = req.body.created_by_user; 
+        if (!createdByUser) {
+            return res.status(400).json({ error: 'created_by_user is required' });
+        }
+
+        const csvs = [];
+        const filePath = path.join(__dirname, '../excel', req.file.filename);
+        fs.createReadStream(filePath)
+            .pipe(csvParser())
+            .on('data', (row) => {
+                csvs.push(row);
+            })
+            .on('end', async () => {
+                try {
+                    
+                    const result = await WardService.bulkInsert(csvs, createdByUser);
+                    res.status(200).json(result);
+                } catch (error) {
+                    next(error);
+                } finally {
+                    
+                    fs.unlinkSync(filePath);
+                }
+            });
+    } catch (error) {
+        next(error);
+    }
+};
+
+
 exports.uploadCSV = async (req, res, next) => {
     try {
-     
-      if (!req.file) {
-        return res.status(400).json({ error: 'No file uploaded' });
-      }
-  
-      const csvs = [];
-      const filePath = path.join(__dirname, '../excel', req.file.filename);
-      fs.createReadStream(filePath)
-        .pipe(csvParser())
-        .on('data', (row) => {
-          csvs.push(row);
-        })
-        .on('end', async () => {
-          try {
-            const result = await WardService.bulkInsert(csvs);
-            res.status(200).json(result);
-          } catch (error) {
-            next(error);
-          } finally {
-            // Remove the file after processing
-            fs.unlinkSync(filePath);
-          }
-        });
+       
+        if (!req.file) {
+            return res.status(400).json({ error: 'No file uploaded' });
+        }
+
+        const createdByUser  = req.body.created_by_user; 
+        if (!createdByUser ) {
+            return res.status(400).json({ error: 'created_by_user is required' });
+        }
+
+        const csvs = [];
+        const filePath = path.join(__dirname, '../excel', req.file.filename);
+      
+        fs.createReadStream(filePath)
+            .pipe(csvParser())
+            .on('data', (row) => {
+                csvs.push(row);
+            })
+            .on('end', async () => {
+                try {
+                    for (let csv of csvs) {
+                        const zone = await ZoneModel.findOne({
+                            zone_id: csv.zone_id,
+                            status: 'active',
+                            created_by_user: createdByUser ,
+                        });
+
+                        if (!zone) {
+                            return res.status(400).json({ error: `Zone not found for zone_id: ${csv.zone_id}` });
+                        }
+
+                        const existingWard = await WardModel.findOne({ ward_name: csv.ward_name });
+                        if (existingWard) {
+                            return res.status(400).json({ error: `Duplicate ward_name: ${csv.ward_name}` });
+                        }
+
+                        csv.zone_name = zone.zone_name;
+                        csv.ward_id = await IdcodeServices.generateCode('Ward');
+                        csv.status = 'active'; 
+                        csv.created_by_user = createdByUser ; 
+                    }
+
+                    const result = await WardModel.insertMany(csvs);
+                    return res.status(200).json(result);
+                } catch (error) {
+                    return res.status(500).json({ error: 'An unexpected error occurred' });
+                } finally {
+                   
+                    fs.unlinkSync(filePath);
+                }
+            });
     } catch (error) {
-      next(error);
+        return res.status(500).json({ error: 'An unexpected error occurred' });
     }
-  };
+};

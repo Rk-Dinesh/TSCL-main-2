@@ -1,4 +1,5 @@
 const WardModel = require('../Models/ward');
+const ZoneModel = require('../Models/zone');
 const IdcodeServices = require('./idcode_Service');
 
 exports.createWard = async (wardData) => {
@@ -33,13 +34,33 @@ exports.deleteWardById = async (ward_id) => {
     return await WardModel.findOneAndDelete({ ward_id });
 };
 
-exports.bulkInsert =  async(csvs) => {
+exports.bulkInsert = async (csvs, createdByUser) => {
     try {
         for (let csv of csvs) {
+           
+            const zone = await ZoneModel.findOne({
+                zone_id: csv.zone_id,
+                status: 'active',
+                created_by_user: createdByUser,
+            });
+
+            if (!zone) {
+                throw new Error(`Zone not found for zone_id: ${csv.zone_id}`);
+            }
+
+            const existingWard = await WardModel.findOne({ ward_name: csv.ward_name });
+            if (existingWard) {
+                throw new Error(`Duplicate ward_name: ${csv.ward_name}`);
+            }
+
+            csv.zone_name = zone.zone_name;
             csv.ward_id = await IdcodeServices.generateCode('Ward');
+            csv.status = 'active'; 
+            csv.created_by_user = createdByUser; 
         }
         return await WardModel.insertMany(csvs);
     } catch (error) {
         throw error;
     }
-}
+};
+
