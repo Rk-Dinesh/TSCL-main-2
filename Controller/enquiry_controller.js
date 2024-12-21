@@ -8,9 +8,9 @@ const path = require('path');
 
 exports.createResource = async (req, res, next) => {
     try {
-        const {  res_name, status, created_by_user } = req.body;
+        const {  res_name, image,status, created_by_user } = req.body;
         const Resource_id = await IdcodeServices.generateCode("Resource");
-        const Resource = await ResourceService.createResource({ res_id: Resource_id, res_name, status, created_by_user });
+        const Resource = await ResourceService.createResource({ res_id: Resource_id, res_name,image, status, created_by_user });
         
         res.status(200).json({
             status: true,
@@ -70,7 +70,7 @@ exports.getResourceById = async (req, res, next) => {
 exports.updateResource = async (req, res, next) => {
     try {
       const { res_id } = req.query;
-      const { res_name, status } = req.body;
+      const { res_name,image, status } = req.body;
   
     
       const Resource = await ResourceService.getResourceById(res_id);
@@ -80,6 +80,7 @@ exports.updateResource = async (req, res, next) => {
 
       const updatedResource = await ResourceService.updateResourceById(res_id, {
         res_name,
+        image,
         status,
       });
   
