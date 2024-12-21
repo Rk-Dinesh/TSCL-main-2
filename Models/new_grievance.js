@@ -27,6 +27,8 @@ const NewGrievanceSchema = new Schema(
     priority: String,
     lat: String,
     lon: String,
+    operator:String,
+    operator_id:String,
   },
   { timestamps: true }
 );

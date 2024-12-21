@@ -31,6 +31,10 @@ exports.getGrievanceByDept = async (dept_name) => {
     return await NewGrievanceModel.find({ dept_name });
 };
 
+exports.getGrievanceByOperator = async (filter) => {
+  return await NewGrievanceModel.find(filter);
+};
+
 exports.getGrievanceByDeptnotClosed = async (dept_name) => {
   return await NewGrievanceModel.find({ 
     dept_name,
@@ -83,7 +87,9 @@ exports.filterGrievances = async (filter) => {
   exports.getGrievanceByClosed = async () => {
     return await NewGrievanceModel.find({
       status: { $in: ['closed', 'Closed', 'CLOSE', 'CLOSED'] }
-    });
+    })
+    .sort({ createdAt: -1 }) 
+    .limit(1500); 
   };
 
   exports.getGrievanceBySeverityHigh = async () => {

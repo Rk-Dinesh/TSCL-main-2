@@ -8,7 +8,13 @@ exports.createWard = async (wardData) => {
 };
 
 exports.getAllWards = async () => {
-    return await WardModel.find();
+    try {
+        const wards = await WardModel.find();
+        const sortedWards = wards.sort((a, b) => Number(a.ward_name) - Number(b.ward_name));
+        return sortedWards;
+    } catch (error) {
+        throw new Error('Error fetching wards');
+    }
 };
 
 exports.getActiveWards = async () => {
