@@ -76,6 +76,7 @@ exports.checkEscalation = async () => {
           escalation_raisedby: grievance.public_user_name,
           escalation_priority: complaint.priority,
           status: grievance.status,
+          escalation_time1: escalationDateTime
         });
 
         // Save the escalation document
@@ -138,6 +139,7 @@ exports.checkEscalation = async () => {
             escalation_raisedby: grievance.public_user_name,
             escalation_priority: complaint.priority,
             status: grievance.status,
+            escalation_time2: escalationDateTime
           }
         );
         // console.log("escalted_l2");
@@ -201,6 +203,7 @@ exports.checkEscalation = async () => {
             escalation_raisedby: grievance.public_user_name,
             escalation_priority: complaint.priority,
             status: grievance.status,
+            escalation_time3: escalationDateTime
           }
         );
 
@@ -266,6 +269,7 @@ exports.checkEscalation = async () => {
             escalation_raisedby: grievance.public_user_name,
             escalation_priority: complaint.priority,
             status: grievance.status,
+            escalation_time4: escalationDateTime
           }
         );
 

@@ -15,6 +15,10 @@ const GrievanceEscalationSchema = new Schema({
     escalation_raisedby:String,
     escalation_priority:String,
     status: String,
+    escalation_time1:String,
+    escalation_time2:String,
+    escalation_time3:String,
+    escalation_time4:String,
 }, { timestamps: true });
 
 const GrievanceEscalationModel = mongoose.model('GrievanceEscalation', GrievanceEscalationSchema);
