@@ -21,6 +21,7 @@ const NewGrievanceSchema = new Schema(
     assign_user: String,
     assign_username: String,
     assign_userphone: String,
+    assign_time:String,
     status: String,
     escalation_level: String,
     statusflow: String,
@@ -29,6 +30,7 @@ const NewGrievanceSchema = new Schema(
     lon: String,
     operator:String,
     operator_id:String,
+    escaltiontime:String,
   },
   { timestamps: true }
 );

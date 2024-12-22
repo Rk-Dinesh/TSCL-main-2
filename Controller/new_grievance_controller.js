@@ -6,6 +6,7 @@ const GrievanceLogModel = require("../Models/grievance_log");
 const NewGrievanceModel = require("../Models/new_grievance");
 const ComplaintModel = require("../Models/complaint");
 const GrievanceEscalationModel = require("../Models/grievance_escalation");
+const WardModel = require("../Models/ward");
 
 // exports.createNewGrievance = async (req, res, next) => {
 //     try {
@@ -29,7 +30,6 @@ exports.createNewGrievance = async (req, res, next) => {
       grievance_mode,
       complaint_type_title,
       dept_name,
-      zone_name,
       ward_name,
       street_name,
       pincode,
@@ -39,10 +39,7 @@ exports.createNewGrievance = async (req, res, next) => {
       public_user_id,
       public_user_name,
       phone,
-      status,
       escalation_level,
-      statusflow,
-      priority,
       lon,
       lat,
       operator,
@@ -50,17 +47,23 @@ exports.createNewGrievance = async (req, res, next) => {
     } = req.body;
     const grievance_id = await IdcodeServices.generateCode("NewGrievance");
 
+    const complaint_tat = await ComplaintModel.findOne({complaint_type_title:complaint})
+    const wardData = await WardModel.findOne({ward_name:ward_name})
+
     const user = await UserModel.findOne({
       dept_name,
       ward_name: { $in: [ward_name] },
     });
+
+    const assignTime = user ? Date.now() : null;
+
     if (user) {
       var newGrievance = await NewGrievanceService.createNewGrievance({
         grievance_id,
         grievance_mode,
         complaint_type_title,
         dept_name,
-        zone_name,
+        zone_name:wardData.zone_name,
         ward_name,
         street_name,
         pincode,
@@ -73,14 +76,16 @@ exports.createNewGrievance = async (req, res, next) => {
         assign_user: user.user_id,
         assign_username: user.user_name,
         assign_userphone: user.phone,
-        status,
+        assign_time:assignTime,
+        status:'new',
         escalation_level,
-        statusflow,
-        priority,
+        statusflow:'new',
+        priority:complaint_tat.priority,
         lon,
         lat,
         operator,
-        operator_id
+        operator_id,
+        escaltiontime:complaint_tat.tat_duration,
       });
       const newLog = await GrievanceLogModel.create({
         grievance_id,
@@ -93,7 +98,7 @@ exports.createNewGrievance = async (req, res, next) => {
         grievance_mode,
         complaint_type_title,
         dept_name,
-        zone_name,
+        zone_name:wardData.zone_name,
         ward_name,
         street_name,
         pincode,
@@ -103,14 +108,15 @@ exports.createNewGrievance = async (req, res, next) => {
         public_user_id,
         public_user_name,
         phone,
-        status,
+        status:'new',
         escalation_level,
-        statusflow,
-        priority,
+        statusflow:'new',
+        priority:complaint_tat.priority,
         lon,
         lat,
         operator,
-        operator_id
+        operator_id,
+        escaltiontime:complaint_tat.tat_duration,
       });
     }
 
