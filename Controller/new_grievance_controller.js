@@ -108,6 +108,7 @@ exports.createNewGrievance = async (req, res, next) => {
         public_user_id,
         public_user_name,
         phone,
+        assign_time:assignTime,
         status:'new',
         escalation_level,
         statusflow:'new',
@@ -447,6 +448,7 @@ exports.updateAssign = async (req, res, next) => {
     newGrievance.assign_user = assign_user;
     newGrievance.assign_username = assign_username;
     newGrievance.assign_userphone = assign_userphone;
+    newGrievance.assign_time = Date.now();
 
     await newGrievance.save();
 
@@ -487,6 +489,7 @@ exports.UpdateManyAssign = async (req, res, next) => {
             assign_user: assignUserDetails.assign_user,
             assign_username: assignUserDetails.assign_username,
             assign_userphone: assignUserDetails.assign_userphone,
+            assign_time: Date.now(),
           },
         },
       },
