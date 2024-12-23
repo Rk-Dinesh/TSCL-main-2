@@ -86,6 +86,7 @@ exports.createNewGrievance = async (req, res, next) => {
         operator,
         operator_id,
         escaltiontime:complaint_tat.tat_duration,
+        escaltiontype:complaint_tat.escalation_type
       });
       const newLog = await GrievanceLogModel.create({
         grievance_id,
@@ -118,6 +119,7 @@ exports.createNewGrievance = async (req, res, next) => {
         operator,
         operator_id,
         escaltiontime:complaint_tat.tat_duration,
+        escaltiontype:complaint_tat.escalation_type
       });
     }
 
