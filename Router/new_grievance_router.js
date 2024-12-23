@@ -5,6 +5,7 @@ const verifyToken = require('../Authorization');
 
 router.post('/post',verifyToken, newGrievanceController.createNewGrievance);
 router.get('/getbyid',verifyToken, newGrievanceController.getNewGrievanceById);
+router.get('/getbyphone',verifyToken, newGrievanceController.getNewGrievanceByPhone);
 router.get('/getbyuserid',verifyToken, newGrievanceController.getGrievanceByUserId);
 router.get('/getbyidstatus',verifyToken, newGrievanceController.getGrievanceByUstatusClosedID);
 router.get('/getbyassign',verifyToken, newGrievanceController.getGrievanceByAssign);
@@ -12,6 +13,8 @@ router.get('/getbydept',verifyToken, newGrievanceController.getGrievanceByDept);
 router.get('/getbyoperator',verifyToken, newGrievanceController.getGrievanceByOperator);
 router.post('/notify',verifyToken, newGrievanceController.updateEscalationNotify);
 router.post('/notifyread',verifyToken, newGrievanceController.updateEscalationNotify);
+router.post('/worksheetJE',verifyToken, newGrievanceController.updateworksheetJE);
+router.post('/reopen',verifyToken, newGrievanceController.ReopenTicket);
 router.post('/updatestatus', newGrievanceController.updateStatus);
 router.post('/updateassign',verifyToken, newGrievanceController.updateAssign);
 router.post('/tickettransfer',verifyToken, newGrievanceController.updateTransfer);

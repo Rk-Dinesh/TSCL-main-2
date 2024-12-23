@@ -12,6 +12,20 @@ exports.getNewGrievanceById = async (grievance_id) => {
     return await NewGrievanceModel.findOne({ grievance_id });
 };
 
+exports.getNewGrievanceByPhone = async (phone) => {
+  try {
+    const grievances = await NewGrievanceModel.find({ phone })
+      .sort({ _id: -1 })
+      .limit(20); 
+
+    return grievances
+  } catch (error) {
+    console.error("Error fetching grievances:", error);
+    throw error; 
+  }
+};
+
+
 exports.getGrievanceByUserId = async (public_user_id) => {
     return await NewGrievanceModel.find({
       public_user_id,

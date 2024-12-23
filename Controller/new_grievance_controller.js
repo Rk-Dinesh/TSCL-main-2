@@ -168,6 +168,28 @@ exports.getNewGrievanceById = async (req, res, next) => {
   }
 };
 
+exports.getNewGrievanceByPhone = async (req, res, next) => {
+  try {
+    const { phone } = req.query;
+    const newGrievance = await NewGrievanceService.getNewGrievanceByPhone(
+      phone
+    );
+    if (!newGrievance) {
+      return res
+        .status(404)
+        .json({ status: false, message: "New grievance not found" });
+    }
+    const encryptedData = encryptData(newGrievance);
+    res.status(200).json({
+      status: true,
+      message: "New grievance retrieved successfully",
+      data: encryptedData,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.getGrievanceByUserId = async (req, res, next) => {
   try {
     const { public_user_id } = req.query;
@@ -417,6 +439,62 @@ exports.updateEscalationNotifyRead = async (req, res, next) => {
       .json({
         status: true,
         message: "escalation_notify updated successfully",
+      });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.updateworksheetJE = async (req, res, next) => {
+  try {
+    const { grievance_id } = req.query;
+    const { worksheet_JE } = req.body;
+
+    const newGrievance = await NewGrievanceService.getNewGrievanceById(
+      grievance_id
+    );
+    if (!newGrievance) {
+      return res
+        .status(404)
+        .json({ status: false, message: "Grievance not found" });
+    }
+
+    newGrievance.worksheet_JE = worksheet_JE;
+    
+    await newGrievance.save();
+    return res
+      .status(200)
+      .json({
+        status: true,
+        message: "worksheet_JE updated successfully",
+      });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.ReopenTicket = async (req, res, next) => {
+  try {
+    const { grievance_id } = req.query;
+    
+
+    const newGrievance = await NewGrievanceService.getNewGrievanceById(
+      grievance_id
+    );
+    if (!newGrievance) {
+      return res
+        .status(404)
+        .json({ status: false, message: "Grievance not found" });
+    }
+
+    newGrievance.status = 'processing';
+    
+    await newGrievance.save();
+    return res
+      .status(200)
+      .json({
+        status: true,
+        message: "Status updated successfully",
       });
   } catch (error) {
     next(error);
