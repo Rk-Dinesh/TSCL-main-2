@@ -367,6 +367,62 @@ exports.getGrievanceByAssignClosed = async (req, res, next) => {
   }
 };
 
+exports.updateEscalationNotify = async (req, res, next) => {
+  try {
+    const { grievance_id } = req.query;
+    const { escalation_notify,escalation_notify_read } = req.body;
+
+    const newGrievance = await NewGrievanceService.getNewGrievanceById(
+      grievance_id
+    );
+    if (!newGrievance) {
+      return res
+        .status(404)
+        .json({ status: false, message: "Grievance not found" });
+    }
+
+    newGrievance.escalation_notify = escalation_notify;
+    newGrievance.escalation_notify_read = escalation_notify_read;
+    
+    await newGrievance.save();
+    return res
+      .status(200)
+      .json({
+        status: true,
+        message: "escalation_notify updated successfully",
+      });
+  } catch (error) {
+    next(error);
+  }
+};
+exports.updateEscalationNotifyRead = async (req, res, next) => {
+  try {
+    const { grievance_id } = req.query;
+    const { escalation_notify_read } = req.body;
+
+    const newGrievance = await NewGrievanceService.getNewGrievanceById(
+      grievance_id
+    );
+    if (!newGrievance) {
+      return res
+        .status(404)
+        .json({ status: false, message: "Grievance not found" });
+    }
+
+    newGrievance.escalation_notify_read = escalation_notify_read;
+    
+    await newGrievance.save();
+    return res
+      .status(200)
+      .json({
+        status: true,
+        message: "escalation_notify updated successfully",
+      });
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.updateStatus = async (req, res, next) => {
   try {
     const { grievance_id } = req.query;

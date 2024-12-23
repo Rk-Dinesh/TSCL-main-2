@@ -32,6 +32,8 @@ const NewGrievanceSchema = new Schema(
     operator_id:String,
     escaltiontime:String,
     escaltiontype:String,
+    escalation_notify:String,
+    escalation_notify_read:String,
   },
   { timestamps: true }
 );
