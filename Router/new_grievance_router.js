@@ -45,6 +45,7 @@ router.get('/byhigh',verifyToken, newGrievanceController.getGrievanceBySeverityH
 router.get('/bymedium',verifyToken, newGrievanceController.getGrievanceBySeverityMedium);
 router.get('/bylow',verifyToken, newGrievanceController.getGrievanceBySeverityLow);
 router.get('/byreopen',verifyToken, newGrievanceController.getGrievanceByReopen);
+router.get('/byisreopen',verifyToken, newGrievanceController.getGrievanceByISReopen);
 
 router.get('/getbydeptnotclosed',verifyToken, newGrievanceController.getGrievanceByDeptnotClosed);
 router.get('/getbydeptclosed',verifyToken, newGrievanceController.getGrievanceByDeptClosed);

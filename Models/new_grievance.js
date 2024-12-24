@@ -36,6 +36,7 @@ const NewGrievanceSchema = new Schema(
     escalation_notify_read:String,
     worksheet_JE:String,
     isHighlighted:String,
+    isReopened:String,
   },
   { timestamps: true }
 );

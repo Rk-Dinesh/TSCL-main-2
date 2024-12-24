@@ -488,6 +488,7 @@ exports.ReopenTicket = async (req, res, next) => {
     }
 
     newGrievance.status = 'processing';
+    newGrievance.isReopened = 'yes';
     
     await newGrievance.save();
     return res
@@ -1482,6 +1483,20 @@ exports.getGrievanceBySeverityLow = async (req, res, next) => {
 exports.getGrievanceByReopen = async (req, res, next) => {
   try {
     const newGrievances = await NewGrievanceService.getGrievanceByReopen();
+    const encryptedData = encryptData(newGrievances);
+    res.status(200).json({
+      status: true,
+      message: "New grievances Reopen retrieved successfully",
+      data: encryptedData,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getGrievanceByISReopen = async (req, res, next) => {
+  try {
+    const newGrievances = await NewGrievanceService.getGrievanceByIsReopen();
     const encryptedData = encryptData(newGrievances);
     res.status(200).json({
       status: true,

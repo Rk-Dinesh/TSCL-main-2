@@ -129,3 +129,9 @@ exports.filterGrievances = async (filter) => {
       status:'Re-opened'
     });
   };
+
+  exports.getGrievanceByIsReopen = async () => {
+    return await NewGrievanceModel.find({
+      isReopened:'yes'
+    });
+  };
