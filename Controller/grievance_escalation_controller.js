@@ -26,6 +26,7 @@ exports.checkEscalation = async () => {
     }
 
     const escalationLevel = complaint.escalation_type;
+    const now = new Date();
 
     // Check if escalation_l1 is done
     if (
@@ -60,6 +61,15 @@ exports.checkEscalation = async () => {
         continue;
       }
 
+      const highlightTime = new Date(escalationTime - 24 * 60 * 60 * 1000);
+
+      if (now >= highlightTime && grievance.isHighlighted !== "yes") {
+        await Grievance.updateOne(
+          { grievance_id: grievance.grievance_id },
+          { isHighlighted: "yes" }
+        );
+      }
+
       // Check if the grievance has exceeded the escalation time
       if (new Date() > escalationDateTime) {
         // Create a new escalation document
@@ -86,7 +96,7 @@ exports.checkEscalation = async () => {
         // Update the grievance status
         await Grievance.updateOne(
           { grievance_id: grievance.grievance_id },
-          { escalation_level: "escalated_l1" }
+          { escalation_level: "escalated_l1",isHighlighted: "no"  }
         );
       }
     }
