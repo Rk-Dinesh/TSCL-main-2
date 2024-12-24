@@ -15,6 +15,7 @@ router.post('/notify',verifyToken, newGrievanceController.updateEscalationNotify
 router.post('/notifyread',verifyToken, newGrievanceController.updateEscalationNotify);
 router.post('/worksheetJE',verifyToken, newGrievanceController.updateworksheetJE);
 router.post('/reopen',verifyToken, newGrievanceController.ReopenTicket);
+router.post('/highlight',verifyToken, newGrievanceController.Highlighted);
 router.post('/updatestatus', newGrievanceController.updateStatus);
 router.post('/updateassign',verifyToken, newGrievanceController.updateAssign);
 router.post('/tickettransfer',verifyToken, newGrievanceController.updateTransfer);

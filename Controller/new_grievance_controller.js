@@ -501,6 +501,34 @@ exports.ReopenTicket = async (req, res, next) => {
   }
 };
 
+exports.Highlighted = async (req, res, next) => {
+  try {
+    const { grievance_id } = req.query;
+    const { isHighlighted } = req.body;
+
+    const newGrievance = await NewGrievanceService.getNewGrievanceById(
+      grievance_id
+    );
+    if (!newGrievance) {
+      return res
+        .status(404)
+        .json({ status: false, message: "Grievance not found" });
+    }
+
+    newGrievance.isHighlighted = 'no';
+    
+    await newGrievance.save();
+    return res
+      .status(200)
+      .json({
+        status: true,
+        message: "worksheet_JE updated successfully",
+      });
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.updateStatus = async (req, res, next) => {
   try {
     const { grievance_id } = req.query;
