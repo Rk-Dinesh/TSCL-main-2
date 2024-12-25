@@ -96,7 +96,7 @@ exports.checkEscalation = async () => {
         // Update the grievance status
         await Grievance.updateOne(
           { grievance_id: grievance.grievance_id },
-          { escalation_level: "escalated_l1",isHighlighted: "no"  }
+          { escalation_level: "escalated_l1",isHighlighted: "no",isEsacalted:'yes'  }
         );
       }
     }
@@ -156,7 +156,7 @@ exports.checkEscalation = async () => {
         // Update the grievance status
         await Grievance.updateOne(
           { grievance_id: grievance.grievance_id },
-          { escalation_level: "escalated_l2" }
+          { escalation_level: "escalated_l2",isEsacalted:'yes' }
         );
       }
     }
@@ -222,7 +222,7 @@ exports.checkEscalation = async () => {
         // Update the grievance status
         await Grievance.updateOne(
           { grievance_id: grievance.grievance_id },
-          { escalation_level: "escalated_l3" }
+          { escalation_level: "escalated_l3" ,isEsacalted:'yes'}
         );
       }
     }

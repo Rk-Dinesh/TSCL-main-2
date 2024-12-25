@@ -37,6 +37,7 @@ const NewGrievanceSchema = new Schema(
     worksheet_JE:String,
     isHighlighted:String,
     isReopened:String,
+    isEsacalted:String,
   },
   { timestamps: true }
 );
