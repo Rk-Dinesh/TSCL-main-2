@@ -61,9 +61,9 @@ exports.checkEscalation = async () => {
         continue;
       }
 
-      const highlightTime = new Date(escalationTime - 24 * 60 * 60 * 1000);
+      const highlightTime = new Date(escalationDateTime.getTime() - 24 * 60 * 60 * 1000);
 
-      if (now >= highlightTime && grievance.isHighlighted !== "yes") {
+      if (now >= highlightTime && now < escalationDateTime && grievance.isHighlighted !== "yes") {
         await Grievance.updateOne(
           { grievance_id: grievance.grievance_id },
           { isHighlighted: "yes" }
