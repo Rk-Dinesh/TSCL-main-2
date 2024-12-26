@@ -15,6 +15,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.post('/post', publicUserController.createPublicUser);
+router.post('/postapp', publicUserController.createPublicUserSignup);
 router.post('/login', publicUserController.loginPublicUser);
 router.post('/loginweb', publicUserController.loginPublicUserweb);
 router.get('/get',verifyToken, publicUserController.getAllPublicUsers);

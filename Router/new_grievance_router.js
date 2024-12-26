@@ -12,7 +12,7 @@ router.get('/getbyassign',verifyToken, newGrievanceController.getGrievanceByAssi
 router.get('/getbydept',verifyToken, newGrievanceController.getGrievanceByDept);
 router.get('/getbyoperator',verifyToken, newGrievanceController.getGrievanceByOperator);
 router.post('/notify',verifyToken, newGrievanceController.updateEscalationNotify);
-router.post('/notifyread',verifyToken, newGrievanceController.updateEscalationNotify);
+router.post('/notifyread',verifyToken, newGrievanceController.updateEscalationNotifyRead);
 router.post('/worksheetJE',verifyToken, newGrievanceController.updateworksheetJE);
 router.post('/reopen',verifyToken, newGrievanceController.ReopenTicket);
 router.post('/highlight',verifyToken, newGrievanceController.Highlighted);

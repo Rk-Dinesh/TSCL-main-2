@@ -27,13 +27,13 @@ exports.createPublicUser = async (req, res, next) => {
     const existingUser = await PublicUserService.findPublicUserByPhone(phone);
     if (existingUser) {
      
-      if (address && existingUser.address !== address) {
-        existingUser.address = address;
-      }
-      if (pincode && existingUser.pincode !== pincode) {
-        existingUser.pincode = pincode;
-      }
-      await existingUser.save(); 
+      // if (address && existingUser.address !== address) {
+      //   existingUser.address = address;
+      // }
+      // if (pincode && existingUser.pincode !== pincode) {
+      //   existingUser.pincode = pincode;
+      // }
+      // await existingUser.save(); 
 
       return res.status(200).json({
         status: true,
@@ -66,6 +66,67 @@ exports.createPublicUser = async (req, res, next) => {
       data:encryptedData
      
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+exports.createPublicUserSignup = async (req, res, next) => {
+  try {
+    const {
+      public_user_name,
+      phone,
+      email,
+      address,
+      pincode,
+      login_password,
+      verification_status,
+      user_status,
+      role,
+      lat,
+      lon
+    } = req.body;
+
+    const existingUser = await PublicUserService.findPublicUserByPhone(phone);
+    if (existingUser) {
+     
+      // if (address && existingUser.address !== address) {
+      //   existingUser.address = address;
+      // }
+      // if (pincode && existingUser.pincode !== pincode) {
+      //   existingUser.pincode = pincode;
+      // }
+      // await existingUser.save(); 
+
+      return res.status(200).json({
+        status: true,
+        message:
+          "User with this phone number already exists"
+      });
+    }
+
+    
+
+    const publicUser = await PublicUserService.createPublicUser(
+      public_user_name,
+      phone,
+      email,
+      address,
+      pincode,
+      login_password,
+      verification_status,
+      user_status,
+      role,
+      lat,
+      lon
+    );
+
+    const userId =publicUser.public_user_id;
+
+    const token = jwt.sign({code:userId }, process.env.SECRET_TOKEN, { expiresIn: '3h' });
+
+    res.status(200).json({token});
   } catch (error) {
     next(error);
   }
