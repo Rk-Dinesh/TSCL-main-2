@@ -1,4 +1,5 @@
 const StreetModel = require('../Models/street');
+const WardModel = require('../Models/ward');
 const IdcodeServices = require('./idcode_Service');
 
 exports.createStreet = async (streetData) => {
@@ -34,10 +35,27 @@ exports.deleteStreetById = async (street_id) => {
     return await StreetModel.findOneAndDelete({ street_id });
 };
 
-exports.bulkInsert =  async(csvs) => {
+exports.bulkInsert =  async(csvs,createdByUser) => {
     try {
+
+       
         for (let csv of csvs) {
+
+            const ward = await WardModel.findOne({
+                ward_id: csv.ward_id,
+                });
+
+            
+            if (!ward) {
+                throw new Error(`Ward not found for ward_id: ${csv.ward_id}`);
+            }
+
             csv.street_id = await IdcodeServices.generateCode('Street');
+            csv.ward_name = ward.ward_name;
+            csv.zone_id =  ward.zone_id;
+            csv.zone_name =  ward.zone_name;
+            csv.status = 'active'; 
+            csv.created_by_user = createdByUser;
         }
         return await StreetModel.insertMany(csvs);
     } catch (error) {
