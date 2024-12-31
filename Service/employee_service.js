@@ -59,10 +59,12 @@ exports.updateUserById = async (emp_id, updateData) => {
 exports.deleteUserById = async (emp_id) => {
     return await EmployeeModel.findOneAndDelete({ emp_id });
 };
-exports.bulkInsert =  async(csvs) => {
+exports.bulkInsert =  async(csvs,createdByUser) => {
     try {
         for (let csv of csvs) {
             csv.emp_id = await IdcodeServices.generateCode("Employee");
+            csv.status = 'active'; 
+            csv.created_by_user = createdByUser;
         }
         return await EmployeeModel.insertMany(csvs);
     } catch (error) {

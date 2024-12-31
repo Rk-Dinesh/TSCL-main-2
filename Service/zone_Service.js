@@ -26,10 +26,12 @@ exports.deleteZoneById = async (zone_id) => {
     return await ZoneModel.findOneAndDelete({ zone_id });
 };
 
-exports.bulkInsert =  async(csvs) => {
+exports.bulkInsert =  async(csvs,createdByUser) => {
     try {
         for (let csv of csvs) {
             csv.zone_id = await IdcodeServices.generateCode('Zone');
+            csv.status = 'active'; 
+            csv.created_by_user = createdByUser;
         }
         return await ZoneModel.insertMany(csvs);
     } catch (error) {

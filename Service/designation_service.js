@@ -24,10 +24,12 @@ exports.deleteDesignationById = async (desgination_id) => {
     return await DesignationModel.findOneAndDelete({ desgination_id });
 };
 
-exports.bulkInsert =  async(csvs) => {
+exports.bulkInsert =  async(csvs,createdByUser) => {
     try {
         for (let csv of csvs) {
             csv.desgination_id = await IdcodeServices.generateCode("Designation");
+            csv.status = 'active'; 
+            csv.created_by_user = createdByUser;
         }
         return await DesignationModel.insertMany(csvs);
     } catch (error) {
