@@ -168,6 +168,11 @@ exports.uploadCSV = async (req, res, next) => {
       if (!req.file) {
         return res.status(400).json({ error: 'No file uploaded' });
       }
+
+      const createdByUser = req.body.created_by_user; 
+      if (!createdByUser) {
+          return res.status(400).json({ error: 'created_by_user is required' });
+      }
   
       const csvs = [];
       const filePath = path.join(__dirname, '../excel', req.file.filename);
@@ -178,7 +183,7 @@ exports.uploadCSV = async (req, res, next) => {
         })
         .on('end', async () => {
           try {
-            const result = await StreetService.bulkInsert(csvs);
+            const result = await StreetService.bulkInsert(csvs,createdByUser);
             res.status(200).json(result);
           } catch (error) {
             next(error);
