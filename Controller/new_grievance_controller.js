@@ -461,6 +461,7 @@ exports.updateworksheetJE = async (req, res, next) => {
 
     newGrievance.worksheet_JE = worksheet_JE;
     newGrievance.isEsacalted ='no';
+    newGrievance.ticketclosedtime = new Date();
     
     await newGrievance.save();
     return res
@@ -1508,3 +1509,108 @@ exports.getGrievanceByISReopen = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.departmentGrievanceCounts = async (req, res, next) => {
+  try {
+    const { startDate, endDate, department } = req.query;
+
+    // Build match conditions based on filters
+    const matchConditions = {};
+    if (department) {
+      matchConditions.dept_name = department;
+    }
+    if (startDate && endDate) {
+      matchConditions.createdAt = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate),
+      };
+    }
+
+    // Aggregation pipeline
+    const grievanceCounts = await NewGrievanceModel.aggregate([
+      { $match: matchConditions },
+      {
+        $facet: {
+          total: [
+            {
+              $group: {
+                _id: "$dept_name", // Group by department
+                count: { $sum: 1 },
+                resolved: { $sum: { $cond: [{ $eq: ["$status", "closed"] }, 1, 0] } },
+                pending: { $sum: { $cond: [{ $ne: ["$status", "closed"] }, 1, 0] } },
+                escalated: { $sum: { $cond: [{ $eq: ["$isEsacalted", "yes"] }, 1, 0] } },
+              },
+            },
+          ],
+          repeated: [
+            {
+              $match: { isReopened: "yes" }, // Only grievances with isReopened = yes
+            },
+            {
+              $group: {
+                _id: "$dept_name",
+                count: { $sum: 1 },
+                resolved: {
+                  $sum: {
+                    $cond: [{ $eq: ["$status", "closed"] }, 1, 0],
+                  },
+                },
+                pending: {
+                  $sum: {
+                    $cond: [{ $ne: ["$status", "closed"] }, 1, 0],
+                  },
+                },
+                escalated: {
+                  $sum: {
+                    $cond: [{ $eq: ["$isEsacalted", "yes"] }, 1, 0],
+                  },
+                },
+              },
+            },
+          ],
+        },
+      },
+    ]);
+
+    // Transform data into the desired format
+    const totalData = grievanceCounts[0].total || [];
+    const repeatedData = grievanceCounts[0].repeated || [];
+
+    const formattedData = totalData.map((totalItem) => {
+      const repeatedItem = repeatedData.find(
+        (r) => r._id === totalItem._id
+      ) || {
+        count: 0,
+        resolved: 0,
+        notClosed: 0,
+        escalated: 0,
+      };
+
+      return {
+        department: totalItem._id,
+        total: {
+          count: totalItem.count,
+          resolved: totalItem.resolved,
+          pending: totalItem.pending,
+          escalated: totalItem.escalated,
+        },
+        repeated: {
+          count: repeatedItem.count,
+          resolved: repeatedItem.resolved,
+          notClosed: repeatedItem.notClosed,
+          escalated: repeatedItem.escalated,
+        },
+      };
+    });
+
+    res.json(formattedData);
+  } catch (error) {
+    console.error("Error getting department grievance counts:", error);
+    res.status(500).json({ message: "Error retrieving department grievance counts" });
+  }
+};
+
+
+
+
+

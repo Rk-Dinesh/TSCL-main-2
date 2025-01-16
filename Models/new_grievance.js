@@ -23,6 +23,7 @@ const NewGrievanceSchema = new Schema(
     assign_userphone: String,
     assign_time:String,
     status: String,
+    ticketclosedtime:String,
     escalation_level: String,
     statusflow: String,
     priority: String,

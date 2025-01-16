@@ -37,6 +37,7 @@ router.get('/averageresolution', newGrievanceController.AverageResolutionTimeByE
 router.get('/beforeescalation', newGrievanceController.PercentageOfGrievancesResolvedWithinSpecifiedPeriodByDepartmentAndComplaintType);
 router.get('/afterescalation', newGrievanceController.PercentageOfGrievancesEscalatedToHigherAuthorities);
 router.get('/compartiveanalysis', newGrievanceController.ComparativeAnalysis);
+router.get('/departmentGrievanceCounts', newGrievanceController.departmentGrievanceCounts);
 
 router.get('/get',verifyToken, newGrievanceController.getAllNewGrievances);
 router.get('/bynotclosed',verifyToken, newGrievanceController.getGrievanceBynotClosed);
