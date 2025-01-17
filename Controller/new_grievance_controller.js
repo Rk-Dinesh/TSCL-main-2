@@ -1610,6 +1610,128 @@ exports.departmentGrievanceCounts = async (req, res, next) => {
   }
 };
 
+exports.zoneDepartmentGrievances = async (req, res, next) => {
+  try {
+    const { startDate, endDate, zone } = req.query;
+
+
+    const matchConditions = {};
+    if (zone) {
+      matchConditions.zone_name = zone; 
+    }
+    if (startDate && endDate) {
+      matchConditions.createdAt = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate),
+      };
+    }
+
+    const grievancesData = await NewGrievanceModel.aggregate([
+      { $match: matchConditions },
+      {
+        $group: {
+          _id: { zone: "$zone_name", department: "$dept_name" }, 
+          received: { $sum: 1 },
+          closed: { $sum: { $cond: [{ $eq: ["$status", "closed"] }, 1, 0] } },
+          pending: { $sum: { $cond: [{ $ne: ["$status", "closed"] }, 1, 0] } }, 
+        },
+      },
+      {
+        $group: {
+          _id: "$_id.zone", 
+          departments: {
+            $push: {
+              department: "$_id.department",
+              received: "$received",
+              closed: "$closed",
+              pending: "$pending",
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          zone: "$_id",
+          departments: 1,
+        },
+      },
+    ]);
+
+    res.json(grievancesData);
+  } catch (error) {
+    console.error("Error getting zone and department grievances:", error);
+    res.status(500).json({ message: "Error retrieving zone and department grievances" });
+  }
+};
+
+exports.wardDepartmentGrievances = async (req, res, next) => {
+  try {
+    const { startDate, endDate, ward } = req.query;
+
+    const matchConditions = {};
+    if (ward) {
+      matchConditions.ward_name = ward;
+    }
+    if (startDate && endDate) {
+      matchConditions.createdAt = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate),
+      };
+    }
+
+    const grievancesData = await NewGrievanceModel.aggregate([
+      { $match: matchConditions },
+      {
+        $group: {
+          _id: { zone: "$zone_name", ward: "$ward_name", department: "$dept_name" },
+          received: { $sum: 1 },
+          closed: { $sum: { $cond: [{ $eq: ["$status", "closed"] }, 1, 0] } },
+          pending: { $sum: { $cond: [{ $ne: ["$status", "closed"] }, 1, 0] } },
+        },
+      },
+      {
+        $group: {
+          _id: { zone: "$_id.zone", ward: "$_id.ward" }, 
+          departments: {
+            $push: {
+              department: "$_id.department",
+              received: "$received",
+              closed: "$closed",
+              pending: "$pending",
+            },
+          },
+        },
+      },
+      {
+        $group: {
+          _id: "$_id.zone", 
+          wards: {
+            $push: {
+              ward: "$_id.ward",
+              departments: "$departments",
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          zone: "$_id",
+          wards: 1,
+        },
+      },
+    ]);
+
+    res.json(grievancesData);
+  } catch (error) {
+    console.error("Error getting ward and department grievances:", error);
+    res.status(500).json({ message: "Error retrieving ward and department grievances" });
+  }
+};
+
+
+
 
 
 

@@ -38,6 +38,8 @@ router.get('/beforeescalation', newGrievanceController.PercentageOfGrievancesRes
 router.get('/afterescalation', newGrievanceController.PercentageOfGrievancesEscalatedToHigherAuthorities);
 router.get('/compartiveanalysis', newGrievanceController.ComparativeAnalysis);
 router.get('/departmentGrievanceCounts', newGrievanceController.departmentGrievanceCounts);
+router.get('/zoneDepartmentGrievances', newGrievanceController.zoneDepartmentGrievances);
+router.get('/wardDepartmentGrievances', newGrievanceController.wardDepartmentGrievances);
 
 router.get('/get',verifyToken, newGrievanceController.getAllNewGrievances);
 router.get('/bynotclosed',verifyToken, newGrievanceController.getGrievanceBynotClosed);
