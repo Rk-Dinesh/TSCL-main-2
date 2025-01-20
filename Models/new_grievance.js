@@ -45,3 +45,5 @@ const NewGrievanceSchema = new Schema(
 
 const NewGrievanceModel = mongoose.model("NewGrievance", NewGrievanceSchema);
 module.exports = NewGrievanceModel;
+
+

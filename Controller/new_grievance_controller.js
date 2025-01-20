@@ -1730,9 +1730,65 @@ exports.wardDepartmentGrievances = async (req, res, next) => {
   }
 };
 
+exports.departmentGrievanceCountsDetailed = async (req, res, next) => {
+  try {
+    const { startDate, endDate, department } = req.query;
 
+    // Build match conditions based on filters
+    const matchConditions = {
+      assign_username: { $nin: [null, "", "Yet to be assigned"] }, // Exclude grievances with no assigned user or "Yet to be assigned"
+    };
+    if (department) {
+      matchConditions.dept_name = department;
+    }
+    if (startDate && endDate) {
+      matchConditions.createdAt = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate),
+      };
+    }
 
+    // Aggregation pipeline
+    const grievanceCounts = await NewGrievanceModel.aggregate([
+      { $match: matchConditions },
+      {
+        $group: {
+          _id: {
+            department: "$dept_name",
+            employeeName: "$assign_username",
+            employeeId:"$assign_user",
+            zone: "$zone_name",
+            ward: "$ward_name",
+          },
+          received: { $sum: 1 },
+          closed: {
+            $sum: { $cond: [{ $eq: ["$status", "closed"] }, 1, 0] },
+          },
+          pending: {
+            $sum: { $cond: [{ $ne: ["$status", "closed"] }, 1, 0] },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          department: "$_id.department",
+          employeeName: "$_id.employeeName",
+          employeeId:"$_id.employeeId",
+          zone: "$_id.zone",
+          ward: "$_id.ward",
+          received: "$received",
+          closed: "$closed",
+          pending: "$pending",
+        },
+      },
+    ]);
 
-
-
-
+    res.json(grievanceCounts);
+  } catch (error) {
+    console.error("Error getting detailed department grievance counts:", error);
+    res.status(500).json({
+      message: "Error retrieving detailed department grievance counts",
+    });
+  }
+};
