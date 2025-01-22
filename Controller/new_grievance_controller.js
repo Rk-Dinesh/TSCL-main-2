@@ -985,7 +985,7 @@ exports.getGrievanceCounts = async (req, res, next) => {
             { $count: "highPriority" },
           ],
           reopendGrievances: [
-            { $match: { status: "re-opened" } },
+            { $match: { isReopened: "yes" } },
             { $count: "reopen" },
           ],
         },
