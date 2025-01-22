@@ -2,7 +2,7 @@ const UserModel = require('../Models/user');
 const IdcodeServices = require('./idcode_Service');
 const bcrypt = require('bcrypt');
 
-exports.createUser = async (user_name, dept_name, phone, email, address, pincode, login_password, status,role_id, role,designation, created_by_user,zone_name,ward_name) => {
+exports.createUser = async (emp_id,user_name, dept_name, phone, email, address, pincode, login_password, status,role_id, role,designation, created_by_user,zone_name,ward_name) => {
     try {
         
         var user_id = await IdcodeServices.generateCode("User");
@@ -12,6 +12,7 @@ exports.createUser = async (user_name, dept_name, phone, email, address, pincode
 
         const user = new UserModel({
             user_id,
+            emp_id,
             user_name,
             dept_name,
             phone,

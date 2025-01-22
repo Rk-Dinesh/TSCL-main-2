@@ -6,11 +6,12 @@ const jwt = require("jsonwebtoken");
 const csvParser = require('csv-parser');
 const fs = require('fs');
 const path = require('path');
+const EmployeeModel = require('../Models/employee_Model');
 
 
 exports.createUser = async (req, res, next) => {
     try {
-        const { user_name, dept_name, phone, email, address, pincode,  status,role_id, role,designation,  created_by_user,zone_name,ward_name } = req.body;
+        const { emp_id,user_name, dept_name, phone, email, address, pincode,  status,role_id, role,designation,  created_by_user,zone_name,ward_name } = req.body;
 
         const existingUser = await UserService.findUserByPhone(phone);
         if (existingUser) {
@@ -29,6 +30,7 @@ exports.createUser = async (req, res, next) => {
         }
         const login_password='Admin@mscl'
         const adminUser = await UserService.createUser(
+          emp_id,
             user_name,
             dept_name,
             phone,
@@ -240,7 +242,7 @@ exports.changePassword = async(req, res, next) => {
 exports.updateUser = async (req, res, next) => {
   try {
     const { user_id } = req.query;
-    const { user_name,dept_name,address,pincode,status,role_id,role ,zone_name,ward_name } = req.body;
+    const { user_name,email,dept_name,address,pincode,status,role_id,role ,zone_name,ward_name } = req.body;
 
   
     const user = await UserService.findUserById(user_id);
@@ -248,8 +250,20 @@ exports.updateUser = async (req, res, next) => {
       return res.status(404).json({ status: false, message: "User not found" });
     }
 
+    const emp_id = user.emp_id;
+    
+    const employee = await EmployeeModel.findOne({ emp_id });
+    console.log(employee);
+    
+    employee.email = email;
+    employee.emp_name = user_name;
+    
+    await employee.save();
+    
+
     const updatedUser = await UserService.updateUserById(user_id, {
       user_name,
+      email,
       dept_name,
       address,
       pincode,
