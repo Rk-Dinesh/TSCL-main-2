@@ -251,9 +251,8 @@ exports.updateUser = async (req, res, next) => {
     }
 
     const emp_id = user.emp_id;
-    
+
     const employee = await EmployeeModel.findOne({ emp_id });
-    console.log(employee);
     
     employee.email = email;
     employee.emp_name = user_name;

@@ -25,6 +25,12 @@ exports.getNewGrievanceByPhone = async (phone) => {
   }
 };
 
+exports.getGrievanceByUserIdfull = async (public_user_id) => {
+  return await NewGrievanceModel.find({
+    public_user_id,
+  });
+};
+
 
 exports.getGrievanceByUserId = async (public_user_id) => {
     return await NewGrievanceModel.find({

@@ -78,6 +78,7 @@ exports.getComplaintByDept = async (req, res, next) => {
       next(error);
   }
 };
+
 exports.getComplaintById = async (req, res, next) => {
     try {
         const { complaint_id } = req.query;

@@ -190,6 +190,28 @@ exports.getNewGrievanceByPhone = async (req, res, next) => {
   }
 };
 
+exports.getGrievanceByUserIdfull = async (req, res, next) => {
+  try {
+    const { public_user_id } = req.query;
+    const newGrievance = await NewGrievanceService.getGrievanceByUserIdfull(
+      public_user_id
+    );
+    if (!newGrievance) {
+      return res
+        .status(404)
+        .json({ status: false, message: " grievance not found" });
+    }
+    const encryptedData = encryptData(newGrievance);
+    res.status(200).json({
+      status: true,
+      message: "New grievance retrieved successfully",
+      data: encryptedData,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.getGrievanceByUserId = async (req, res, next) => {
   try {
     const { public_user_id } = req.query;

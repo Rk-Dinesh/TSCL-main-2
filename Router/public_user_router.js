@@ -21,6 +21,7 @@ router.post('/loginweb', publicUserController.loginPublicUserweb);
 router.get('/get',verifyToken, publicUserController.getAllPublicUsers);
 router.get('/getbyid',verifyToken, publicUserController.getPublicUserById);
 router.get('/getbyphone',verifyToken, publicUserController.getPublicUserPhone);
+router.get('/getbyphoneguest', publicUserController.getPublicUserPhone);
 router.post('/forgotpassword',publicUserController.forwardPassword);
 router.post('/changePassword',verifyToken,publicUserController.changePassword);
 router.delete('/delete',verifyToken, publicUserController.deletePublicUserById);
