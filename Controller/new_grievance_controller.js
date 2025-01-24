@@ -1704,6 +1704,186 @@ exports.departmentGrievanceCounts = async (req, res, next) => {
   }
 };
 
+exports.departmentcomplaintGrievanceCounts = async (req, res, next) => {
+  try {
+    const { startDate, endDate, department } = req.query;
+
+    // Build match conditions based on filters
+    const matchConditions = {};
+    if (department) {
+      matchConditions.dept_name = department;
+    }
+    if (startDate && endDate) {
+      matchConditions.createdAt = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate),
+      };
+    }
+
+    // Aggregation pipeline
+    const grievanceCounts = await NewGrievanceModel.aggregate([
+      { $match: matchConditions },
+      {
+        $group: {
+          _id: { dept_name: "$dept_name", complaint: "$complaint" }, // Group by department and complaint
+          count: { $sum: 1 },
+          resolved: { $sum: { $cond: [{ $eq: ["$status", "closed"] }, 1, 0] } },
+          pending: { $sum: { $cond: [{ $ne: ["$status", "closed"] }, 1, 0] } },
+          escalated: { $sum: { $cond: [{ $eq: ["$isEsacalted", "yes"] }, 1, 0] } },
+        },
+      },
+      {
+        $group: {
+          _id: "$_id.dept_name", // Group by department
+          complaints: {
+            $push: {
+              complaint: "$_id.complaint",
+              count: "$count",
+              resolved: "$resolved",
+              pending: "$pending",
+              escalated: "$escalated",
+            },
+          },
+        },
+      },
+    ]);
+
+    // Transform data into the desired format
+    const formattedData = grievanceCounts.map((item) => ({
+      department: item._id,
+      complaints: item.complaints,
+    }));
+
+    res.json(formattedData);
+  } catch (error) {
+    console.error("Error getting department grievance counts:", error);
+    res.status(500).json({ message: "Error retrieving department grievance counts" });
+  }
+};
+
+
+exports.getComplaintSummaryByZone = async (req, res) => {
+  try {
+    const now = Date.now();
+
+    const pipeline = [
+      {
+        $match: {
+          status: { $ne: "closed" },
+        },
+      },
+      {
+        $group: {
+          _id: { zone: "$zone_name", department: "$dept_name" },
+          count: { $sum: 1 },
+          below30Days: {
+            $sum: {
+              $cond: [
+                { $lte: ["$createdAt", new Date(now - 30 * 24 * 60 * 60 * 1000)] },
+                1,
+                0,
+              ],
+            },
+          },
+          between30and60Days: {
+            $sum: {
+              $cond: [
+                {
+                  $and: [
+                    { $gt: ["$createdAt", new Date(now - 60 * 24 * 60 * 60 * 1000)] },
+                    { $lte: ["$createdAt", new Date(now - 30 * 24 * 60 * 60 * 1000)] },
+                  ],
+                },
+                1,
+                0,
+              ],
+            },
+          },
+          between60and90Days: {
+            $sum: {
+              $cond: [
+                {
+                  $and: [
+                    { $gt: ["$createdAt", new Date(now - 90 * 24 * 60 * 60 * 1000)] },
+                    { $lte: ["$createdAt", new Date(now - 60 * 24 * 60 * 60 * 1000)] },
+                  ],
+                },
+                1,
+                0,
+              ],
+            },
+          },
+          above90Days: {
+            $sum: {
+              $cond: [
+                { $gt: ["$createdAt", new Date(now - 90 * 24 * 60 * 60 * 1000)] },
+                1,
+                0,
+              ],
+            },
+          },
+        },
+      },
+      {
+        $group: {
+          _id: "$_id.zone",
+          openingBalance: {
+            $sum: {
+              $cond: [
+                { $lt: ["$createdAt", new Date(now - 7 * 24 * 60 * 60 * 1000)] },
+                1,
+                0,
+              ],
+            },
+          },
+          duringThisWeek: {
+            $sum: {
+              $cond: [
+                { $gte: ["$createdAt", new Date(now - 7 * 24 * 60 * 60 * 1000)] },
+                1,
+                0,
+              ],
+            },
+          },
+          totalPending: { $sum: "$count" },
+          below30Days: { $sum: "$below30Days" },
+          between30and60Days: { $sum: "$between30and60Days" },
+          between60and90Days: { $sum: "$between60and90Days" },
+          above90Days: { $sum: "$above90Days" },
+          departmentCounts: {
+            $push: {
+              department: "$_id.department",
+              count: "$count",
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          zone: "$_id",
+          _id: 0,
+          openingBalance: 1,
+          duringThisWeek: 1,
+          totalPending: 1,
+          below30Days: 1,
+          between30and60Days: 1,
+          between60and90Days: 1,
+          above90Days: 1,
+          departmentCounts: 1,
+        },
+      },
+    ];
+
+    const result = await NewGrievanceModel.aggregate(pipeline);
+    res.json(result);
+  } catch (error) {
+    console.error("Error aggregating complaint summary by zone:", error);
+    res.status(500).json({ message: "Error aggregating complaint summary by zone" });
+  }
+};
+
+
+
 exports.zoneDepartmentGrievances = async (req, res, next) => {
   try {
     const { startDate, endDate, zone } = req.query;
