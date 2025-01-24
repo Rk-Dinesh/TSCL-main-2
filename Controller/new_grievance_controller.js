@@ -8,21 +8,6 @@ const ComplaintModel = require("../Models/complaint");
 const GrievanceEscalationModel = require("../Models/grievance_escalation");
 const WardModel = require("../Models/ward");
 
-// exports.createNewGrievance = async (req, res, next) => {
-//     try {
-//         const { grievance_mode,complaint_type_title, dept_name, zone_name, ward_name, street_name,pincode,complaint,complaint_details, public_user_id, public_user_name,phone,assign_user,assign_username,assign_userphone, status, escalation_level,statusflow,priority} = req.body;
-//         const grievance_id = await IdcodeServices.generateCode("NewGrievance");
-//         const newGrievance = await NewGrievanceService.createNewGrievance({ grievance_id,grievance_mode, complaint_type_title, dept_name, zone_name, ward_name, street_name,pincode,complaint,complaint_details, public_user_id, public_user_name,phone,assign_user,assign_username,assign_userphone, status, escalation_level,statusflow,priority});
-
-//         res.status(200).json({
-//             status: true,
-//             message: "New grievance created successfully",
-//             data: newGrievance.grievance_id
-//         });
-//     } catch (error) {
-//         next(error);
-//     }
-// };
 
 exports.createNewGrievance = async (req, res, next) => {
   try {
@@ -132,6 +117,92 @@ exports.createNewGrievance = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.updateGrievance = async (req, res) => {
+  try {
+    const { grievance_id } = req.query;
+    const updateData = req.body;
+
+    if (!grievance_id) {
+      return res.status(400).json({ message: "grievance_id is required in query parameters" });
+    }
+
+    const {
+      grievance_mode,
+      dept_name,
+      complaint,
+      ward_name,
+      street_name,
+      complaintaddress,
+      complaint_details
+    } = updateData;
+
+    console.log(updateData);
+
+    const fieldsToUpdate = {};
+
+    if (complaint) {
+      const complaint_tat = await ComplaintModel.findOne({ complaint_type_title: complaint });
+      
+      if (complaint_tat) {
+        fieldsToUpdate.priority = complaint_tat.priority;
+        fieldsToUpdate.escaltiontime = complaint_tat.tat_duration;
+        fieldsToUpdate.escaltiontype = complaint_tat.escalation_type;
+        fieldsToUpdate.complaint = complaint;
+      }
+    }
+
+    if (ward_name) {
+      const wardData = await WardModel.findOne({ ward_name });
+      if (wardData) {
+        fieldsToUpdate.zone_name = wardData.zone_name;
+        fieldsToUpdate.ward_name = ward_name;
+      }
+    }
+
+    if (dept_name && ward_name) {
+      const user = await UserModel.findOne({
+        dept_name,
+        ward_name: { $in: [ward_name] },
+      });
+
+      if (user) {
+        fieldsToUpdate.assign_user = user.user_id;
+        fieldsToUpdate.assign_username = user.user_name;
+        fieldsToUpdate.assign_userphone = user.phone;
+        fieldsToUpdate.assign_time = Date.now();
+      } else {
+        fieldsToUpdate.assign_time = null;
+      }
+    }
+
+    if (grievance_mode) fieldsToUpdate.grievance_mode = grievance_mode;
+    if (street_name) fieldsToUpdate.street_name = street_name;
+    if (complaintaddress) fieldsToUpdate.complaintaddress = complaintaddress;
+    if (complaint_details) fieldsToUpdate.complaint_details = complaint_details;
+
+    const updatedGrievance = await NewGrievanceModel.findOneAndUpdate(
+      { grievance_id },
+      fieldsToUpdate,
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedGrievance) {
+      return res.status(404).json({ message: "Grievance not found" });
+    }
+
+    res.status(200).json({
+      message: "Grievance updated successfully",
+      updatedGrievance,
+    });
+  } catch (error) {
+    console.error("Error updating grievance:", error);
+    res.status(500).json({
+      message: "Failed to update grievance",
+      error: error.message,
+    });
+  }
+}
 
 exports.getAllNewGrievances = async (req, res, next) => {
   try {
