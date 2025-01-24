@@ -27,6 +27,8 @@ exports.checkEscalation = async () => {
 
     const escalationLevel = complaint.escalation_type;
     const now = new Date();
+    //console.log(now,'now');
+    
 
     // Check if escalation_l1 is done
     if (
@@ -60,16 +62,18 @@ exports.checkEscalation = async () => {
         );
         continue;
       }
-
+     // console.log(grievance.grievance_id);
+     // console.log(escalationDateTime,'time of escaltion');
       const highlightTime = new Date(escalationDateTime.getTime() - 24 * 60 * 60 * 1000);
-
-      if (now >= highlightTime && now < escalationDateTime && grievance.isHighlighted !== "yes") {
+     // console.log(highlightTime,"highlightTime");
+      if (now >= highlightTime && now < escalationDateTime && highlightTime < escalationDateTime && grievance.isHighlighted !== "yes") {
+        //console.log(grievance.grievance_id);
+        
         await Grievance.updateOne(
           { grievance_id: grievance.grievance_id },
           { isHighlighted: "yes" }
         );
       }
-
       // Check if the grievance has exceeded the escalation time
       if (new Date() > escalationDateTime) {
         // Create a new escalation document
@@ -115,11 +119,11 @@ exports.checkEscalation = async () => {
       let escalationDateTime;
       if (escalationLevel === "day") {
         escalationDateTime = new Date(
-          grievance.updatedAt.getTime() + escalationTime * 24 * 60 * 60 * 1000
+          grievance.createdAt.getTime() + escalationTime * 24 * 60 * 60 * 1000
         );
       } else if (escalationLevel === "month") {
         escalationDateTime = new Date(
-          grievance.updatedAt.getTime() +
+          grievance.createdAt.getTime() +
             escalationTime * 30 * 24 * 60 * 60 * 1000
         );
       } else if (escalationLevel === "minute") {
@@ -180,11 +184,11 @@ exports.checkEscalation = async () => {
       let escalationDateTime;
       if (escalationLevel === "day") {
         escalationDateTime = new Date(
-          grievance.updatedAt.getTime() + escalationTime * 24 * 60 * 60 * 1000
+          grievance.createdAt.getTime() + escalationTime * 24 * 60 * 60 * 1000
         );
       } else if (escalationLevel === "month") {
         escalationDateTime = new Date(
-          grievance.updatedAt.getTime() +
+          grievance.createdAt.getTime() +
             escalationTime * 30 * 24 * 60 * 60 * 1000
         );
       } else if (escalationLevel === "minute") {
@@ -217,7 +221,7 @@ exports.checkEscalation = async () => {
           }
         );
 
-        // console.log("escalted_l3");
+        //  console.log("escalted_l3");
 
         // Update the grievance status
         await Grievance.updateOne(
@@ -246,11 +250,11 @@ exports.checkEscalation = async () => {
       let escalationDateTime;
       if (escalationLevel === "day") {
         escalationDateTime = new Date(
-          grievance.updatedAt.getTime() + escalationTime * 24 * 60 * 60 * 1000
+          grievance.createdAt.getTime() + escalationTime * 24 * 60 * 60 * 1000
         );
       } else if (escalationLevel === "month") {
         escalationDateTime = new Date(
-          grievance.updatedAt.getTime() +
+          grievance.createdAt.getTime() +
             escalationTime * 30 * 24 * 60 * 60 * 1000
         );
       } else if (escalationLevel === "minute") {

@@ -555,6 +555,7 @@ exports.updateworksheetJE = async (req, res, next) => {
     newGrievance.worksheet_JE = worksheet_JE;
     newGrievance.isEsacalted ='no';
     newGrievance.ticketclosedtime = new Date();
+    newGrievance.isHighlighted = 'no';
     
     await newGrievance.save();
     return res
