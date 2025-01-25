@@ -293,10 +293,18 @@ exports.getNewGrievanceByPhonewhatsapp = async (req, res, next) => {
         .status(404)
         .json({ status: false, message: "New grievance not found" });
     }
+
+    const grievanceIds = newGrievance.map((grievance) => grievance.grievance_id).join(",");
+
+    // const grievanceIds = newGrievance
+    //   .map((grievance, index) => `${index + 1}. ${grievance.grievance_id}`) 
+    //   .join(", ");
+
+
     res.status(200).json({
       status: true,
       message: "New grievance retrieved successfully",
-      data: newGrievance,
+      data: grievanceIds,
     });
   } catch (error) {
     next(error);

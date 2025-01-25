@@ -29,8 +29,8 @@ exports.getNewGrievanceByPhonewhatsapp = async (phone) => {
   try {
     const grievances = await NewGrievanceModel.find({ phone })
       .sort({ _id: -1 })
-      .limit(10)
-      .select("grievance_id"); 
+      .limit(12)
+      .select("grievance_id -_id"); 
 
     return grievances
   } catch (error) {
