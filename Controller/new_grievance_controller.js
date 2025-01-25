@@ -239,6 +239,27 @@ exports.getNewGrievanceById = async (req, res, next) => {
   }
 };
 
+exports.getNewGrievanceByIdwhatsapp = async (req, res, next) => {
+  try {
+    const { grievance_id } = req.query;
+    const newGrievance = await NewGrievanceService.getNewGrievanceById(
+      grievance_id
+    );
+    if (!newGrievance) {
+      return res
+        .status(404)
+        .json({ status: false, message: "New grievance not found" });
+    }
+    res.status(200).json({
+      status: true,
+      message: "New grievance retrieved successfully",
+      data: newGrievance,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.getNewGrievanceByPhone = async (req, res, next) => {
   try {
     const { phone } = req.query;
@@ -255,6 +276,27 @@ exports.getNewGrievanceByPhone = async (req, res, next) => {
       status: true,
       message: "New grievance retrieved successfully",
       data: encryptedData,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getNewGrievanceByPhonewhatsapp = async (req, res, next) => {
+  try {
+    const { phone } = req.query;
+    const newGrievance = await NewGrievanceService.getNewGrievanceByPhonewhatsapp(
+      phone
+    );
+    if (!newGrievance) {
+      return res
+        .status(404)
+        .json({ status: false, message: "New grievance not found" });
+    }
+    res.status(200).json({
+      status: true,
+      message: "New grievance retrieved successfully",
+      data: newGrievance,
     });
   } catch (error) {
     next(error);
