@@ -5,7 +5,7 @@ const verifyToken = require('../Authorization');
 
 router.post('/post',verifyToken, newGrievanceController.createNewGrievance);
 router.put("/update-grievance",newGrievanceController.updateGrievance);
-router.post('/postguest', newGrievanceController.createNewGrievance);
+router.post('/postguest', newGrievanceController.createNewGrievancewhatsapp);
 router.get('/getbyid',verifyToken, newGrievanceController.getNewGrievanceById);
 router.get('/getbyidwhatsapp', newGrievanceController.getNewGrievanceByIdwhatsapp);
 router.get('/getbyphone',verifyToken, newGrievanceController.getNewGrievanceByPhone);

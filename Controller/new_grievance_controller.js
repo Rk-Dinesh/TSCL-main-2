@@ -7,7 +7,7 @@ const NewGrievanceModel = require("../Models/new_grievance");
 const ComplaintModel = require("../Models/complaint");
 const GrievanceEscalationModel = require("../Models/grievance_escalation");
 const WardModel = require("../Models/ward");
-
+const axios = require("axios");
 
 exports.createNewGrievance = async (req, res, next) => {
   try {
@@ -28,12 +28,14 @@ exports.createNewGrievance = async (req, res, next) => {
       lon,
       lat,
       operator,
-      operator_id
+      operator_id,
     } = req.body;
     const grievance_id = await IdcodeServices.generateCode("NewGrievance");
 
-    const complaint_tat = await ComplaintModel.findOne({complaint_type_title:complaint})
-    const wardData = await WardModel.findOne({ward_name:ward_name})
+    const complaint_tat = await ComplaintModel.findOne({
+      complaint_type_title: complaint,
+    });
+    const wardData = await WardModel.findOne({ ward_name: ward_name });
 
     const user = await UserModel.findOne({
       dept_name,
@@ -48,7 +50,7 @@ exports.createNewGrievance = async (req, res, next) => {
         grievance_mode,
         complaint_type_title,
         dept_name,
-        zone_name:wardData.zone_name,
+        zone_name: wardData.zone_name,
         ward_name,
         street_name,
         pincode,
@@ -61,17 +63,17 @@ exports.createNewGrievance = async (req, res, next) => {
         assign_user: user.user_id,
         assign_username: user.user_name,
         assign_userphone: user.phone,
-        assign_time:assignTime,
-        status:'processing',
+        assign_time: assignTime,
+        status: "processing",
         escalation_level,
-        statusflow:'processing',
-        priority:complaint_tat.priority,
+        statusflow: "processing",
+        priority: complaint_tat.priority,
         lon,
         lat,
         operator,
         operator_id,
-        escaltiontime:complaint_tat.tat_duration,
-        escaltiontype:complaint_tat.escalation_type
+        escaltiontime: complaint_tat.tat_duration,
+        escaltiontype: complaint_tat.escalation_type,
       });
       const newLog = await GrievanceLogModel.create({
         grievance_id,
@@ -84,7 +86,7 @@ exports.createNewGrievance = async (req, res, next) => {
         grievance_mode,
         complaint_type_title,
         dept_name,
-        zone_name:wardData.zone_name,
+        zone_name: wardData.zone_name,
         ward_name,
         street_name,
         pincode,
@@ -94,17 +96,17 @@ exports.createNewGrievance = async (req, res, next) => {
         public_user_id,
         public_user_name,
         phone,
-        assign_time:assignTime,
-        status:'processing',
+        assign_time: assignTime,
+        status: "processing",
         escalation_level,
-        statusflow:'processing',
-        priority:complaint_tat.priority,
+        statusflow: "processing",
+        priority: complaint_tat.priority,
         lon,
         lat,
         operator,
         operator_id,
-        escaltiontime:complaint_tat.tat_duration,
-        escaltiontype:complaint_tat.escalation_type
+        escaltiontime: complaint_tat.tat_duration,
+        escaltiontype: complaint_tat.escalation_type,
       });
     }
 
@@ -113,6 +115,195 @@ exports.createNewGrievance = async (req, res, next) => {
       message: "New grievance created successfully",
       data: newGrievance.grievance_id,
     });
+
+    if(user){
+      try { 
+        const apiResponse = await axios.post(
+          "https://app.kwic.in/api/v1/push?api_key=67973db6a4684146de808250",
+          {
+            mobile_number: `91${user.phone}`,
+            variable: {
+              resident_name: public_user_name,
+              grievance_id: grievance_id,
+              resident_phone: phone,
+              ward_name: ward_name,
+              street_name: street_name,
+              dept_name: dept_name,
+              complaint: complaint,
+              complaint_details: complaint_details,
+            },
+            template_id: "complaint_assigned_template",
+          }
+        );
+      } catch (apiError) {
+        console.error(
+          "Failed to send WhatsApp notification:",
+          apiError.response?.data || apiError.message
+        );
+      }
+    }
+
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.createNewGrievancewhatsapp = async (req, res, next) => {
+  try {
+    const {
+      grievance_mode,
+      complaint_type_title,
+      dept_name,
+      ward_name,
+      street_name,
+      pincode,
+      complaintaddress,
+      complaint,
+      complaint_details,
+      public_user_id,
+      public_user_name,
+      phone,
+      escalation_level,
+      lon,
+      lat,
+      operator,
+      operator_id,
+    } = req.body;
+    const grievance_id = await IdcodeServices.generateCode("NewGrievance");
+
+    const complaint_tat = await ComplaintModel.findOne({
+      complaint_type_title: complaint,
+    });
+    const wardData = await WardModel.findOne({ ward_name: ward_name });
+
+    const user = await UserModel.findOne({
+      dept_name,
+      ward_name: { $in: [ward_name] },
+    });
+
+    const assignTime = user ? Date.now() : null;
+
+    if (user) {
+      var newGrievance = await NewGrievanceService.createNewGrievance({
+        grievance_id,
+        grievance_mode,
+        complaint_type_title,
+        dept_name,
+        zone_name: wardData.zone_name,
+        ward_name,
+        street_name,
+        pincode,
+        complaintaddress,
+        complaint,
+        complaint_details,
+        public_user_id,
+        public_user_name,
+        phone,
+        assign_user: user.user_id,
+        assign_username: user.user_name,
+        assign_userphone: user.phone,
+        assign_time: assignTime,
+        status: "processing",
+        escalation_level,
+        statusflow: "processing",
+        priority: complaint_tat.priority,
+        lon,
+        lat,
+        operator,
+        operator_id,
+        escaltiontime: complaint_tat.tat_duration,
+        escaltiontype: complaint_tat.escalation_type,
+      });
+      const newLog = await GrievanceLogModel.create({
+        grievance_id,
+        log_details: `Work assigned automatically to ${user.user_name}`,
+        created_by_user: public_user_name,
+      });
+    } else {
+      var newGrievance = await NewGrievanceService.createNewGrievance({
+        grievance_id,
+        grievance_mode,
+        complaint_type_title,
+        dept_name,
+        zone_name: wardData.zone_name,
+        ward_name,
+        street_name,
+        pincode,
+        complaintaddress,
+        complaint,
+        complaint_details,
+        public_user_id,
+        public_user_name,
+        phone,
+        assign_time: assignTime,
+        status: "processing",
+        escalation_level,
+        statusflow: "processing",
+        priority: complaint_tat.priority,
+        lon,
+        lat,
+        operator,
+        operator_id,
+        escaltiontime: complaint_tat.tat_duration,
+        escaltiontype: complaint_tat.escalation_type,
+      });
+    }
+
+    res.status(200).json({
+      status: true,
+      message: "New grievance created successfully",
+      data: newGrievance,
+    });
+
+    try {
+      const apiResponse = await axios.post(
+        "https://app.kwic.in/api/v1/push?api_key=67973db6a4684146de808250",
+        {
+          mobile_number: `91${phone}`,
+          variable: {
+            resident_name: public_user_name,
+            grievance_id: grievance_id,
+            assign_username: user?.user_name || "Unassigned",
+            assign_userphone: user?.phone || "N/A",
+          },
+          template_id: "complaint_registration",
+        }
+      );
+
+    } catch (apiError) {
+      console.error(
+        "Failed to send WhatsApp notification:",
+        apiError.response?.data || apiError.message
+      );
+    }
+
+    if(user){
+      try { 
+        const apiResponse = await axios.post(
+          "https://app.kwic.in/api/v1/push?api_key=67973db6a4684146de808250",
+          {
+            mobile_number: `91${user.phone}`,
+            variable: {
+              resident_name: public_user_name,
+              grievance_id: grievance_id,
+              resident_phone: phone,
+              ward_name: ward_name,
+              street_name: street_name,
+              dept_name: dept_name,
+              complaint: complaint,
+              complaint_details: complaint_details,
+            },
+            template_id: "complaint_assigned_template",
+          }
+        );
+      } catch (apiError) {
+        console.error(
+          "Failed to send WhatsApp notification:",
+          apiError.response?.data || apiError.message
+        );
+      }
+    }
+   
   } catch (error) {
     next(error);
   }
@@ -124,7 +315,9 @@ exports.updateGrievance = async (req, res) => {
     const updateData = req.body;
 
     if (!grievance_id) {
-      return res.status(400).json({ message: "grievance_id is required in query parameters" });
+      return res
+        .status(400)
+        .json({ message: "grievance_id is required in query parameters" });
     }
 
     const {
@@ -134,16 +327,16 @@ exports.updateGrievance = async (req, res) => {
       ward_name,
       street_name,
       complaintaddress,
-      complaint_details
+      complaint_details,
     } = updateData;
-
-    console.log(updateData);
 
     const fieldsToUpdate = {};
 
     if (complaint) {
-      const complaint_tat = await ComplaintModel.findOne({ complaint_type_title: complaint });
-      
+      const complaint_tat = await ComplaintModel.findOne({
+        complaint_type_title: complaint,
+      });
+
       if (complaint_tat) {
         fieldsToUpdate.priority = complaint_tat.priority;
         fieldsToUpdate.escaltiontime = complaint_tat.tat_duration;
@@ -202,7 +395,7 @@ exports.updateGrievance = async (req, res) => {
       error: error.message,
     });
   }
-}
+};
 
 exports.getAllNewGrievances = async (req, res, next) => {
   try {
@@ -285,21 +478,33 @@ exports.getNewGrievanceByPhone = async (req, res, next) => {
 exports.getNewGrievanceByPhonewhatsapp = async (req, res, next) => {
   try {
     const { phone } = req.query;
-    const newGrievance = await NewGrievanceService.getNewGrievanceByPhonewhatsapp(
-      phone
-    );
+
+    if (phone.startsWith("91")) {
+      phone = phone.slice(2);
+    }
+
+    const newGrievance =
+      await NewGrievanceService.getNewGrievanceByPhonewhatsapp(phone);
+
     if (!newGrievance) {
       return res
         .status(404)
         .json({ status: false, message: "New grievance not found" });
     }
 
-    const grievanceIds = newGrievance.map((grievance) => grievance.grievance_id).join(",");
+    if (Array.isArray(newGrievance) && newGrievance.length === 0) {
+      return res
+        .status(400)
+        .json({ status: false, message: "No grievances found for this phone number" });
+    }
+
+    const grievanceIds = newGrievance
+      .map((grievance) => grievance.grievance_id)
+      .join(",");
 
     // const grievanceIds = newGrievance
-    //   .map((grievance, index) => `${index + 1}. ${grievance.grievance_id}`) 
+    //   .map((grievance, index) => `${index + 1}. ${grievance.grievance_id}`)
     //   .join(", ");
-
 
     res.status(200).json({
       status: true,
@@ -401,12 +606,14 @@ exports.getGrievanceByDept = async (req, res, next) => {
 
 exports.getGrievanceByOperator = async (req, res, next) => {
   try {
-    const { operator,operator_id } = req.query;
+    const { operator, operator_id } = req.query;
     const filter = {};
 
     if (operator) filter.operator = operator;
     if (operator_id) filter.operator_id = operator_id;
-    const newGrievance = await NewGrievanceService.getGrievanceByOperator(filter);
+    const newGrievance = await NewGrievanceService.getGrievanceByOperator(
+      filter
+    );
     if (!newGrievance) {
       return res
         .status(404)
@@ -535,7 +742,7 @@ exports.getGrievanceByAssignClosed = async (req, res, next) => {
 exports.updateEscalationNotify = async (req, res, next) => {
   try {
     const { grievance_id } = req.query;
-    const { escalation_notify,escalation_notify_read } = req.body;
+    const { escalation_notify, escalation_notify_read } = req.body;
 
     const newGrievance = await NewGrievanceService.getNewGrievanceById(
       grievance_id
@@ -548,14 +755,12 @@ exports.updateEscalationNotify = async (req, res, next) => {
 
     newGrievance.escalation_notify = escalation_notify;
     newGrievance.escalation_notify_read = escalation_notify_read;
-    
+
     await newGrievance.save();
-    return res
-      .status(200)
-      .json({
-        status: true,
-        message: "escalation_notify updated successfully",
-      });
+    return res.status(200).json({
+      status: true,
+      message: "escalation_notify updated successfully",
+    });
   } catch (error) {
     next(error);
   }
@@ -575,14 +780,12 @@ exports.updateEscalationNotifyRead = async (req, res, next) => {
     }
 
     newGrievance.escalation_notify_read = escalation_notify_read;
-    
+
     await newGrievance.save();
-    return res
-      .status(200)
-      .json({
-        status: true,
-        message: "escalation_notify updated successfully",
-      });
+    return res.status(200).json({
+      status: true,
+      message: "escalation_notify updated successfully",
+    });
   } catch (error) {
     next(error);
   }
@@ -603,17 +806,15 @@ exports.updateworksheetJE = async (req, res, next) => {
     }
 
     newGrievance.worksheet_JE = worksheet_JE;
-    newGrievance.isEsacalted ='no';
+    newGrievance.isEsacalted = "no";
     newGrievance.ticketclosedtime = new Date();
-    newGrievance.isHighlighted = 'no';
-    
+    newGrievance.isHighlighted = "no";
+
     await newGrievance.save();
-    return res
-      .status(200)
-      .json({
-        status: true,
-        message: "worksheet_JE updated successfully",
-      });
+    return res.status(200).json({
+      status: true,
+      message: "worksheet_JE updated successfully",
+    });
   } catch (error) {
     next(error);
   }
@@ -622,7 +823,6 @@ exports.updateworksheetJE = async (req, res, next) => {
 exports.ReopenTicket = async (req, res, next) => {
   try {
     const { grievance_id } = req.query;
-    
 
     const newGrievance = await NewGrievanceService.getNewGrievanceById(
       grievance_id
@@ -633,16 +833,14 @@ exports.ReopenTicket = async (req, res, next) => {
         .json({ status: false, message: "Grievance not found" });
     }
 
-    newGrievance.status = 'processing';
-    newGrievance.isReopened = 'yes';
-    
+    newGrievance.status = "processing";
+    newGrievance.isReopened = "yes";
+
     await newGrievance.save();
-    return res
-      .status(200)
-      .json({
-        status: true,
-        message: "Status updated successfully",
-      });
+    return res.status(200).json({
+      status: true,
+      message: "Status updated successfully",
+    });
   } catch (error) {
     next(error);
   }
@@ -662,15 +860,13 @@ exports.Highlighted = async (req, res, next) => {
         .json({ status: false, message: "Grievance not found" });
     }
 
-    newGrievance.isHighlighted = 'no';
-    
+    newGrievance.isHighlighted = "no";
+
     await newGrievance.save();
-    return res
-      .status(200)
-      .json({
-        status: true,
-        message: "worksheet_JE updated successfully",
-      });
+    return res.status(200).json({
+      status: true,
+      message: "worksheet_JE updated successfully",
+    });
   } catch (error) {
     next(error);
   }
@@ -703,12 +899,10 @@ exports.updateStatus = async (req, res, next) => {
       await escalation.save();
     }
 
-    return res
-      .status(200)
-      .json({
-        status: true,
-        message: "Status and status flow updated successfully",
-      });
+    return res.status(200).json({
+      status: true,
+      message: "Status and status flow updated successfully",
+    });
   } catch (error) {
     next(error);
   }
@@ -825,7 +1019,6 @@ exports.UpdateManyAssign = async (req, res, next) => {
   }
 };
 
-
 exports.UpdateManyTransfer = async (req, res, next) => {
   try {
     const { grievanceIds, transferDetails, user } = req.body;
@@ -869,7 +1062,9 @@ exports.UpdateManyTransfer = async (req, res, next) => {
       GrievanceLogModel.insertMany(grievanceLogs),
     ]);
 
-    res.json({ message: "Grievances transferred successfully with logs created" });
+    res.json({
+      message: "Grievances transferred successfully with logs created",
+    });
   } catch (error) {
     console.error("Error in UpdateManyTransfer:", error);
     res.status(500).json({ error: "Internal Server Error" });
@@ -1313,12 +1508,10 @@ exports.AverageResolutionTimeByEngineerByDepartment = async (
 
     res.json(averageResolutionTimeByEngineerByDepartmentArray);
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message:
-          "Error fetching average resolution time by engineer by department",
-      });
+    res.status(500).json({
+      message:
+        "Error fetching average resolution time by engineer by department",
+    });
   }
 };
 
@@ -1414,12 +1607,10 @@ exports.PercentageOfGrievancesResolvedWithinSpecifiedPeriodByDepartmentAndCompla
         generalResolved: totalGrievanceResolved,
       });
     } catch (error) {
-      res
-        .status(500)
-        .json({
-          message:
-            "Error fetching percentage of grievances resolved within specified period",
-        });
+      res.status(500).json({
+        message:
+          "Error fetching percentage of grievances resolved within specified period",
+      });
     }
   };
 
@@ -1457,12 +1648,10 @@ exports.PercentageOfGrievancesEscalatedToHigherAuthorities = async (
       escalatedL3: escalatedL3,
     });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message:
-          "Error fetching percentage of grievances escalated to higher authorities",
-      });
+    res.status(500).json({
+      message:
+        "Error fetching percentage of grievances escalated to higher authorities",
+    });
   }
 };
 
@@ -1680,9 +1869,15 @@ exports.departmentGrievanceCounts = async (req, res, next) => {
               $group: {
                 _id: "$dept_name", // Group by department
                 count: { $sum: 1 },
-                resolved: { $sum: { $cond: [{ $eq: ["$status", "closed"] }, 1, 0] } },
-                pending: { $sum: { $cond: [{ $ne: ["$status", "closed"] }, 1, 0] } },
-                escalated: { $sum: { $cond: [{ $eq: ["$isEsacalted", "yes"] }, 1, 0] } },
+                resolved: {
+                  $sum: { $cond: [{ $eq: ["$status", "closed"] }, 1, 0] },
+                },
+                pending: {
+                  $sum: { $cond: [{ $ne: ["$status", "closed"] }, 1, 0] },
+                },
+                escalated: {
+                  $sum: { $cond: [{ $eq: ["$isEsacalted", "yes"] }, 1, 0] },
+                },
               },
             },
           ],
@@ -1750,7 +1945,9 @@ exports.departmentGrievanceCounts = async (req, res, next) => {
     res.json(formattedData);
   } catch (error) {
     console.error("Error getting department grievance counts:", error);
-    res.status(500).json({ message: "Error retrieving department grievance counts" });
+    res
+      .status(500)
+      .json({ message: "Error retrieving department grievance counts" });
   }
 };
 
@@ -1779,7 +1976,9 @@ exports.departmentcomplaintGrievanceCounts = async (req, res, next) => {
           count: { $sum: 1 },
           resolved: { $sum: { $cond: [{ $eq: ["$status", "closed"] }, 1, 0] } },
           pending: { $sum: { $cond: [{ $ne: ["$status", "closed"] }, 1, 0] } },
-          escalated: { $sum: { $cond: [{ $eq: ["$isEsacalted", "yes"] }, 1, 0] } },
+          escalated: {
+            $sum: { $cond: [{ $eq: ["$isEsacalted", "yes"] }, 1, 0] },
+          },
         },
       },
       {
@@ -1807,29 +2006,43 @@ exports.departmentcomplaintGrievanceCounts = async (req, res, next) => {
     res.json(formattedData);
   } catch (error) {
     console.error("Error getting department grievance counts:", error);
-    res.status(500).json({ message: "Error retrieving department grievance counts" });
+    res
+      .status(500)
+      .json({ message: "Error retrieving department grievance counts" });
   }
 };
 
-
 exports.getComplaintSummaryByZone = async (req, res) => {
   try {
-    const now = Date.now();
+    const now = Date.now(); // Current timestamp
 
     const pipeline = [
       {
         $match: {
-          status: { $ne: "closed" },
+          status: { $ne: "closed" }, // Exclude closed complaints
         },
       },
       {
         $group: {
           _id: { zone: "$zone_name", department: "$dept_name" },
           count: { $sum: 1 },
+          duringThisWeek: {
+            $sum: {
+              $cond: [
+                {
+                  $gt: ["$createdAt", new Date(now - 7 * 24 * 60 * 60 * 1000)],
+                },
+                1,
+                0,
+              ],
+            },
+          },
           below30Days: {
             $sum: {
               $cond: [
-                { $lte: ["$createdAt", new Date(now - 30 * 24 * 60 * 60 * 1000)] },
+                {
+                  $gt: ["$createdAt", new Date(now - 30 * 24 * 60 * 60 * 1000)],
+                },
                 1,
                 0,
               ],
@@ -1840,8 +2053,18 @@ exports.getComplaintSummaryByZone = async (req, res) => {
               $cond: [
                 {
                   $and: [
-                    { $gt: ["$createdAt", new Date(now - 60 * 24 * 60 * 60 * 1000)] },
-                    { $lte: ["$createdAt", new Date(now - 30 * 24 * 60 * 60 * 1000)] },
+                    {
+                      $gt: [
+                        "$createdAt",
+                        new Date(now - 60 * 24 * 60 * 60 * 1000),
+                      ],
+                    },
+                    {
+                      $lte: [
+                        "$createdAt",
+                        new Date(now - 30 * 24 * 60 * 60 * 1000),
+                      ],
+                    },
                   ],
                 },
                 1,
@@ -1854,8 +2077,18 @@ exports.getComplaintSummaryByZone = async (req, res) => {
               $cond: [
                 {
                   $and: [
-                    { $gt: ["$createdAt", new Date(now - 90 * 24 * 60 * 60 * 1000)] },
-                    { $lte: ["$createdAt", new Date(now - 60 * 24 * 60 * 60 * 1000)] },
+                    {
+                      $gt: [
+                        "$createdAt",
+                        new Date(now - 90 * 24 * 60 * 60 * 1000),
+                      ],
+                    },
+                    {
+                      $lte: [
+                        "$createdAt",
+                        new Date(now - 60 * 24 * 60 * 60 * 1000),
+                      ],
+                    },
                   ],
                 },
                 1,
@@ -1866,7 +2099,12 @@ exports.getComplaintSummaryByZone = async (req, res) => {
           above90Days: {
             $sum: {
               $cond: [
-                { $gt: ["$createdAt", new Date(now - 90 * 24 * 60 * 60 * 1000)] },
+                {
+                  $lte: [
+                    "$createdAt",
+                    new Date(now - 90 * 24 * 60 * 60 * 1000),
+                  ],
+                },
                 1,
                 0,
               ],
@@ -1880,21 +2118,15 @@ exports.getComplaintSummaryByZone = async (req, res) => {
           openingBalance: {
             $sum: {
               $cond: [
-                { $lt: ["$createdAt", new Date(now - 7 * 24 * 60 * 60 * 1000)] },
+                {
+                  $lt: ["$createdAt", new Date(now - 7 * 24 * 60 * 60 * 1000)],
+                },
                 1,
                 0,
               ],
             },
           },
-          duringThisWeek: {
-            $sum: {
-              $cond: [
-                { $gte: ["$createdAt", new Date(now - 7 * 24 * 60 * 60 * 1000)] },
-                1,
-                0,
-              ],
-            },
-          },
+          duringThisWeek: { $sum: "$duringThisWeek" },
           totalPending: { $sum: "$count" },
           below30Days: { $sum: "$below30Days" },
           between30and60Days: { $sum: "$between30and60Days" },
@@ -1924,24 +2156,41 @@ exports.getComplaintSummaryByZone = async (req, res) => {
       },
     ];
 
+    // Run the aggregation pipeline
     const result = await NewGrievanceModel.aggregate(pipeline);
+
+    // Check totals for validation
+    result.forEach((zone) => {
+      const total =
+        zone.below30Days +
+        zone.between30and60Days +
+        zone.between60and90Days +
+        zone.above90Days;
+
+      if (total !== zone.totalPending) {
+        console.warn(
+          `Data mismatch in zone ${zone.zone}: Total Pending (${zone.totalPending}) != Sum of ranges (${total})`
+        );
+      }
+    });
+
+    // Send the result as response
     res.json(result);
   } catch (error) {
     console.error("Error aggregating complaint summary by zone:", error);
-    res.status(500).json({ message: "Error aggregating complaint summary by zone" });
+    res
+      .status(500)
+      .json({ message: "Error aggregating complaint summary by zone" });
   }
 };
-
-
 
 exports.zoneDepartmentGrievances = async (req, res, next) => {
   try {
     const { startDate, endDate, zone } = req.query;
 
-
     const matchConditions = {};
     if (zone) {
-      matchConditions.zone_name = zone; 
+      matchConditions.zone_name = zone;
     }
     if (startDate && endDate) {
       matchConditions.createdAt = {
@@ -1954,15 +2203,15 @@ exports.zoneDepartmentGrievances = async (req, res, next) => {
       { $match: matchConditions },
       {
         $group: {
-          _id: { zone: "$zone_name", department: "$dept_name" }, 
+          _id: { zone: "$zone_name", department: "$dept_name" },
           received: { $sum: 1 },
           closed: { $sum: { $cond: [{ $eq: ["$status", "closed"] }, 1, 0] } },
-          pending: { $sum: { $cond: [{ $ne: ["$status", "closed"] }, 1, 0] } }, 
+          pending: { $sum: { $cond: [{ $ne: ["$status", "closed"] }, 1, 0] } },
         },
       },
       {
         $group: {
-          _id: "$_id.zone", 
+          _id: "$_id.zone",
           departments: {
             $push: {
               department: "$_id.department",
@@ -1985,7 +2234,9 @@ exports.zoneDepartmentGrievances = async (req, res, next) => {
     res.json(grievancesData);
   } catch (error) {
     console.error("Error getting zone and department grievances:", error);
-    res.status(500).json({ message: "Error retrieving zone and department grievances" });
+    res
+      .status(500)
+      .json({ message: "Error retrieving zone and department grievances" });
   }
 };
 
@@ -2008,7 +2259,11 @@ exports.wardDepartmentGrievances = async (req, res, next) => {
       { $match: matchConditions },
       {
         $group: {
-          _id: { zone: "$zone_name", ward: "$ward_name", department: "$dept_name" },
+          _id: {
+            zone: "$zone_name",
+            ward: "$ward_name",
+            department: "$dept_name",
+          },
           received: { $sum: 1 },
           closed: { $sum: { $cond: [{ $eq: ["$status", "closed"] }, 1, 0] } },
           pending: { $sum: { $cond: [{ $ne: ["$status", "closed"] }, 1, 0] } },
@@ -2016,7 +2271,7 @@ exports.wardDepartmentGrievances = async (req, res, next) => {
       },
       {
         $group: {
-          _id: { zone: "$_id.zone", ward: "$_id.ward" }, 
+          _id: { zone: "$_id.zone", ward: "$_id.ward" },
           departments: {
             $push: {
               department: "$_id.department",
@@ -2029,7 +2284,7 @@ exports.wardDepartmentGrievances = async (req, res, next) => {
       },
       {
         $group: {
-          _id: "$_id.zone", 
+          _id: "$_id.zone",
           wards: {
             $push: {
               ward: "$_id.ward",
@@ -2050,7 +2305,9 @@ exports.wardDepartmentGrievances = async (req, res, next) => {
     res.json(grievancesData);
   } catch (error) {
     console.error("Error getting ward and department grievances:", error);
-    res.status(500).json({ message: "Error retrieving ward and department grievances" });
+    res
+      .status(500)
+      .json({ message: "Error retrieving ward and department grievances" });
   }
 };
 
@@ -2080,7 +2337,7 @@ exports.departmentGrievanceCountsDetailed = async (req, res, next) => {
           _id: {
             department: "$dept_name",
             employeeName: "$assign_username",
-            employeeId:"$assign_user",
+            employeeId: "$assign_user",
             zone: "$zone_name",
             ward: "$ward_name",
           },
@@ -2098,7 +2355,7 @@ exports.departmentGrievanceCountsDetailed = async (req, res, next) => {
           _id: 0,
           department: "$_id.department",
           employeeName: "$_id.employeeName",
-          employeeId:"$_id.employeeId",
+          employeeId: "$_id.employeeId",
           zone: "$_id.zone",
           ward: "$_id.ward",
           received: "$received",
