@@ -478,13 +478,11 @@ exports.getNewGrievanceByPhone = async (req, res, next) => {
 exports.getNewGrievanceByPhonewhatsapp = async (req, res, next) => {
   try {
     const { phone } = req.query;
-
     if (phone.startsWith("91")) {
-      phone = phone.slice(2);
-    }
-
+      formatPhone = phone.slice(2);      
+    }  
     const newGrievance =
-      await NewGrievanceService.getNewGrievanceByPhonewhatsapp(phone);
+      await NewGrievanceService.getNewGrievanceByPhonewhatsapp(formatPhone);
 
     if (!newGrievance) {
       return res
