@@ -39,10 +39,10 @@ const NewGrievanceSchema = new Schema(
     isHighlighted: { type: String, default: "no" },
     isReopened:String,
     isEsacalted:String,
-    call_id:{ type: String, default: null },
-    call_duration:{ type: String, default: null },
-    call_recording_url:{ type: String, default: null },
-    receiver_number:{ type: String, default: null },
+    is_call_id:{ type: String, default: '' },
+    is_call_duration:{ type: String, default: '' },
+    is_call_recording_url:{ type: String, default: '' },
+    is_receiver_number:{ type: String, default: '' },
   },
   { timestamps: true }
 );
