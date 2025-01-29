@@ -252,7 +252,7 @@ exports.createNewGrievancewhatsapp = async (req, res, next) => {
     res.status(200).json({
       status: true,
       message: "New grievance created successfully",
-      data: newGrievance,
+      data: newGrievance.grievance_id,
     });
 
     try {
