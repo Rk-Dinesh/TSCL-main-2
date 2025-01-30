@@ -142,12 +142,34 @@ exports.createNewGrievance = async (req, res, next) => {
       data: newGrievance.grievance_id,
     });
 
+    try {
+      const apiResponse = await axios.post(
+        "https://app.kwic.in/api/v1/push?api_key=67973db6a4684146de808250",
+        {
+          mobile_number: `91${phone}`,
+          variable: {
+            resident_name: public_user_name,
+            grievance_id: grievance_id,
+            assign_username: user?.user_name || "Unassigned",
+            assign_userphone: user?.phone || "N/A",
+          },
+          template_id: "complaint_registration",
+        }
+      );
+
+    } catch (apiError) {
+      console.error(
+        "Failed to send WhatsApp notification:",
+        apiError.response?.data || apiError.message
+      );
+    }
+
     if(user){
       try { 
         const apiResponse = await axios.post(
           "https://app.kwic.in/api/v1/push?api_key=67973db6a4684146de808250",
           {
-            mobile_number: `917708209937`,
+            mobile_number: `91${user.phone}`,
             variable: {
               resident_name: public_user_name,
               grievance_id: grievance_id,
