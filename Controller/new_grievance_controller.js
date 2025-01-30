@@ -8,6 +8,7 @@ const ComplaintModel = require("../Models/complaint");
 const GrievanceEscalationModel = require("../Models/grievance_escalation");
 const WardModel = require("../Models/ward");
 const axios = require("axios");
+const AlohaaModel = require("../Models/alohaa");
 
 exports.createNewGrievance = async (req, res, next) => {
   try {
@@ -29,6 +30,7 @@ exports.createNewGrievance = async (req, res, next) => {
       lat,
       operator,
       operator_id,
+      is_call_id,
     } = req.body;
     const grievance_id = await IdcodeServices.generateCode("NewGrievance");
 
@@ -43,6 +45,22 @@ exports.createNewGrievance = async (req, res, next) => {
     });
 
     const assignTime = user ? Date.now() : null;
+
+    let is_call_duration = '';
+    let is_call_recording_url = '';
+    let is_receiver_number = '';
+
+    if (is_call_id) {
+      const callRecord = await AlohaaModel.findOne({ 
+        call_id: is_call_id, 
+        call_status: "answered" 
+      });
+      if (callRecord) {
+        is_call_duration = callRecord.call_duration;
+        is_call_recording_url = callRecord.call_recording_url;
+        is_receiver_number = callRecord.receiver_number;
+      }
+    }
 
     if (user) {
       var newGrievance = await NewGrievanceService.createNewGrievance({
@@ -74,6 +92,10 @@ exports.createNewGrievance = async (req, res, next) => {
         operator_id,
         escaltiontime: complaint_tat.tat_duration,
         escaltiontype: complaint_tat.escalation_type,
+        is_call_id,
+        is_call_duration,
+        is_call_recording_url,
+        is_receiver_number
       });
       const newLog = await GrievanceLogModel.create({
         grievance_id,
@@ -107,6 +129,10 @@ exports.createNewGrievance = async (req, res, next) => {
         operator_id,
         escaltiontime: complaint_tat.tat_duration,
         escaltiontype: complaint_tat.escalation_type,
+        is_call_id,
+        is_call_duration,
+        is_call_recording_url,
+        is_receiver_number
       });
     }
 
@@ -121,7 +147,7 @@ exports.createNewGrievance = async (req, res, next) => {
         const apiResponse = await axios.post(
           "https://app.kwic.in/api/v1/push?api_key=67973db6a4684146de808250",
           {
-            mobile_number: `91${user.phone}`,
+            mobile_number: `917708209937`,
             variable: {
               resident_name: public_user_name,
               grievance_id: grievance_id,

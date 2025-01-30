@@ -5,5 +5,6 @@ const AlohaaController = require('../Controller/alohaa_controller');
 router.post('/incoming', AlohaaController.createAlohaa);
 router.post('/outgoing', AlohaaController.createAlohaa);
 router.get('/lastcall', AlohaaController.getalohaabyagent);
+router.get('/lastuser', AlohaaController.getalohaabyPhone);
 
 module.exports = router;

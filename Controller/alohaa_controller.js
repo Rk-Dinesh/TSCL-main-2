@@ -1,5 +1,6 @@
-const NewGrievanceModel = require('../Models/new_grievance');
-const AlohaaService = require('../Service/alohaa_service')
+const AlohaaModel = require("../Models/alohaa");
+const NewGrievanceModel = require("../Models/new_grievance");
+const AlohaaService = require("../Service/alohaa_service");
 
 exports.createAlohaa = async (req, res, next) => {
   const event = req.body;
@@ -39,12 +40,17 @@ exports.createAlohaa = async (req, res, next) => {
     });
 
     if (call_status === "answered" && call_id) {
-      const grievance = await NewGrievanceModel.findOne({ is_call_id:call_id });
+      const grievance = await NewGrievanceModel.findOne({
+        is_call_id: call_id,
+      });
 
       if (grievance) {
-        grievance.is_call_durationcall_duration = call_duration || grievance.is_call_duration;
-        grievance.is_call_recording_url = call_recording_url || grievance.is_call_recording_url;
-        grievance.is_receiver_number = receiver_number || grievance.is_receiver_number;
+        grievance.is_call_duration =
+          call_duration || grievance.is_call_duration;
+        grievance.is_call_recording_url =
+          call_recording_url || grievance.is_call_recording_url;
+        grievance.is_receiver_number =
+          receiver_number || grievance.is_receiver_number;
         await grievance.save();
       }
     }
@@ -64,7 +70,6 @@ exports.createAlohaa = async (req, res, next) => {
   }
 };
 
-
 exports.getalohaabyagent = async (req, res, next) => {
   try {
     const { receiver_number } = req.query;
@@ -78,39 +83,48 @@ exports.getalohaabyagent = async (req, res, next) => {
     const alohaa = await AlohaaService.getbyAgentPhone(receiver_number);
 
     if (!alohaa || alohaa.length === 0) {
-      return res
-        .status(404)
-        .json({ status: false, message: "Data not found" });
+      return res.status(404).json({ status: false, message: "Data not found" });
     }
 
     const now = new Date();
     const uniqueCalls = {};
     alohaa.forEach((call) => {
-      if (!uniqueCalls[call.call_id] || new Date(call.createdAt) > new Date(uniqueCalls[call.call_id].createdAt)) {
+      if (
+        !uniqueCalls[call.call_id] ||
+        new Date(call.createdAt) > new Date(uniqueCalls[call.call_id].createdAt)
+      ) {
         uniqueCalls[call.call_id] = call;
       }
     });
 
     const recentCalls = Object.values(uniqueCalls);
 
-    const filteredData = recentCalls
-      .slice(-4) 
-      .filter((call) => {
-        const createdAt = new Date(call.createdAt.$date || call.createdAt);
-        const timeDifference = (now - createdAt) / 1000; 
-        return (
-          call.call_status === "notanswered" &&
-          timeDifference <= 45 
-        );
-      });
+    const filteredData = recentCalls.slice(-4).filter((call) => {
+      const createdAt = new Date(call.createdAt.$date || call.createdAt);
+      const timeDifference = (now - createdAt) / 1000;
+      return call.call_status === "notanswered" && timeDifference <= 60;
+    });
 
     if (filteredData.length === 0) {
       return res
         .status(404)
         .json({ status: false, message: "No missed calls found" });
     }
-    const lastCallerNumber = filteredData[filteredData.length - 1].caller_number;
+    const lastCallerNumber =
+      filteredData[filteredData.length - 1].caller_number;
     const call_id = filteredData[filteredData.length - 1].call_id;
+
+    const find_call_id = await AlohaaModel.findOne({ 
+      call_id: call_id, 
+      call_status: "answered" 
+    });
+    
+    if (find_call_id) {
+      return res.status(404).json({
+        status: false,
+        message: "No missed call found",
+      });
+    }
 
     res.status(200).json({
       status: true,
@@ -118,6 +132,77 @@ exports.getalohaabyagent = async (req, res, next) => {
       data: {
         lastCallerNumber,
         call_id,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getalohaabyPhone = async (req, res, next) => {
+  try {
+    const { caller_number } = req.query;
+
+    if (!caller_number) {
+      return res
+        .status(400)
+        .json({ status: false, message: "Caller number is required" });
+    }
+
+    const alohaa = await AlohaaService.getbyCallerPhone(caller_number);
+
+    if (!alohaa || alohaa.length === 0) {
+      return res.status(404).json({ status: false, message: "Data not found" });
+    }
+
+    const now = new Date();
+    const uniqueCalls = {};
+    alohaa.forEach((call) => {
+      if (
+        !uniqueCalls[call.call_id] ||
+        new Date(call.createdAt) > new Date(uniqueCalls[call.call_id].createdAt)
+      ) {
+        uniqueCalls[call.call_id] = call;
+      }
+    });
+
+    const recentCalls = Object.values(uniqueCalls);
+
+    const filteredData = recentCalls.slice(-4).filter((call) => {
+      const createdAt = new Date(call.createdAt.$date || call.createdAt);
+      const timeDifference = (now - createdAt) / 1000;
+      return call.call_status === "notanswered" && timeDifference <= 60;
+    });
+
+    if (filteredData.length === 0) {
+      return res
+        .status(404)
+        .json({ status: false, message: "No missed calls found" });
+    }
+    const lastCallerNumber =
+      filteredData[filteredData.length - 1].caller_number;
+    const call_id = filteredData[filteredData.length - 1].call_id;
+    const agentNumber = filteredData[filteredData.length - 1].receiver_number;
+
+    const find_call_id = await AlohaaModel.findOne({ 
+      call_id: call_id, 
+      call_status: "answered" 
+    });
+    
+    if (find_call_id) {
+      return res.status(404).json({
+        status: false,
+        message: "No missed call found",
+      });
+    }
+
+    res.status(200).json({
+      status: true,
+      message: "Last missed call retrieved successfully",
+      data: {
+        lastCallerNumber,
+        call_id,
+        agentNumber
       },
     });
   } catch (error) {

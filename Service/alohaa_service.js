@@ -10,3 +10,9 @@ exports.getbyAgentPhone = async (receiver_number) => {
         receiver_number,
     });
   };
+
+  exports.getbyCallerPhone = async (caller_number) => {
+    return await AlohaaModel.find({
+        caller_number,
+    });
+  };
