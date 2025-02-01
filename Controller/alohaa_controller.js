@@ -209,3 +209,61 @@ exports.getalohaabyPhone = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.getalohaaMissedCall = async (req, res, next) => {
+  try {
+    const { receiver_number } = req.query;
+
+    if (!receiver_number) {
+      return res.status(400).json({ status: false, message: "Receiver number is required" });
+    }
+
+    const alohaa = await AlohaaService.getbyAgentPhone(receiver_number);
+
+    if (!alohaa || alohaa.length === 0) {
+      return res.status(404).json({ status: false, message: "Data not found" });
+    }
+
+    const callMap = new Map();
+    
+    for (const call of alohaa) {
+      const { call_id, call_status } = call;
+
+      if (!callMap.has(call_id)) {
+        callMap.set(call_id, []);
+      }
+
+      callMap.get(call_id).push(call_status);
+    }
+
+    const validCallIds = new Set();
+    
+    for (const [call_id, statuses] of callMap.entries()) {
+      if (statuses.includes("notanswered") && !statuses.includes("answered")) {
+        validCallIds.add(call_id);
+      }
+    }
+
+    const filteredData = [];
+    const seenCallIds = new Set();
+
+    for (const call of alohaa.reverse()) {
+      if (call.call_status === "notanswered" && validCallIds.has(call.call_id)) {
+        if (!seenCallIds.has(call.call_id)) {
+          filteredData.push(call);
+          seenCallIds.add(call.call_id);
+        }
+      }
+    }
+
+    res.status(200).json({
+      status: true,
+      message: "Missed calls retrieved successfully",
+      data: filteredData
+    });
+
+  } catch (error) {
+    next(error);
+  }
+};
+
