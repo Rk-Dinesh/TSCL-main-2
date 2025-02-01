@@ -224,10 +224,15 @@ exports.getalohaaMissedCall = async (req, res, next) => {
       return res.status(404).json({ status: false, message: "Data not found" });
     }
 
+    const tenDaysAgo = new Date();
+    tenDaysAgo.setDate(tenDaysAgo.getDate() - 10);
+
     const callMap = new Map();
     
     for (const call of alohaa) {
-      const { call_id, call_status } = call;
+      const { call_id, call_status, received_at } = call;
+
+      if (new Date(received_at) < tenDaysAgo) continue;
 
       if (!callMap.has(call_id)) {
         callMap.set(call_id, []);
@@ -247,7 +252,7 @@ exports.getalohaaMissedCall = async (req, res, next) => {
     const filteredData = [];
     const seenCallIds = new Set();
 
-    for (const call of alohaa.reverse()) {
+    for (const call of alohaa.reverse()) { 
       if (call.call_status === "notanswered" && validCallIds.has(call.call_id)) {
         if (!seenCallIds.has(call.call_id)) {
           filteredData.push(call);
@@ -266,4 +271,5 @@ exports.getalohaaMissedCall = async (req, res, next) => {
     next(error);
   }
 };
+
 
