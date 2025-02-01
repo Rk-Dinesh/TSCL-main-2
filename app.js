@@ -32,6 +32,7 @@ const translateRouter = require('./Router/translate_router');
 const templateRouter = require('./Router/template_router');
 const resourceRouter = require('./Router/enquiry_router');
 const alohaaRouter = require('./Router/alohaa_router');
+const alohaagentRouter = require('./Router/alohaa_agent_router');
 const { checkEscalation } = require('./Controller/grievance_escalation_controller');
 
 
@@ -75,6 +76,7 @@ app.use('/translate', translateRouter);
 app.use('/template',templateRouter);
 app.use('/resource',resourceRouter);
 app.use('/alohaa',alohaaRouter);
+app.use('/alohaagent',alohaagentRouter);
 
 app.use((err, req, res, next) => {
   if (err.code === 'LIMIT_FILE_COUNT') {
