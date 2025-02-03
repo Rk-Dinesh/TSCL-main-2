@@ -1163,6 +1163,38 @@ exports.filterGrievances = async (req, res, next) => {
   }
 };
 
+exports.filterReports = async (req, res, next) => {
+  try {
+    const { zone_name, ward_name, dept_name, complaint,assign_user,exclude_closed,isEsacalted,isReopened } = req.query;
+    
+    const filter = {};
+
+    if (zone_name) filter.zone_name = zone_name;
+    if (ward_name) filter.ward_name = ward_name
+    if (dept_name) filter.dept_name = dept_name;
+    if (complaint) filter.complaint = complaint;
+    if( assign_user) filter.assign_user = assign_user;
+    if (isEsacalted) filter.isEsacalted = isEsacalted;
+    if (isReopened) filter.isReopened = isReopened;
+    if (exclude_closed === "true") {
+      filter.status = { $nin: ["closed", "Closed", "CLOSE", "CLOSED"] };
+    }
+    if (exclude_closed === "false") {
+      filter.status = { $in: ["closed", "Closed", "CLOSE", "CLOSED"] };
+    }
+
+    const grievances = await NewGrievanceService.filterReports(filter);
+    
+    res.status(200).json({
+      status: true,
+      message: "New grievance Filtered successfully",
+      data: grievances,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // List wards with grievance count in descending order
 exports.wardGrievanceCounts = async (req, res, next) => {
   try {

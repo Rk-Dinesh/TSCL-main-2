@@ -28,6 +28,7 @@ router.delete('/delete',verifyToken, newGrievanceController.deleteNewGrievanceBy
 router.post('/updatemanyassign', newGrievanceController.UpdateManyAssign);
 router.post('/updatemanytransfer', newGrievanceController.UpdateManyTransfer);
 router.get('/filter',verifyToken, newGrievanceController.filterGrievances);
+router.get('/reports', newGrievanceController.filterReports);
 
 router.get('/ward-grievance-counts', newGrievanceController.wardGrievanceCounts);
 router.get('/frequent-complainants-by-wardall', newGrievanceController.frequentComplainantsByWardAll);

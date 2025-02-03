@@ -111,6 +111,10 @@ exports.filterGrievances = async (filter) => {
     return await NewGrievanceModel.find(filter,'createdAt grievance_id status complaint_details complaint dept_name grievance_mode');
   };  
 
+  exports.filterReports = async (filter) => {
+    return await NewGrievanceModel.find(filter,'createdAt grievance_id status complaint_details complaint dept_name grievance_mode zone_name ward_name public_user_name priority');
+  };
+
 
   exports.getGrievanceBynotClosed = async () => {
     return await NewGrievanceModel.find({
