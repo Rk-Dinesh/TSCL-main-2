@@ -10,6 +10,7 @@ router.get('/getbyid',verifyToken, newGrievanceController.getNewGrievanceById);
 router.get('/getbyidwhatsapp', newGrievanceController.getNewGrievanceByIdwhatsapp);
 router.get('/getbyphone',verifyToken, newGrievanceController.getNewGrievanceByPhone);
 router.get('/getbyphonewhatsapp', newGrievanceController.getNewGrievanceByPhonewhatsapp);
+router.get('/getbyphoneEngineerwhatsapp', newGrievanceController.getNewGrievanceByEngineerPhonewhatsapp);
 router.get('/getbyuseridfull',verifyToken, newGrievanceController.getGrievanceByUserIdfull);
 router.get('/getbyuserid',verifyToken, newGrievanceController.getGrievanceByUserId);
 router.get('/getbyidstatus',verifyToken, newGrievanceController.getGrievanceByUstatusClosedID);
@@ -19,6 +20,7 @@ router.get('/getbyoperator',verifyToken, newGrievanceController.getGrievanceByOp
 router.post('/notify',verifyToken, newGrievanceController.updateEscalationNotify);
 router.post('/notifyread',verifyToken, newGrievanceController.updateEscalationNotifyRead);
 router.post('/worksheetJE',verifyToken, newGrievanceController.updateworksheetJE);
+router.post('/closeComplaintwhatsapp', newGrievanceController.updateworksheetJEwhatsapp);
 router.post('/reopen',verifyToken, newGrievanceController.ReopenTicket);
 router.post('/highlight',verifyToken, newGrievanceController.Highlighted);
 router.post('/updatestatus', newGrievanceController.updateStatus);

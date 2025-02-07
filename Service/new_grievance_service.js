@@ -39,6 +39,20 @@ exports.getNewGrievanceByPhonewhatsapp = async (phone) => {
   }
 };
 
+exports.getNewGrievanceByEngineerPhonewhatsapp = async (assign_userphone) => {
+  try {
+    const grievances = await NewGrievanceModel.find({ assign_userphone })
+      .sort({ _id: -1 })
+      .limit(12)
+      .select("grievance_id -_id"); 
+
+    return grievances
+  } catch (error) {
+    console.error("Error fetching grievances:", error);
+    throw error; 
+  }
+};
+
 exports.getGrievanceByUserIdfull = async (public_user_id) => {
   return await NewGrievanceModel.find({
     public_user_id,

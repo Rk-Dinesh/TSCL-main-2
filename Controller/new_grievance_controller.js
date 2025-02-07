@@ -9,6 +9,7 @@ const GrievanceEscalationModel = require("../Models/grievance_escalation");
 const WardModel = require("../Models/ward");
 const axios = require("axios");
 const AlohaaModel = require("../Models/alohaa");
+const GrievanceWorksheetModel = require("../Models/grievance_worksheet");
 
 exports.createNewGrievance = async (req, res, next) => {
   try {
@@ -562,6 +563,45 @@ exports.getNewGrievanceByPhonewhatsapp = async (req, res, next) => {
   }
 };
 
+exports.getNewGrievanceByEngineerPhonewhatsapp = async (req, res, next) => {
+  try {
+    const { assign_userphone } = req.query;
+    if (assign_userphone.startsWith("91")) {
+      formatPhone = assign_userphone.slice(2);      
+    }  
+    const newGrievance =
+      await NewGrievanceService.getNewGrievanceByEngineerPhonewhatsapp(formatPhone);
+
+    if (!newGrievance) {
+      return res
+        .status(404)
+        .json({ status: false, message: "New grievance not found" });
+    }
+
+    if (Array.isArray(newGrievance) && newGrievance.length === 0) {
+      return res
+        .status(400)
+        .json({ status: false, message: "No grievances found for this phone number" });
+    }
+
+    const grievanceIds = newGrievance
+      .map((grievance) => grievance.grievance_id)
+      .join(",");
+
+    // const grievanceIds = newGrievance
+    //   .map((grievance, index) => `${index + 1}. ${grievance.grievance_id}`)
+    //   .join(", ");
+
+    res.status(200).json({
+      status: true,
+      message: "New grievance retrieved successfully",
+      data: grievanceIds,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.getGrievanceByUserIdfull = async (req, res, next) => {
   try {
     const { public_user_id } = req.query;
@@ -857,6 +897,54 @@ exports.updateworksheetJE = async (req, res, next) => {
     newGrievance.isHighlighted = "no";
 
     await newGrievance.save();
+    return res.status(200).json({
+      status: true,
+      message: "worksheet_JE updated successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.updateworksheetJEwhatsapp = async (req, res, next) => {
+  try {
+    const { grievance_id } = req.query;
+    const { worksheet_JE } = req.body;
+
+    const newGrievance = await NewGrievanceService.getNewGrievanceById(
+      grievance_id
+    );
+    if (!newGrievance) {
+      return res
+        .status(404)
+        .json({ status: false, message: "Grievance not found" });
+    }
+
+    newGrievance.worksheet_JE = worksheet_JE;
+    newGrievance.isEsacalted = "no";
+    newGrievance.ticketclosedtime = new Date();
+    newGrievance.isHighlighted = "no";
+    newGrievance.status = "closed"
+
+    await newGrievance.save();
+
+    const grievanceWorksheetData = {
+      worksheet_name: `WorkSheet given by ${newGrievance.assign_username}: ${worksheet_JE}`,
+      grievance_id: grievance_id,
+      created_by_user: ` ${newGrievance.assign_username}`, 
+    };
+
+    await GrievanceWorksheetModel.create(grievanceWorksheetData);
+
+    const grievanclogData = {
+      log_details: `WorkSheet given by ${newGrievance.assign_username}: ${worksheet_JE}`,
+      grievance_id: grievance_id,
+      created_by_user: ` ${newGrievance.assign_username}`, 
+    };
+
+    await GrievanceLogModel.create(grievanclogData);
+
+
     return res.status(200).json({
       status: true,
       message: "worksheet_JE updated successfully",
