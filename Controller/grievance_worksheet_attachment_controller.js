@@ -1,11 +1,12 @@
 const GrievanceWorksheetAttachmentService = require('../Service/grievance_worksheet_attachment_service');
-
 const crypto = require("crypto");
 const {  gfs1 } = require('../Config/db');
 const fs = require("fs");
 const mongoose = require("mongoose");
 const encryptData = require('../encryptedData');
 const GrievanceWorksheetAttachmentModel = require('../Models/grievance_worksheet_attachment');
+const NewGrievanceModel = require('../Models/new_grievance');
+const { default: axios } = require('axios');
 
 
   exports.uploadFiles = async (req, res) => {
@@ -44,6 +45,47 @@ const GrievanceWorksheetAttachmentModel = require('../Models/grievance_worksheet
       }
   
       res.status(200).json(attachments);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Failed to upload files" });
+    }
+  };
+  exports.uploadFilesWhatsapp = async (req, res) => {
+    try {
+      const fileUrl = req.body.file_url;
+      const grievance_id = req.body.grievance_id;
+    
+      const grievance = await NewGrievanceModel.findOne({grievance_id});
+      if (!grievance) {
+        return res.status(404).json({ message: "Grievance  not found" });
+      }
+      const username = grievance.assign_username; 
+      const response = await axios.get(fileUrl, { responseType: 'stream' });
+      console.log(response);
+      
+      const randomName = crypto.randomBytes(10).toString("hex");
+      const writeStream = gfs1.openUploadStream(randomName, {
+        _id: new mongoose.Types.ObjectId(),
+      });
+
+      response.data.pipe(writeStream);
+
+      const attachment = new GrievanceWorksheetAttachmentModel({
+        grievance_id,
+        created_by_user: username, 
+        attachment_id: writeStream.id,
+        attachment: randomName,
+      });  
+      await attachment.save();
+      writeStream.on('finish', async () => {
+        res.status(200).json(attachment);
+      });
+  
+      writeStream.on('error', (error) => {
+        console.error(error);
+        res.status(500).json({ message: "Failed to upload file" });
+      });
+  
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Failed to upload files" });

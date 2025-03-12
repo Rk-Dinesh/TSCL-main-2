@@ -66,10 +66,6 @@ router.get('/getbydeptclosed',verifyToken, newGrievanceController.getGrievanceBy
 
 router.get('/getbyassignnotclosed',verifyToken, newGrievanceController.getGrievanceByAssignnotClosed);
 router.get('/getbyassignclosed',verifyToken, newGrievanceController.getGrievanceByAssignClosed);
-
-
-
-
 module.exports = router;
 
 

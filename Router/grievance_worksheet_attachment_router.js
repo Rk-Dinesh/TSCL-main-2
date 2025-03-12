@@ -12,6 +12,7 @@ const upload = multer({
   });
   
 router.post('/post', upload.array("files", 5), grievanceWorksheetAttachmentController.uploadFiles);
+router.post('/postwhatsapp', grievanceWorksheetAttachmentController.uploadFilesWhatsapp);
 router.get('/file/:filename', grievanceWorksheetAttachmentController.getFile);
 router.get('/getattachments', grievanceWorksheetAttachmentController.getAttachments);
 module.exports = router;
