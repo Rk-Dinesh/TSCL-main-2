@@ -37,6 +37,7 @@ router.get('/frequent-complainants-by-wardall', newGrievanceController.frequentC
 router.get('/frequent-complainants-by-ward', newGrievanceController.frequentComplainantsByWard);
 router.get('/top-grievances-by-public-name', newGrievanceController.topGrievancesByPublicName);
 router.get('/grievancecounts', newGrievanceController.getGrievanceCounts);
+router.get('/grievancecountsbyid', newGrievanceController.getGrievanceCountsbyuserId);
 router.get('/prioritycounts', newGrievanceController.PriorityCounts);
 router.get('/locationZone', newGrievanceController.TopGrievancesByLocation);
 router.get('/complaintcount', newGrievanceController.TopGrievancescomplaint);
@@ -45,6 +46,7 @@ router.get('/averageresolution', newGrievanceController.AverageResolutionTimeByE
 router.get('/beforeescalation', newGrievanceController.PercentageOfGrievancesResolvedWithinSpecifiedPeriodByDepartmentAndComplaintType);
 router.get('/afterescalation', newGrievanceController.PercentageOfGrievancesEscalatedToHigherAuthorities);
 router.get('/compartiveanalysis', newGrievanceController.ComparativeAnalysis);
+router.get('/departmentonlyGrievanceCounts',newGrievanceController.departmentonlyGrievanceCounts);
 router.get('/departmentGrievanceCounts', newGrievanceController.departmentGrievanceCounts);
 router.get('/departmentcomplaintGrievanceCounts', newGrievanceController.departmentcomplaintGrievanceCounts);
 router.get('/zoneDepartmentGrievances', newGrievanceController.zoneDepartmentGrievances);

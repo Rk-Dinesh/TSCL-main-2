@@ -5,9 +5,19 @@ exports.createNewGrievance = async (newGrievanceData) => {
     return await newGrievance.save();
 };
 
-exports.getAllNewGrievances = async () => {
-    return await NewGrievanceModel.find();
+// exports.getAllNewGrievances = async () => {
+//     return await NewGrievanceModel.find();
+// };
+
+exports.getAllNewGrievances = async (assign_user = null) => {
+  const query = {};
+  if (assign_user) {
+    query.assign_user = assign_user;
+  }
+
+  return await NewGrievanceModel.find(query);
 };
+
 exports.getNewGrievanceById = async (grievance_id) => {
     return await NewGrievanceModel.findOne({ grievance_id });
 };
@@ -130,24 +140,57 @@ exports.filterGrievances = async (filter) => {
   };
 
 
-  exports.getGrievanceBynotClosed = async () => {
-    return await NewGrievanceModel.find({
-      status: { $nin: ['closed', 'Closed', 'CLOSE', 'CLOSED'] }
-    });
+  // exports.getGrievanceBynotClosed = async () => {
+  //   return await NewGrievanceModel.find({
+  //     status: { $nin: ['closed', 'Closed', 'CLOSE', 'CLOSED'] }
+  //   });
+  // };
+
+  exports.getGrievanceBynotClosed = async (assign_user = null) => {
+    const query = {
+      status: { $nin: ['closed', 'Closed', 'CLOSE', 'CLOSED'] }, 
+    };
+    if (assign_user) {
+      query.assign_user = assign_user;
+    }
+    return await NewGrievanceModel.find(query);
   };
 
-  exports.getGrievanceByClosed = async () => {
-    return await NewGrievanceModel.find({
-      status: { $in: ['closed', 'Closed', 'CLOSE', 'CLOSED'] }
-    })
+  // exports.getGrievanceByClosed = async () => {
+  //   return await NewGrievanceModel.find({
+  //     status: { $in: ['closed', 'Closed', 'CLOSE', 'CLOSED'] }
+  //   })
+  //   .sort({ createdAt: -1 }) 
+  //   .limit(1500); 
+  // };
+
+  exports.getGrievanceByClosed = async (assign_user = null) => {
+    const query = {
+      status: { $in: ['closed', 'Closed', 'CLOSE', 'CLOSED'] }, 
+    };
+    if (assign_user) {
+      query.assign_user = assign_user;
+    }
+    return await NewGrievanceModel.find(query)
     .sort({ createdAt: -1 }) 
     .limit(1500); 
   };
 
-  exports.getGrievanceBySeverityHigh = async () => {
-    return await NewGrievanceModel.find({
-      priority:'High'
-    });
+  // exports.getGrievanceBySeverityHigh = async () => {
+  //   return await NewGrievanceModel.find({
+  //     priority:'High'
+  //   });
+  // };
+
+  exports.getGrievanceBySeverityHigh = async (assign_user = null) => {
+    const query = {
+      priority: 'High', 
+    };
+    if (assign_user) {
+      query.assign_user = assign_user;
+    }
+  
+    return await NewGrievanceModel.find(query);
   };
 
   exports.getGrievanceBySeverityLow = async () => {
@@ -162,10 +205,20 @@ exports.filterGrievances = async (filter) => {
     });
   };
 
-  exports.getGrievanceByReopen = async () => {
-    return await NewGrievanceModel.find({
-      status:'Re-opened'
-    });
+  // exports.getGrievanceByReopen = async () => {
+  //   return await NewGrievanceModel.find({
+  //     status:'Re-opened'
+  //   });
+  // };
+
+  exports.getGrievanceByReopen = async (assign_user = null) => {
+    const query = {
+      status: 'Re-opened', 
+    };
+    if (assign_user) {
+      query.assign_user = assign_user;
+    }
+    return await NewGrievanceModel.find(query);
   };
 
   exports.getGrievanceByIsReopen = async () => {

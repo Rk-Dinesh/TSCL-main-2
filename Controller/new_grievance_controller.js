@@ -448,11 +448,14 @@ exports.updateGrievance = async (req, res) => {
 
 exports.getAllNewGrievances = async (req, res, next) => {
   try {
-    const newGrievances = await NewGrievanceService.getAllNewGrievances();
+    const { assign_user } = req.query;
+    const newGrievances = await NewGrievanceService.getAllNewGrievances(assign_user);
     const encryptedData = encryptData(newGrievances);
     res.status(200).json({
       status: true,
-      message: "New grievances retrieved successfully",
+      message: assign_user
+      ? "New grievances filtered by assign_user retrieved successfully"
+      : "All new grievances retrieved successfully",
       data: encryptedData,
     });
   } catch (error) {
@@ -1507,9 +1510,81 @@ exports.getGrievanceCounts = async (req, res, next) => {
   }
 };
 
+exports.getGrievanceCountsbyuserId = async (req, res, next) => {
+  try {
+    const { user_id } = req.query; // Extract user_id from query parameters
+
+    if (!user_id) {
+      return res.status(400).json({ message: "user_id is required" });
+    }
+
+    const counts = await NewGrievanceModel.aggregate([
+      {
+        $match: { assign_user: user_id }, // Filter documents by user_id
+      },
+      {
+        $facet: {
+          totalGrievances: [{ $count: "total" }],
+          resolvedGrievances: [
+            {
+              $match: {
+                status: { $in: ["closed", "Closed", "CLOSED", "CLOSE"] },
+              },
+            },
+            { $count: "resolved" },
+          ],
+          pendingGrievances: [
+            {
+              $match: {
+                status: {
+                  $not: { $in: ["closed", "Closed", "CLOSED", "CLOSE"] },
+                },
+              },
+            },
+            { $count: "pending" },
+          ],
+          escalatedGrievances: [
+            { $match: { escalation_level: { $exists: true } } },
+            { $count: "escalated" },
+          ],
+          highPriorityGrievances: [
+            { $match: { priority: "High" } },
+            { $count: "highPriority" },
+          ],
+          reopendGrievances: [
+            { $match: { isReopened: "yes" } },
+            { $count: "reopen" },
+          ],
+        },
+      },
+    ]);
+
+    // If no grievances are found for the user_id, ensure counts are returned as 0
+    const result = counts[0];
+    const formattedResult = {
+      totalGrievances: result.totalGrievances[0]?.total || 0,
+      resolvedGrievances: result.resolvedGrievances[0]?.resolved || 0,
+      pendingGrievances: result.pendingGrievances[0]?.pending || 0,
+      escalatedGrievances: result.escalatedGrievances[0]?.escalated || 0,
+      highPriorityGrievances: result.highPriorityGrievances[0]?.highPriority || 0,
+      reopendGrievances: result.reopendGrievances[0]?.reopen || 0,
+    };
+
+    res.json(counts[0]);
+  } catch (error) {
+    console.error("Error getting grievance counts:", error);
+    res.status(500).json({ message: "Error retrieving grievance counts" });
+  }
+};
+
 exports.PriorityCounts = async (req, res, next) => {
+  const {assign_user} = req.query;
   try {
     const priorityCounts = await NewGrievanceModel.aggregate([
+      ...(assign_user
+        ? [{ $match: { assign_user: assign_user } }]
+        : [] 
+      ),
       {
         $group: {
           _id: "$priority",
@@ -1532,8 +1607,13 @@ exports.PriorityCounts = async (req, res, next) => {
 };
 
 exports.TopGrievancesByLocation = async (req, res, next) => {
+  const {assign_user} = req.query;
   try {
     const topGrievancesByLocation = await NewGrievanceModel.aggregate([
+      ...(assign_user
+        ? [{ $match: { assign_user: assign_user } }]
+        : [] 
+      ),
       {
         $group: {
           _id: "$zone_name",
@@ -1562,8 +1642,14 @@ exports.TopGrievancesByLocation = async (req, res, next) => {
 };
 
 exports.TopGrievancescomplaint = async (req, res, next) => {
+
   try {
+    const {assign_user} = req.query;
     const topGrievancesByComplaint = await NewGrievanceModel.aggregate([
+      ...(assign_user
+        ? [{ $match: { assign_user: assign_user } }]
+        : [] 
+      ),
       {
         $group: {
           _id: "$complaint",
@@ -1911,11 +1997,14 @@ exports.ComparativeAnalysis = async (req, res, next) => {
 
 exports.getGrievanceBynotClosed = async (req, res, next) => {
   try {
-    const newGrievances = await NewGrievanceService.getGrievanceBynotClosed();
+    const { assign_user } = req.query;
+    const newGrievances = await NewGrievanceService.getGrievanceBynotClosed(assign_user);
     const encryptedData = encryptData(newGrievances);
     res.status(200).json({
       status: true,
-      message: "New grievances Not closed retrieved successfully",
+      message: assign_user
+      ? "New grievances (Not Closed) filtered by assign_user retrieved successfully"
+      : "New grievances (Not Closed) retrieved successfully",
       data: encryptedData,
     });
   } catch (error) {
@@ -1925,11 +2014,14 @@ exports.getGrievanceBynotClosed = async (req, res, next) => {
 
 exports.getGrievanceByClosed = async (req, res, next) => {
   try {
-    const newGrievances = await NewGrievanceService.getGrievanceByClosed();
+    const { assign_user } = req.query;
+    const newGrievances = await NewGrievanceService.getGrievanceByClosed(assign_user);
     const encryptedData = encryptData(newGrievances);
     res.status(200).json({
       status: true,
-      message: "New grievances Closed retrieved successfully",
+      message: assign_user
+      ? "New grievances filtered by assign_user retrieved successfully"
+      : "New grievances retrieved successfully",
       data: encryptedData,
     });
   } catch (error) {
@@ -1939,12 +2031,15 @@ exports.getGrievanceByClosed = async (req, res, next) => {
 
 exports.getGrievanceBySeverityHigh = async (req, res, next) => {
   try {
+    const { assign_user } = req.query;
     const newGrievances =
-      await NewGrievanceService.getGrievanceBySeverityHigh();
+      await NewGrievanceService.getGrievanceBySeverityHigh(assign_user);
     const encryptedData = encryptData(newGrievances);
     res.status(200).json({
       status: true,
-      message: "New grievances High retrieved successfully",
+      message: assign_user
+      ? "New grievances (High Severity) filtered by assign_user retrieved successfully"
+      : "New grievances (High Severity) retrieved successfully",
       data: encryptedData,
     });
   } catch (error) {
@@ -1983,11 +2078,14 @@ exports.getGrievanceBySeverityLow = async (req, res, next) => {
 
 exports.getGrievanceByReopen = async (req, res, next) => {
   try {
-    const newGrievances = await NewGrievanceService.getGrievanceByReopen();
+    const { assign_user } = req.query;
+    const newGrievances = await NewGrievanceService.getGrievanceByReopen(assign_user);
     const encryptedData = encryptData(newGrievances);
     res.status(200).json({
       status: true,
-      message: "New grievances Reopen retrieved successfully",
+      message: assign_user
+      ? "New grievances (Re-opened) filtered by assign_user retrieved successfully"
+      : "New grievances (Re-opened) retrieved successfully",
       data: encryptedData,
     });
   } catch (error) {
@@ -2114,6 +2212,41 @@ exports.departmentGrievanceCounts = async (req, res, next) => {
     res
       .status(500)
       .json({ message: "Error retrieving department grievance counts" });
+  }
+};
+
+exports.departmentonlyGrievanceCounts = async (req, res, next) => {
+  
+  try {
+    const { assign_user } = req.query;
+
+    const grievanceCounts = await NewGrievanceModel.aggregate([
+      ...(assign_user
+        ? [{ $match: { assign_user: assign_user } }]
+        : [] 
+      ),
+      {
+        $group: {
+          _id: "$dept_name", 
+          count: { $sum: 1 }, 
+        },
+      },
+      {
+        $project: {
+          _id: 0, 
+          department: "$_id", 
+          count: 1,
+        },
+      },
+    ]);
+    res.json({
+      status: true,
+      message: "New grievances Reopen retrieved successfully",
+      data: grievanceCounts,
+    });
+  } catch (error) {
+    console.error("Error getting department grievance counts:", error);
+    res.status(500).json({ message: "Error retrieving department grievance counts" });
   }
 };
 

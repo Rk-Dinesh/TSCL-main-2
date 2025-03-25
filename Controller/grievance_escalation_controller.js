@@ -301,8 +301,9 @@ exports.checkEscalation = async () => {
 
 exports.getAllGrievanceEscalations = async (req, res, next) => {
   try {
+    const { escalated_userid } = req.query;
     const grievanceEscalations =
-      await GrievanceEscalationService.getAllGrievanceEscalations();
+      await GrievanceEscalationService.getAllGrievanceEscalations(escalated_userid);
       const encryptedData = encryptData(grievanceEscalations)
     res.status(200).json({
       status: true,
