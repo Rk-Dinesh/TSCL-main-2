@@ -11,6 +11,32 @@ exports.getAllStreets = async () => {
     return await StreetModel.find();
 };
 
+
+exports.getAllStreetsLimit = async (page, limit, searchValue) => {
+    const skip = (page - 1) * limit;
+
+    const query = searchValue
+        ? {
+              $or: [
+                  { street_name: { $regex: searchValue, $options: "i" } },
+                  { ward_name: { $regex: searchValue, $options: "i" } },
+                  { zone_name: { $regex: searchValue, $options: "i" } },
+                  { status: { $regex: searchValue, $options: "i" } },
+              ],
+          }
+        : {};
+
+    // Fetch paginated data
+    const streets = await StreetModel.find(query)
+        .skip(skip)
+        .limit(limit);
+
+    // Fetch total count of matching documents for pagination metadata
+    const totalCount = await StreetModel.countDocuments(query);
+
+    return { streets, totalCount };
+};
+
 exports.getActiveStreets = async () => {
     return await StreetModel.find({status:'active'});
 };

@@ -16,6 +16,7 @@ const upload = multer({ storage: storage });
 
 router.post('/post',verifyToken, streetController.createStreet);
 router.get('/get',verifyToken, streetController.getAllStreets);
+router.get('/getlimit',verifyToken, streetController.getAllStreetsLimit);
 router.get('/getactive',verifyToken, streetController.getActiveStreets);
 router.get('/getward',verifyToken, streetController.getWardByWardName);
 router.get('/getwardguest', streetController.getWardByWardNameGuest);

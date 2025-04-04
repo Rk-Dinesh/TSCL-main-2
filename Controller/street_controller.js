@@ -4,6 +4,7 @@ const encryptData = require('../encryptedData');
 const csvParser = require('csv-parser');
 const fs = require('fs');
 const path = require('path');
+const StreetModel = require('../Models/street');
 
 exports.createStreet = async (req, res, next) => {
     try {
@@ -29,6 +30,34 @@ exports.getAllStreets = async (req, res, next) => {
             status: true,
             message: "Streets retrieved successfully",
             data: encryptedData
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+exports.getAllStreetsLimit = async (req, res, next) => {
+    try {
+        const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
+        const limit = parseInt(req.query.limit) || 10; // Default to 10 items per page
+        const searchValue = req.query.search || ""; // Default to empty string if not provided
+
+        // Fetch data from the service
+        const { streets, totalCount } = await StreetService.getAllStreetsLimit(page, limit, searchValue);
+
+        // Encrypt the data
+        const encryptedData = encryptData(streets);
+
+        // Send the response
+        res.status(200).json({
+            status: true,
+            message: "Streets retrieved successfully",
+            data: encryptedData,
+            metadata: {
+                currentPage: page,
+                totalPages: Math.ceil(totalCount / limit),
+                totalItems: totalCount,
+            },
         });
     } catch (error) {
         next(error);
